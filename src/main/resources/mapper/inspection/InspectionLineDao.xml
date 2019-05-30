@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.inspection.dao.InspectionLineDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.inspection.entity.InspectionLineEntity" id="inspectionLineMap">
+        <result property="id" column="id"/>
+        <result property="guid" column="guid"/>
+        <result property="name" column="name"/>
+        <result property="type" column="type"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="periodType" column="period_type"/>
+        <result property="remark" column="remark"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="orderNum" column="order_num"/>
+    </resultMap>
+
+    <select id="selectByDept" resultType="java.util.HashMap" parameterType="java.lang.Long">
+		select id, name as lable, '' as code, 'line' as type from tb_inspection_line where dept_id = #{deptId}
+	</select>
+
+    <select id="selectByMac" resultType="io.renren.modules.inspection.entity.InspectionLineEntity" parameterType="io.renren.modules.inspection.entity.InspectionLineEntity">
+		select DISTINCT l.* from tb_inspection_line l
+        left join tb_inspection_line_publish p on p.line_id=l.id
+        left join tb_pda pda on pda.pda_id=p.pda_id
+        where l.is_publish=1 and pda.pda_mac=#{mac}
+	</select>
+
+</mapper>

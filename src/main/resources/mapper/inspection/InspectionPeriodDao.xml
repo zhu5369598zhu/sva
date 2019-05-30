@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.inspection.dao.InspectionPeriodDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.inspection.entity.InspectionPeriodEntity" id="inspectionPeriodMap">
+        <result property="id" column="id"/>
+        <result property="guid" column="guid"/>
+        <result property="name" column="name"/>
+        <result property="lineId" column="line_id"/>
+        <result property="basePoint" column="base_point"/>
+        <result property="turnType" column="turn_type"/>
+        <result property="startPoint" column="start_point"/>
+        <result property="span" column="span"/>
+        <result property="frequency" column="Frequency"/>
+        <result property="isAllowOmission" column="Is_allow_Omission"/>
+        <result property="isAllowTimeout" column="is_allow_timeout"/>
+        <result property="turnFinishMod" column="turn_finish_mod"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+
+    <select id="selectPublishedPeriod" resultType="io.renren.modules.inspection.entity.InspectionPeriodEntity" parameterType="java.lang.Long">
+        select  * from  tb_inspection_period where line_id in (select id from tb_inspection_line where is_publish=1)
+    </select>
+
+</mapper>

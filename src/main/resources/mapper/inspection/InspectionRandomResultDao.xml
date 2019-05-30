@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.inspection.dao.InspectionRandomResultDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.inspection.entity.InspectionRandomResultEntity" id="inspectionRandomResultMap">
+        <result property="id" column="id"/>
+        <result property="guid" column="guid"/>
+        <result property="name" column="name"/>
+        <result property="deviceName" column="device_name"/>
+        <result property="deviceCode" column="device_code"/>
+        <result property="workshop" column="workshop"/>
+        <result property="factory" column="factory"/>
+        <result property="dept" column="dept"/>
+        <result property="inspectionType" column="inspection_type"/>
+        <result property="unit" column="unit"/>
+        <result property="userId" column="user_id"/>
+        <result property="result" column="result"/>
+        <result property="remark" column="remark"/>
+        <result property="startTime" column="start_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <select id="selectResultList" resultType="io.renren.modules.inspection.entity.InspectionRandomResultEntity" parameterType="io.renren.modules.inspection.entity.InspectionRandomResultEntity">
+        select r.id, r.factory, r.dept, r.workshop, r.device_name, r.device_code, r.name, t.name as inspection_type,
+        r.result, t.unit, u.username, r.start_time, r.end_time, r.remark, r.create_time
+        from
+        `tb_inspection_random_result` r
+        left join `sys_user` u on u.user_id = r.user_id
+        left join `tb_inspection_type` t on t.id = r.inspection_type_id
+        where 1=1
+        <if test="factory!=null">
+            and r.factory like '%${factory}%'
+        </if>
+        <if test="dept!=null">
+            and r.dept like '%${dept}%'
+        </if>
+        <if test="workshop!=null">
+            and r.workshop like '%${workshop}%'
+        </if>
+        <if test="deviceName!=null">
+            and r.device_name like '%${deviceName}%'
+        </if>
+        <if test="deviceCode!=null">
+            and r.device_code like '%${deviceCode}%'
+        </if>
+        <if test="username!=null">
+            and u.username like '%${username}%'
+        </if>
+        <if test="inspectionTypeId!=null">
+            and r.inspection_type_id=#{inspectionTypeId}
+        </if>
+        <if test="startTime!=null">
+            and r.start_time &gt;= CONCAT(#{startTime},' 00:00:00')
+        </if>
+        <if test="endTime!=null">
+            and r.end_time &lt;= CONCAT(#{endTime},' 23:59:59')
+        </if>
+    </select>
+
+    <select id="selectByGuid" resultType="io.renren.modules.inspection.entity.InspectionRandomResultEntity">
+		select * from tb_inspection_random_result where guid = #{guid}
+	</select>
+
+    <select id="selectByAppResultGuid" resultType="io.renren.modules.inspection.entity.InspectionRandomResultEntity">
+		select * from tb_inspection_random_result where app_result_guid = #{appResultGuid}
+	</select>
+
+    <delete id="deleteByAppResultGuid" parameterType="io.renren.modules.inspection.entity.InspectionRandomResultEntity">
+        delete from tb_inspection_random_result where app_result_guid = #{appResultGuid}
+    </delete>
+
+</mapper>

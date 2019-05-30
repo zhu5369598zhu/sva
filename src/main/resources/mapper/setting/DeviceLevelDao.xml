@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.setting.dao.DeviceLevelDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.setting.entity.DeviceLevelEntity" id="deviceLevelMap">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="orderNum" column="order_num"/>
+    </resultMap>
+
+    <select id="selectByName" resultType="io.renren.modules.setting.entity.DeviceLevelEntity" parameterType="io.renren.modules.setting.entity.DeviceLevelEntity">
+        select * from tb_device_level where name=#{levelName} limit 1
+    </select>
+
+</mapper>

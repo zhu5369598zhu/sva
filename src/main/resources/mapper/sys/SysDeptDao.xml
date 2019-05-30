@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.sys.dao.SysDeptDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.sys.entity.SysDeptEntity" id="sysDeptMap">
+        <result property="deptId" column="dept_id"/>
+        <result property="guid" column="guid"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="name" column="name"/>
+        <result property="orderNum" column="order_num"/>
+        <result property="delFlag" column="del_flag"/>
+    </resultMap>
+
+    <select id="queryListParentId" resultType="java.util.HashMap" parameterType="java.lang.Long">
+		select dept_id as id, name as lable, dept_code as code, 'dept' as type from sys_dept where parent_id = #{parentId} order by order_num asc
+	</select>
+
+    <select id="findInspectionByDeptId" resultType="java.util.HashMap" parameterType="java.lang.Long">
+        select id as id, name as lable, 'inspection'as type from tb_inspection where dept_id=#{deptId} order by inspection_id
+    </select>
+
+    <select id="selectByName" resultType="io.renren.modules.sys.entity.SysDeptEntity" parameterType="io.renren.modules.sys.entity.SysDeptEntity">
+        select * from sys_dept where name=#{deptName} limit 1
+    </select>
+
+</mapper>

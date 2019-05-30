@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.inspection.dao.ZoneDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.inspection.entity.ZoneEntity" id="zoneMap">
+        <result property="zoneId" column="zone_id"/>
+        <result property="guid" column="guid"/>
+        <result property="zoneName" column="zone_name"/>
+        <result property="zoneCode" column="zone_code"/>
+        <result property="createTime" column="create_time"/>
+        <result property="orderNum" column="order_num"/>
+    </resultMap>
+
+    <select id="isExist" resultType="java.lang.Integer" parameterType="io.renren.modules.inspection.entity.ZoneEntity">
+		select count(*) from tb_zone where zone_name = #{zoneName}
+        <if test="zoneCode!=''">
+            or zone_code = #{zoneCode}
+        </if>
+	</select>
+
+    <select id="selectByName" resultType="io.renren.modules.inspection.entity.ZoneEntity" parameterType="io.renren.modules.inspection.entity.ZoneEntity">
+        select * from tb_zone where zone_name=#{zoneName} limit 1
+    </select>
+
+</mapper>

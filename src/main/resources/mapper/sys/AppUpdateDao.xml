@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.sys.dao.AppUpgradeDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.sys.entity.AppUpgradeEntity" id="appUpgradeMap">
+        <result property="id" column="id"/>
+        <result property="localhost" column="localhost"/>
+        <result property="isDomain" column="is_domain"/>
+        <result property="isMust" column="is_must"/>
+        <result property="domain" column="domain"/>
+        <result property="appFile" column="app_file"/>
+        <result property="appFilename" column="app_filename"/>
+        <result property="appFilesize" column="app_filesize"/>
+        <result property="appVersion" column="app_version"/>
+        <result property="appVersionCode" column="app_version_code"/>
+        <result property="appQrcode" column="app_qrcode"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+
+</mapper>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.inspection.dao.InspectionItemExtraDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.inspection.entity.InspectionItemExtraEntity" id="InspectionItemExtraMap">
+        <result property="id" column="id"/>
+        <result property="guid" column="guid"/>
+        <result property="name" column="name"/>
+        <result property="exceptionId" column="exception_id"/>
+
+    </resultMap>
+
+    <insert id ="insertExtraBatch" parameterType="java.util.List" >
+        <selectKey resultType ="java.lang.Integer" keyProperty= "id"
+                   order= "AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey >
+        insert into tb_inspection_item_extra
+        (id, guid, name, exception_id)
+        values
+        <foreach collection ="list" item="extra" index= "index" separator =",">
+            (
+            #{exta.id},
+            #{exta.guid},
+            #{exta.name},
+            #{exta.exceptionId}
+            )
+        </foreach >
+    </insert >
+
+    <select id="selectByName" resultType="io.renren.modules.inspection.entity.InspectionItemExtraEntity" parameterType="io.renren.modules.inspection.entity.InspectionItemExtraEntity">
+		select * from tb_inspection_item_extra where name = #{name}
+	</select>
+
+    <select id="selectByGuid" resultType="io.renren.modules.inspection.entity.InspectionItemExtraEntity">
+		select * from tb_inspection_item_extra where guid = #{guid}
+	</select>
+
+</mapper>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.inspection.dao.TurnClassGroupDao">
+
+    <delete id="deleteBatch">
+        delete from tb_turn_class_group where class_group_id in
+        <foreach item="classGroupId" collection="array" open="(" separator="," close=")">
+            #{classGroupId}
+        </foreach>
+    </delete>
+
+    <select id="queryClassGroupIdList" resultType="long">
+		select class_group_id from tb_turn_class_group where turn_id = #{value}
+	</select>
+</mapper>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.inspection.dao.PeriodTurnDao">
+
+    <delete id="deleteBatch">
+        delete from tb_period_turn where turn_id in
+        <foreach item="turnId" collection="array" open="(" separator="," close=")">
+            #{turnId}
+        </foreach>
+    </delete>
+
+    <select id="queryTurnIdList" resultType="long">
+		select turn_id from tb_period_turn where period_id = #{value}
+	</select>
+</mapper>

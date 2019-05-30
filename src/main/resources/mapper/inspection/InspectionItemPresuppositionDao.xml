@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.inspection.dao.InspectionItemPresuppositionDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.inspection.entity.InspectionItemPresuppositionEntity" id="InspectionItemExtraMap">
+        <result property="id" column="id"/>
+        <result property="guid" column="guid"/>
+        <result property="name" column="name"/>
+
+    </resultMap>
+
+    <insert id ="insertPresuppositionBatch" parameterType="java.util.List" >
+        <selectKey resultType ="java.lang.Integer" keyProperty= "id"
+                   order= "AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey >
+        insert into tb_inspection_item_presupposition
+        (id, guid, name)
+        values
+        <foreach collection ="list" item="presupposition" index= "index" separator =",">
+            (
+            #{presupposition.id},
+            #{presupposition.guid},
+            #{presupposition.name}
+            )
+        </foreach >
+    </insert >
+
+    <select id="selectByGuid" resultType="io.renren.modules.inspection.entity.InspectionItemPresuppositionEntity">
+		select * from tb_inspection_item_presupposition where guid = #{guid}
+	</select>
+
+</mapper>

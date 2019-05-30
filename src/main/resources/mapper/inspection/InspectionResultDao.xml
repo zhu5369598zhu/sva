@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.inspection.dao.InspectionResultDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.inspection.entity.InspectionResultEntity" id="inspectionResultMap">
+        <result property="id" column="id"/>
+        <result property="guid" column="guid"/>
+        <result property="itemId" column="item_id"/>
+        <result property="isOk" column="is_ok"/>
+        <result property="exceptionId" column="exception_id"/>
+        <result property="result" column="result"/>
+        <result property="turnId" column="turn_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="isCheck" column="is_check"/>
+        <result property="remark" column="remark"/>
+        <result property="startTime" column="start_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <select id="selectResultList" resultType="io.renren.modules.inspection.entity.InspectionResultEntity" parameterType="io.renren.modules.inspection.entity.InspectionResultEntity">
+        select distinct r.id,d.device_name as device_name,r.item_id,i.name as item_name,t.name as inspection_type,i.unit,r.is_ok,r.exception_id
+        ,i.up_limit,i.upup_limit,i.down_limit,i.downdown_limit
+        ,e.name as exception_name,r.result,r.start_time,r.end_time,r.create_time,r.turn_id,turn.name as turn_name,s.name as device_status,
+        r.user_id,u.username,r.is_check,r.remark,l.name as device_level,r.status_id,d.device_dept as dept_id,d.device_code,r.is_here
+        from `tb_inspection_result` r
+        left join `tb_inspection_item` i on i.id=r.item_id
+        left join `tb_device` d on d.device_id=i.device_id
+        left join `tb_zone_device` zd on zd.device_id=d.device_id
+        left join `tb_line_zone` lz on lz.zone_id=zd.zone_id
+        left join `tb_inspection_line` line on line.id=lz.line_id
+        left join `sys_user` u on u.user_id = r.user_id
+        left join `tb_inspection_type` t on t.id = i.inspection_type
+        left join `tb_exception` e on e.id = r.exception_id
+        left join `tb_inspection_status` s on s.id = r.status_id
+        left join `tb_device_level` l on l.id = d.device_level
+        left join `tb_turn` turn on r.turn_id=turn.id
+        where 1=1
+        <if test="id!=null and id!=''">
+            and r.id = #{id}
+        </if>
+        <if test="deptIds!=null">
+            and d.device_dept in
+            <foreach item="item" index="index" collection="deptIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="isHere!=null">
+            and r.is_here=#{isHere}
+        </if>
+        <if test="deviceName!=null and deviceName!=''">
+                and d.device_name like '%${deviceName}%'
+        </if>
+        <if test="deviceId!=null">
+            and d.device_id=#{deviceId}
+        </if>
+        <if test="lineId!=null">
+            and line.id=#{lineId}
+        </if>
+        <if test="itemName!=null and itemName!=''">
+            and i.name like '%${itemName}%'
+        </if>
+        <if test="itemId!=null">
+            and r.item_id=#{itemId}
+        </if>
+        <if test="deviceLevelId!=null">
+            and l.id=#{deviceLevelId}
+        </if>
+        <if test="username!=null and username!=''">
+            and u.username like '%${username}%'
+        </if>
+        <if test="statusId!=null">
+            and r.status_id=#{statusId}
+        </if>
+        <if test="exceptionId!=null">
+            and r.exception_id=#{exceptionId}
+        </if>
+        <if test="inspectionTypeId!=null">
+            and t.id=#{inspectionTypeId}
+        </if>
+        <if test="isOk!=null">
+            and r.is_ok=#{isOk}
+        </if>
+        <if test="startTime!=null">
+            and r.start_time &gt;= CONCAT(#{startTime},' 00:00:00')
+        </if>
+        <if test="endTime!=null">
+            and r.end_time &lt;= CONCAT(#{endTime},' 23:59:59')
+        </if>
+    </select>
+
+    <select id="selectExceptionGroupByDevice" resultType="java.util.HashMap" parameterType="io.renren.modules.inspection.entity.InspectionResultEntity">
+        select device_name as deviceName, exception_name as exception,count(*) as count from (select distinct r.id,d.device_name as device_name,d.device_id,r.item_id,i.name as item_name,t.name as inspection_type,i.unit,r.is_ok,r.exception_id
+        ,i.up_limit,i.upup_limit,i.down_limit,i.downdown_limit
+        ,e.name as exception_name,r.result,r.start_time,r.end_time,r.create_time,r.turn_id,turn.name as turn_name,s.name as device_status,
+        r.user_id,u.username,r.is_check,r.remark,l.name as device_level,r.status_id,d.device_dept as dept_id,d.device_code,r.is_here
+        from `tb_inspection_result` r
+        left join `tb_inspection_item` i on i.id=r.item_id
+        left join `tb_device` d on d.device_id=i.device_id
+        left join `tb_zone_device` zd on zd.device_id=d.device_id
+        left join `tb_line_zone` lz on lz.zone_id=zd.zone_id
+        left join `tb_inspection_line` line on line.id=lz.line_id
+        left join `sys_user` u on u.user_id = r.user_id
+        left join `tb_inspection_type` t on t.id = i.inspection_type
+        left join `tb_exception` e on e.id = r.exception_id
+        left join `tb_inspection_status` s on s.id = r.status_id
+        left join `tb_device_level` l on l.id = d.device_level
+        left join `tb_turn` turn on r.turn_id=turn.id
+        where 1=1
+        <if test="deptIds!=null">
+            and d.device_dept in
+            <foreach item="item" index="index" collection="deptIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="isHere!=null">
+            and r.is_here=#{isHere}
+        </if>
+        <if test="deviceName!=null">
+            and d.device_name like '%${deviceName}%'
+        </if>
+        <if test="deviceId!=null">
+            and d.device_id=#{deviceId}
+        </if>
+        <if test="lineId!=null">
+            and line.id=#{lineId}
+        </if>
+        <if test="itemName!=null">
+            and i.name like '%${itemName}%'
+        </if>
+        <if test="itemId!=null">
+            and r.item_id=#{itemId}
+        </if>
+        <if test="deviceLevelId!=null">
+            and l.id=#{deviceLevelId}
+        </if>
+        <if test="username!=null">
+            and u.username like '%${username}%'
+        </if>
+        <if test="statusId!=null">
+            and r.status_id=#{statusId}
+        </if>
+        <if test="exceptionId!=null">
+            and r.exception_id=#{exceptionId}
+        </if>
+        <if test="inspectionTypeId!=null">
+            and t.id=#{inspectionTypeId}
+        </if>
+        <if test="isOk!=null">
+            and r.is_ok=#{isOk}
+        </if>
+        <if test="startTime!=null">
+            and r.start_time &gt;= CONCAT(#{startTime},' 00:00:00')
+        </if>
+        <if test="endTime!=null">
+            and r.end_time &lt;= CONCAT(#{endTime},' 23:59:59')
+        </if>
+          ) a group by  a.device_id, a.exception_id
+    </select>
+
+
+    <select id="selectExceptionGroupByItem" resultType="java.util.HashMap" parameterType="io.renren.modules.inspection.entity.InspectionResultEntity">
+        select i.name as itemName,e.name as exception,count(*) as count
+        from `tb_inspection_result` r
+        left join `tb_inspection_item` i on i.id=r.item_id
+        left join `tb_device` d on d.device_id=i.device_id
+        left join `sys_user` u on u.user_id = r.user_id
+        left join `tb_inspection_type` t on t.id = i.inspection_type
+        left join `tb_exception` e on e.id = r.exception_id
+        left join `tb_inspection_status` s on s.id = r.status_id
+        left join `tb_device_level` l on l.id = d.device_level
+        left join `tb_turn` turn on r.turn_id=turn.id
+        where 1=1
+        <if test="deptIds!=null">
+            and d.device_dept in
+            <foreach item="item" index="index" collection="deptIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="isHere!=null">
+            and r.is_here=#{isHere}
+        </if>
+        <if test="deviceName!=null">
+            and d.device_name like '%${deviceName}%'
+        </if>
+        <if test="deviceId!=null">
+            and d.device_id=#{deviceId}
+        </if>
+        <if test="itemName!=null">
+            and i.name like '%${itemName}%'
+        </if>
+        <if test="itemId!=null">
+            and r.item_id=#{itemId}
+        </if>
+        <if test="deviceLevelId!=null">
+            and l.id=#{deviceLevelId}
+        </if>
+        <if test="username!=null">
+            and u.username like '%${username}%'
+        </if>
+        <if test="statusId!=null">
+            and r.status_id=#{statusId}
+        </if>
+        <if test="exceptionId!=null">
+            and r.exception_id=#{exceptionId}
+        </if>
+        <if test="inspectionTypeId!=null">
+            and t.id=#{inspectionTypeId}
+        </if>
+        <if test="isOk!=null">
+            and r.is_ok=#{isOk}
+        </if>
+        <if test="startTime!=null">
+            and r.start_time &gt;= CONCAT(#{startTime},' 00:00:00')
+        </if>
+        <if test="endTime!=null">
+            and r.end_time &lt;= CONCAT(#{endTime},' 23:59:59')
+        </if>
+        group by i.id,e.id
+    </select>
+
+
+    <select id="selectByGuid" resultType="io.renren.modules.inspection.entity.InspectionResultEntity">
+		select * from tb_inspection_result where guid = #{guid}
+	</select>
+
+    <select id="selectByGuid" resultType="io.renren.modules.inspection.entity.InspectionResultEntity">
+		select * from tb_inspection_result where guid = #{guid}
+	</select>
+
+    <select id="selectByAppResultGuid" resultType="io.renren.modules.inspection.entity.InspectionResultEntity">
+		select * from tb_inspection_result where app_result_guid = #{appResultGuid}
+	</select>
+
+    <delete id="deleteByAppResultGuid" parameterType="io.renren.modules.inspection.entity.InspectionResultEntity">
+        delete from tb_inspection_result where app_result_guid = #{appResultGuid}
+    </delete>
+
+</mapper>

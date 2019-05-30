@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.inspection.dao.InspectionRandomResultMediaDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.inspection.entity.InspectionRandomResultMediaEntity" id="inspectionRandomResultMediaMap">
+        <result property="id" column="id"/>
+        <result property="guid" column="guid"/>
+        <result property="resultId" column="result_id"/>
+        <result property="type" column="type"/>
+        <result property="content" column="content"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <select id="selectByGuid" resultType="io.renren.modules.inspection.entity.InspectionRandomResultMediaEntity">
+		select id, result_id, type, guid, content, create_time from tb_inspection_random_result_media where guid = #{guid}
+	</select>
+
+    <select id="selectListByResultId" resultType="io.renren.modules.inspection.entity.InspectionRandomResultMediaEntity">
+		select id, result_id, type, guid, create_time from tb_inspection_random_result_media where result_id = #{result_id} order by type desc,id desc
+	</select>
+
+</mapper>

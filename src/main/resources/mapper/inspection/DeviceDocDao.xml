@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.inspection.dao.DeviceDocDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.inspection.entity.DeviceDocEntity" id="deviceDocMap">
+        <result property="id" column="id"/>
+        <result property="guid" column="guid"/>
+        <result property="deviceId" column="device_id"/>
+        <result property="category" column="category"/>
+        <result property="type" column="type"/>
+        <result property="data" column="data"/>
+        <result property="filename" column="filename"/>
+        <result property="userId" column="user_id"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <select id="deleteByGuid" resultType="io.renren.modules.inspection.entity.DeviceDocEntity">
+		delete from tb_device_doc where guid = #{guid}
+	</select>
+
+    <select id="selectByGuid" resultType="io.renren.modules.inspection.entity.DeviceDocEntity">
+		select * from tb_device_doc where guid = #{guid}
+	</select>
+
+    <select id="selectByDeviceId" resultType="java.util.Map">
+		select d.guid,d.device_id,d.category,d.filename,d.create_time,u.username from tb_device_doc d
+		left join sys_user u on u.user_id=d.user_id
+		where device_id = #{deviceId}
+	</select>
+
+</mapper>

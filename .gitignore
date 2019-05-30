@@ -1,0 +1,17 @@
+# Intellij
+.idea
+*.iml
+*.ipr
+*.iws
+
+# Out
+target/
+
+# Java class files
+*.class
+
+# Other
+*.bak
+*.tem
+*.temp
+

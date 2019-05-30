@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.inspection.dao.InspectionLinePublishDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.inspection.entity.InspectionLinePublishEntity" id="inspectionLinePublishMap">
+        <result property="id" column="id"/>
+        <result property="lineId" column="line_id"/>
+        <result property="pdaId" column="pda_id"/>
+        <result property="isDownload" column="is_download"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <select id="selectByParams" resultType="io.renren.modules.inspection.entity.InspectionLinePublishEntity">
+		select * from tb_inspection_line_publish where pda_id = #{pdaId} and line_id = #{lineId}
+	</select>
+
+    <insert id ="insertPublishBatch" parameterType="java.util.List" >
+        <selectKey resultType ="java.lang.Integer" keyProperty= "id"
+                   order= "AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey >
+        insert into tb_inspection_line_publish
+        (line_id, pda_id, is_download, create_time)
+        values
+        <foreach collection ="list" item="linePublish" index= "index" separator =",">
+            (
+            #{linePublish.lineId},
+            #{linePublish.pdaId},
+            #{linePublish.isDownload},
+            #{linePublish.createTime}
+            )
+        </foreach >
+    </insert >
+
+    <update id="updateDownload" parameterType="java.lang.Integer">
+        update tb_inspection_line_publish
+        <set>
+            <if test="isDownload !=null">is_download=#{isDownload}</if>
+        </set>
+        where line_id=#{lineId}
+    </update>
+</mapper>

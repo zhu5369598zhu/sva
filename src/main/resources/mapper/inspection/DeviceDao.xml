@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.inspection.dao.DeviceDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.inspection.entity.DeviceEntity" id="deviceMap">
+        <result property="deviceId" column="device_id"/>
+        <result property="guid" column="guid"/>
+        <result property="deviceName" column="device_name"/>
+        <result property="deviceNum" column="device_num"/>
+        <result property="deviceCode" column="device_code"/>
+        <result property="deviceUnit" column="device_unit"/>
+        <result property="deviceManufacturer" column="device_manufacturer"/>
+        <result property="deviceSupplier" column="device_supplier"/>
+        <result property="deviceLevel" column="device_level"/>
+        <result property="deviceDept" column="device_dept"/>
+        <result property="deviceModel" column="device_model"/>
+        <result property="deviceMaster" column="device_master"/>
+        <result property="isInspect" column="is_inspect"/>
+        <result property="isShowDashboard" column="is_show_dashboard"/>
+        <result property="manufactureDate" column="manufacture_date"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <select id="findDeviceList" resultType="java.util.HashMap" parameterType="java.lang.Long">
+        select device_id as id, device_name as lable, device_code as code, 'device' as type from tb_device where is_inspect=1 and device_dept = #{deptId}
+        <if test="deviceName != null">
+            and (device_name like '%${deviceName}%' or device_code like '%${deviceName}%')
+        </if>
+        order by device_id
+    </select>
+
+    <select id="findDeptByDeviceName" resultType="java.util.HashMap" parameterType="java.lang.Long">
+        select distinct device_dept as dept_id, from tb_device where is_inspect=1 and device_name like '%${deviceName}%'
+    </select>
+
+    <select id="selectByCode" resultType="io.renren.modules.inspection.entity.DeviceEntity" parameterType="io.renren.modules.inspection.entity.DeviceEntity">
+        select * from tb_device where device_id != #{deviceId} and device_code = #{deviceCode}  limit 1
+    </select>
+
+    <select id="selectByLine" resultType="java.util.HashMap" parameterType="java.lang.Long">
+        select distinct d.device_id as id, d.device_name as lable, d.device_code as code, 'device' as type
+        from tb_line_zone l
+        left join tb_zone_device z on l.zone_id = z.zone_id
+        left join tb_device d on d.device_id = z.device_id
+        where l.line_id=#{lineId}
+    </select>
+
+    <select id="isExist" resultType="java.lang.Integer" parameterType="io.renren.modules.inspection.entity.DeviceEntity">
+		select count(*) from tb_device where device_name = #{deviceName}
+        <if test="deviceCode!=''">
+            or device_code = #{deviceCode}
+        </if>
+	</select>
+
+    <select id="selectByDeviceName" resultType="io.renren.modules.inspection.entity.DeviceEntity" parameterType="io.renren.modules.inspection.entity.DeviceEntity">
+		select * from tb_device where device_name = #{deviceName}
+	</select>
+
+    <select id="selectByDeviceCode" resultType="io.renren.modules.inspection.entity.DeviceEntity" parameterType="io.renren.modules.inspection.entity.DeviceEntity">
+		select * from tb_device where device_Code = #{deviceCode}
+	</select>
+</mapper>

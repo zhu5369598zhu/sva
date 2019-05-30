@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.inspection.dao.DevicePicDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.inspection.entity.DevicePicEntity" id="devicePicMap">
+        <result property="id" column="id"/>
+        <result property="guid" column="guid"/>
+        <result property="deviceId" column="device_id"/>
+        <result property="type" column="type"/>
+        <result property="data" column="data"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <select id="selectByGuid" resultType="io.renren.modules.inspection.entity.DevicePicEntity">
+		select * from tb_device_pic where guid = #{guid}
+	</select>
+
+    <select id="deleteByGuid" resultType="io.renren.modules.inspection.entity.DevicePicEntity">
+		delete from tb_device_pic where guid = #{guid}
+	</select>
+
+    <select id="selectByDeviceId" resultType="java.util.Map">
+		select guid as url from tb_device_pic where device_id = #{deviceId}
+	</select>
+
+</mapper>
