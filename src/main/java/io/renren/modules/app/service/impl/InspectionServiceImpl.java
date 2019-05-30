@@ -131,6 +131,7 @@ public class InspectionServiceImpl extends ServiceImpl<InspectionLineDao, Inspec
                 ZoneEntity zone = zoneService.selectById(lineZoneEntity.getZoneId());
                 lineZoneJson.put("line_guid", lineEntity.getGuid());
                 lineZoneJson.put("zone_guid", zone.getGuid());
+                lineZoneJson.put("orderNum", lineZoneEntity.getOrderNum());
                 lineZoneList.add(lineZoneJson);
 
                 zoneJson.put("zone_guid", zone.getGuid());
@@ -148,12 +149,14 @@ public class InspectionServiceImpl extends ServiceImpl<InspectionLineDao, Inspec
                     Map<String, Object> zoneDeviceJson = new HashMap<>();
                     zoneDeviceJson.put("zone_guid",zone.getGuid());
                     zoneDeviceJson.put("device_guid",deviceEntity.getGuid());
+                    zoneDeviceJson.put("orderNum",zoneDeviceEntity.getOrderNum());
                     zoneDeviceList.add(zoneDeviceJson);
 
                     Map<String, Object> deviceJson = new HashMap<>();
                     deviceJson.put("device_guid", deviceEntity.getGuid());
                     deviceJson.put("deviceName", deviceEntity.getDeviceName());
                     deviceJson.put("deviceCode", deviceEntity.getDeviceCode());
+                    deviceJson.put("deviceNum", deviceEntity.getDeviceNum());
                     deviceList.add(deviceJson);
 
                     //获取巡检项
