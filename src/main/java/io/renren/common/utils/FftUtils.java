@@ -1,9 +1,5 @@
 package io.renren.common.utils;
 
-import com.sun.org.apache.xalan.internal.xsltc.util.IntegerArray;
-import org.apache.commons.math3.util.DoubleArray;
-import sun.jvm.hotspot.utilities.IntArray;
-
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
