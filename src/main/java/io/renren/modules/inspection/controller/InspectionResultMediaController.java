@@ -5,6 +5,8 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.Map;
 
+import io.renren.common.utils.FftUtils;
+import io.renren.modules.inspection.entity.FftChartEntity;
 import org.apache.commons.io.IOUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -158,6 +160,62 @@ public class InspectionResultMediaController {
         return R.ok().put("page", page);
     }
 
+    /**
+     * 加速度
+     */
+    @RequestMapping("/acc/{uuid}")
+    @RequiresPermissions("inspection:inspectionresultmedia:info")
+    public R acc(@PathVariable("uuid") String uuid){
+        FftChartEntity fftChartEntity = null;
+        InspectionResultMediaEntity inspectionResultMedia = inspectionResultMediaService.selectByGuid(uuid);
+        if(inspectionResultMedia != null && inspectionResultMedia.getType().equals("data")){
+            try{
+                fftChartEntity = FftUtils.accFromByte(inspectionResultMedia.getContent());
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+
+        return R.ok().put("chart", fftChartEntity);
+    }
+
+    /**
+     * 速度
+     */
+    @RequestMapping("/speed/{uuid}")
+    @RequiresPermissions("inspection:inspectionresultmedia:info")
+    public R speed(@PathVariable("uuid") String uuid){
+        FftChartEntity fftChartEntity = null;
+        InspectionResultMediaEntity inspectionResultMedia = inspectionResultMediaService.selectByGuid(uuid);
+        if(inspectionResultMedia != null && inspectionResultMedia.getType().equals("data")){
+            try{
+                fftChartEntity = FftUtils.speedFromByte(inspectionResultMedia.getContent());
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+
+        return R.ok().put("chart", fftChartEntity);
+    }
+
+    /**
+     * 位移
+     */
+    @RequestMapping("/distance/{uuid}")
+    @RequiresPermissions("inspection:inspectionresultmedia:info")
+    public R distance(@PathVariable("uuid") String uuid){
+        FftChartEntity fftChartEntity = null;
+        InspectionResultMediaEntity inspectionResultMedia = inspectionResultMediaService.selectByGuid(uuid);
+        if(inspectionResultMedia != null && inspectionResultMedia.getType().equals("data")){
+            try{
+                fftChartEntity = FftUtils.distanceFromByte(inspectionResultMedia.getContent());
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+
+        return R.ok().put("chart", fftChartEntity);
+    }
 
     /**
      * 信息

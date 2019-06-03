@@ -18,7 +18,7 @@
 	</select>
 
     <select id="selectListByResultId" resultType="io.renren.modules.inspection.entity.InspectionResultMediaEntity">
-		select id, result_id, type, guid, content, create_time from tb_inspection_result_media where result_id = #{result_id} order by type desc,id desc
+		select id, result_id, type, guid, create_time from tb_inspection_result_media where result_id = #{result_id} order by type desc,id desc
 	</select>
 
 </mapper>

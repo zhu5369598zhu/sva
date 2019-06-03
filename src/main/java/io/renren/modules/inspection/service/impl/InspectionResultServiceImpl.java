@@ -6,6 +6,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import io.renren.common.utils.FftUtils;
 import io.renren.common.utils.MapUtils;
 import io.renren.modules.inspection.entity.*;
 import io.renren.modules.inspection.service.*;
@@ -18,6 +19,7 @@ import io.renren.modules.sys.service.SysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.*;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
@@ -576,6 +578,7 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
 
     @Override
     public PageUtils selectResultPage(Map<String, Object> params) {
+        String id = (String)params.get("id");
         String lineId = (String)params.get("lineId");
         String deviceId = (String)params.get("deviceId");
         String itemId = (String)params.get("itemId");
@@ -593,6 +596,9 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
         String endTime = (String)params.get("endTime");
 
         InspectionResultEntity resultEntity = new InspectionResultEntity();
+        if(id != null && !id.equals("")){
+            resultEntity.setId(Integer.parseInt(id));
+        }
         if(lineId != null && !lineId.equals("")){
             resultEntity.setLineId(Integer.parseInt(lineId));
         }
