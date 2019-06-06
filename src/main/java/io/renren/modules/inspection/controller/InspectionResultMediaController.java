@@ -168,7 +168,7 @@ public class InspectionResultMediaController {
     public R acc(@PathVariable("uuid") String uuid){
         FftChartEntity fftChartEntity = null;
         InspectionResultMediaEntity inspectionResultMedia = inspectionResultMediaService.selectByGuid(uuid);
-        if(inspectionResultMedia != null && inspectionResultMedia.getType().equals("data")){
+        if(inspectionResultMedia != null && inspectionResultMedia.getType().equals("data") && inspectionResultMedia.getContent() != null){
             try{
                 fftChartEntity = FftUtils.accFromByte(inspectionResultMedia.getContent());
             }catch (IOException e){

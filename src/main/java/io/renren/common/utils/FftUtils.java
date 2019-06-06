@@ -1,19 +1,92 @@
 package io.renren.common.utils;
 
-import com.mathworks.toolbox.javabuilder.MWArray;
-import com.mathworks.toolbox.javabuilder.MWException;
-import com.mathworks.toolbox.javabuilder.MWNumericArray;
-import domainchange.CDomainChange;
 import io.renren.modules.inspection.entity.FftChartEntity;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.math3.fitting.PolynomialCurveFitter;
+import org.apache.commons.math3.fitting.WeightedObservedPoints;
+import org.apache.commons.math3.util.FastMath;
+import org.jtransforms.fft.DoubleFFT_1D;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.*;
+import java.util.stream.DoubleStream;
+
+
 
 public class FftUtils {
 
-    public static  FftChartEntity accFromByte(byte[] data) throws IOException {
+    public static double[] toAmend(Integer[] sourceData, Double ration){
+        DoubleStream doubleStream = Arrays.stream(sourceData).mapToDouble(a->a);
+        OptionalDouble avg = Arrays.stream(sourceData).mapToDouble(a->a).average();
+        return doubleStream.map(a->((a-avg.getAsDouble())/ration)).toArray();
+    }
+
+    public static double rms(double[] data){
+        DoubleStream in = Arrays.stream(data);
+        return FastMath.sqrt(in.map(it->it*it).average().getAsDouble());
+    }
+
+    public static double[] doFft(double[] data){
+        int n = data.length;
+        double[] in = new double[n*2];
+        for(int i = 0; i < data.length; i++){
+            in[i*2] = data[i];
+        }
+        DoubleFFT_1D fft = new DoubleFFT_1D(n*2);
+        fft.realForward(in);
+        in[1] = 0.0;
+        double[] out = new double[n/2];
+        for(int i = 0; i < out.length; i++){
+            out[i] = FastMath.sqrt(in[i*2]*in[i*2] + in[i*2 + 1]*in[i*2 + 1]);
+            out[i] = out[i]/n;
+        }
+
+        return out;
+    }
+
+    public static double[] integral(double[] data){
+        int n = data.length;
+        double[] out = new double[data.length];
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < i; j++){
+                out[i] += data[j];
+            }
+        }
+
+        return out;
+    }
+
+    public static double[] polyFit(double[] data, int degree){
+        int n = data.length;
+        double[] offset = new double[n];
+        WeightedObservedPoints wop = new WeightedObservedPoints();
+        for(int i = 0; i< n; i++){
+            wop.add((double)i, data[i]);
+        }
+        PolynomialCurveFitter fitter = PolynomialCurveFitter.create(degree);
+        double[] fit = fitter.fit(wop.toList());
+        for(int i = 0; i< n; i++){
+            offset[i] = fit[0]*i + fit[1];
+        }
+
+        return offset;
+    }
+
+    public static double[] calculate(double[] data, double Fs){
+        double[] src = integral(data);
+        int n = src.length;
+        double[] offset = polyFit(src,1);
+        double[] result = new double[n];
+        for(int i = 0; i < n; i++){
+            result[i] = (src[i] - data[i])/Fs;
+        }
+
+        return result;
+    }
+
+    public static FftChartEntity fromByte(byte[] data, String type) throws  IOException{
         FftChartEntity out = new FftChartEntity();
         ByteArrayInputStream bis = new ByteArrayInputStream(data);
         DataInputStream dis = new DataInputStream(bis);
@@ -40,324 +113,89 @@ public class FftUtils {
             out.setFs(settings[4].doubleValue());
         }
 
-        Integer DataLen  = dis.readInt();
-        Integer[] sourceData = new Integer[DataLen];
-        for(int k = 0; k < DataLen; k++){
+        Integer dataLen  = dis.readInt();
+        Integer[] sourceData = new Integer[dataLen];
+        for(int k = 0; k < dataLen; k++){
             sourceData[k] = dis.readInt();
         }
 
-        MWNumericArray t = null;
-        MWNumericArray k = null;
-        MWNumericArray pk_array = null;
-        MWNumericArray pk2pk_array = null;
-        MWNumericArray rm_array = null;
-        MWNumericArray ff_first_array = null;
-        MWNumericArray freq_first_array = null;
-        MWNumericArray ff_second_array = null;
-        MWNumericArray freq_second_array = null;
-        MWNumericArray ff_third_array = null;
-        MWNumericArray freq_third_array = null;
-        MWNumericArray ff_array = null;
-        MWNumericArray freq_array = null;
+        double[] k = toAmend(sourceData, out.getRatio());
+        out.setTimeYData(ArrayUtils.toObject(k));
 
-        Object[] res_adjust = null;
-        Object[] res_time = null;
-        Object[] res_fft = null;
-        CDomainChange domainChange = null;
-        try{
-            domainChange = new CDomainChange();
-            res_adjust = domainChange.to_adjust(2,sourceData,out.getRatio());
-            t = (MWNumericArray) res_adjust[0];
-            out.setTimeXData(ArrayUtils.toObject(t.getIntData()));
-            k = (MWNumericArray) res_adjust[1];
-            out.setTimeYData(ArrayUtils.toObject(k.getDoubleData()));
-            k.getDoubleData();
-            res_time = domainChange.time_domain(3,k);
-            pk_array = (MWNumericArray)res_time[0];
-            out.setPk(pk_array.getDouble());
-            pk2pk_array = (MWNumericArray)res_time[1];
-            out.setPk2pk(pk2pk_array.getDouble());
-            rm_array = (MWNumericArray)res_time[2];
-            out.setRm(rm_array.getDouble());
+        Integer[] t = new Integer[dataLen];
+        for(int i = 0; i < dataLen; i++){
+            t[i] = i;
+        }
+        out.setTimeXData(t);
+        double pk = Arrays.stream(k).map(it->FastMath.abs(it)).max().getAsDouble();
+        out.setPk(pk);
+        double max = Arrays.stream(k).max().getAsDouble();
+        double min = Arrays.stream(k).min().getAsDouble();
+        double pk2pk = max - min;
+        out.setPk2pk(pk);
+        double rm = rms(k);
+        out.setRm(rm);
 
-            res_fft = domainChange.fft_domain(8,out.getFs(),k);
-            ff_first_array = (MWNumericArray)res_fft[0];
-            out.setFf_first(ff_first_array.getDouble());
-            freq_first_array = (MWNumericArray)res_fft[1];
-            out.setFreq_first(freq_first_array.getDouble());
-            ff_second_array = (MWNumericArray)res_fft[2];
-            out.setFf_second(ff_second_array.getDouble());
-            freq_second_array = (MWNumericArray)res_fft[3];
-            out.setFreq_second(freq_second_array.getDouble());
-            ff_third_array = (MWNumericArray)res_fft[4];
-            out.setFf_third(ff_third_array.getDouble());
-            freq_third_array = (MWNumericArray)res_fft[5];
-            out.setFreq_third(freq_third_array.getDouble());
-            ff_array = (MWNumericArray)res_fft[6];
-            freq_array = (MWNumericArray)res_fft[7];
-            out.setFftYData(ArrayUtils.toObject(ff_array.getDoubleData()));
-            out.setFftXData(ArrayUtils.toObject(freq_array.getDoubleData()));
-        }catch(MWException e){
-            e.printStackTrace();
-        }finally{
-            MWArray.disposeArray(t);
-            MWArray.disposeArray(k);
-            MWArray.disposeArray(pk_array);
-            MWArray.disposeArray(pk2pk_array);
-            MWArray.disposeArray(rm_array);
-            MWArray.disposeArray(ff_first_array);
-            MWArray.disposeArray(freq_first_array);
-            MWArray.disposeArray(ff_second_array);
-            MWArray.disposeArray(freq_second_array);
-            MWArray.disposeArray(ff_third_array);
-            MWArray.disposeArray(freq_third_array);
-            MWArray.disposeArray(res_adjust);
-            MWArray.disposeArray(res_time);
-            MWArray.disposeArray(res_fft);
-            domainChange.dispose();
+        if(type.equals("acc")){
+
+        } else if(type.equals("speed")){
+            k = calculate(k, out.getFs());
+        }else if(type.equals("distance")){
+            k = calculate(k, out.getFs());
+            k = calculate(k, out.getFs());
         }
 
-        dis.close();
-        bis.close();
+        double[] fft = doFft(k);
+        Double[] fft_d = ArrayUtils.toObject(fft);
+        out.setFftYData(fft_d);
+        double[] freq = new double[fft.length];
+        for(int i = 0; i < fft.length; i++){
+            double a = out.getFs()/2.0/fft.length;
+            freq[i] = out.getFs()/2.0/fft.length*i;
+        }
+        Double[] freq_d = ArrayUtils.toObject(freq);
+        out.setFftXData(freq_d);
+
+        int index = 0;
+
+        ArrayList<Double> fft_list = new ArrayList<>(Arrays.asList(fft_d));
+        List<Double> freq_list = new ArrayList<>(Arrays.asList(freq_d));
+        double fft_first = Collections.max(fft_list);
+        out.setFf_first(fft_first);
+        index = fft_list.indexOf(fft_first);
+        double freq_first = freq_list.get(index);
+        out.setFreq_first(freq_first);
+        fft_list.remove(index);
+        freq_list.remove(index);
+
+        double fft_second = Collections.max(fft_list);
+        out.setFf_second(fft_second);
+        index = fft_list.indexOf(fft_second);
+        double freq_second = freq_list.get(index);
+        out.setFreq_second(freq_second);
+        fft_list.remove(index);
+        freq_list.remove(index);
+
+        double fft_third = Collections.max(fft_list);
+        out.setFf_third(fft_third);
+        index = fft_list.indexOf(fft_third);
+        double freq_third = freq_list.get(index);
+        out.setFreq_third(freq_third);
+        fft_list.remove(index);
+        freq_list.remove(index);
 
         return out;
     }
 
+    public static  FftChartEntity accFromByte(byte[] data) throws IOException {
+        return fromByte(data, "acc");
+    }
 
     public static  FftChartEntity speedFromByte(byte[] data) throws IOException {
-        FftChartEntity out = new FftChartEntity();
-        ByteArrayInputStream bis = new ByteArrayInputStream(data);
-        DataInputStream dis = new DataInputStream(bis);
-        Integer paramsLen = dis.readInt();
-        Float[] params = new Float[paramsLen];
-        for(Integer i = 0; i < paramsLen; i++){
-            params[i] = dis.readFloat();
-        }
-        if(params.length == 2){
-            //out.ratio = params[0];
-            out.setOffset(params[1].doubleValue());
-        }
-
-        Integer settingLen = dis.readInt();
-        Integer[] settings = new Integer[settingLen];
-        for(Integer j = 0; j < settingLen; j++){
-            settings[j] = dis.readInt();
-        }
-        if(settings.length == 5){
-            out.setCmd(settings[0]);
-            out.setAxles(settings[1]);
-            out.setChannel(settings[2]);
-            out.setN(settings[3]);
-            out.setFs(settings[4].doubleValue());
-        }
-
-        Integer DataLen  = dis.readInt();
-        Integer[] sourceData = new Integer[DataLen];
-        for(int k = 0; k < DataLen; k++){
-            sourceData[k] = dis.readInt();
-        }
-
-        MWNumericArray t = null;
-        MWNumericArray k = null;
-        MWNumericArray speed = null;
-        MWNumericArray pk_array = null;
-        MWNumericArray pk2pk_array = null;
-        MWNumericArray rm_array = null;
-        MWNumericArray ff_first_array = null;
-        MWNumericArray freq_first_array = null;
-        MWNumericArray ff_second_array = null;
-        MWNumericArray freq_second_array = null;
-        MWNumericArray ff_third_array = null;
-        MWNumericArray freq_third_array = null;
-        MWNumericArray ff_array = null;
-        MWNumericArray freq_array = null;
-
-        Object[] res_adjust = null;
-        Object[] res_time = null;
-        Object[] res_speed = null;
-        Object[] res_fft = null;
-        CDomainChange domainChange = null;
-        try{
-            domainChange = new CDomainChange();
-            res_adjust = domainChange.to_adjust(2,sourceData,out.getRatio());
-            t = (MWNumericArray) res_adjust[0];
-            out.setTimeXData(ArrayUtils.toObject(t.getIntData()));
-            k = (MWNumericArray) res_adjust[1];
-            out.setTimeYData(ArrayUtils.toObject(k.getDoubleData()));
-            k.getDoubleData();
-            res_time = domainChange.time_domain(3,k);
-            pk_array = (MWNumericArray)res_time[0];
-            out.setPk(pk_array.getDouble());
-            pk2pk_array = (MWNumericArray)res_time[1];
-            out.setPk2pk(pk2pk_array.getDouble());
-            rm_array = (MWNumericArray)res_time[2];
-            out.setRm(rm_array.getDouble());
-
-            res_speed = domainChange.to_integral(1,out.getFs(),k);
-            speed = (MWNumericArray) res_speed[0];
-
-            res_fft = domainChange.fft_domain(8,out.getFs(),speed);
-            ff_first_array = (MWNumericArray)res_fft[0];
-            out.setFf_first(ff_first_array.getDouble());
-            freq_first_array = (MWNumericArray)res_fft[1];
-            out.setFreq_first(freq_first_array.getDouble());
-            ff_second_array = (MWNumericArray)res_fft[2];
-            out.setFf_second(ff_second_array.getDouble());
-            freq_second_array = (MWNumericArray)res_fft[3];
-            out.setFreq_second(freq_second_array.getDouble());
-            ff_third_array = (MWNumericArray)res_fft[4];
-            out.setFf_third(ff_third_array.getDouble());
-            freq_third_array = (MWNumericArray)res_fft[5];
-            out.setFreq_third(freq_third_array.getDouble());
-            ff_array = (MWNumericArray)res_fft[6];
-            freq_array = (MWNumericArray)res_fft[7];
-            out.setFftYData(ArrayUtils.toObject(ff_array.getDoubleData()));
-            out.setFftXData(ArrayUtils.toObject(freq_array.getDoubleData()));
-        }catch(MWException e){
-            e.printStackTrace();
-        }finally{
-            MWArray.disposeArray(t);
-            MWArray.disposeArray(k);
-            MWArray.disposeArray(pk_array);
-            MWArray.disposeArray(pk2pk_array);
-            MWArray.disposeArray(rm_array);
-            MWArray.disposeArray(ff_first_array);
-            MWArray.disposeArray(freq_first_array);
-            MWArray.disposeArray(ff_second_array);
-            MWArray.disposeArray(freq_second_array);
-            MWArray.disposeArray(ff_third_array);
-            MWArray.disposeArray(freq_third_array);
-            MWArray.disposeArray(res_adjust);
-            MWArray.disposeArray(res_time);
-            MWArray.disposeArray(res_fft);
-            domainChange.dispose();
-        }
-
-        dis.close();
-        bis.close();
-
-        return out;
+        return fromByte(data, "speed");
     }
 
-
-
     public static  FftChartEntity distanceFromByte(byte[] data) throws IOException {
-        FftChartEntity out = new FftChartEntity();
-        ByteArrayInputStream bis = new ByteArrayInputStream(data);
-        DataInputStream dis = new DataInputStream(bis);
-        Integer paramsLen = dis.readInt();
-        Float[] params = new Float[paramsLen];
-        for(Integer i = 0; i < paramsLen; i++){
-            params[i] = dis.readFloat();
-        }
-        if(params.length == 2){
-            //out.ratio = params[0];
-            out.setOffset(params[1].doubleValue());
-        }
-
-        Integer settingLen = dis.readInt();
-        Integer[] settings = new Integer[settingLen];
-        for(Integer j = 0; j < settingLen; j++){
-            settings[j] = dis.readInt();
-        }
-        if(settings.length == 5){
-            out.setCmd(settings[0]);
-            out.setAxles(settings[1]);
-            out.setChannel(settings[2]);
-            out.setN(settings[3]);
-            out.setFs(settings[4].doubleValue());
-        }
-
-        Integer DataLen  = dis.readInt();
-        Integer[] sourceData = new Integer[DataLen];
-        for(int k = 0; k < DataLen; k++){
-            sourceData[k] = dis.readInt();
-        }
-
-        MWNumericArray t = null;
-        MWNumericArray k = null;
-        MWNumericArray speed = null;
-        MWNumericArray distance = null;
-        MWNumericArray pk_array = null;
-        MWNumericArray pk2pk_array = null;
-        MWNumericArray rm_array = null;
-        MWNumericArray ff_first_array = null;
-        MWNumericArray freq_first_array = null;
-        MWNumericArray ff_second_array = null;
-        MWNumericArray freq_second_array = null;
-        MWNumericArray ff_third_array = null;
-        MWNumericArray freq_third_array = null;
-        MWNumericArray ff_array = null;
-        MWNumericArray freq_array = null;
-
-        Object[] res_adjust = null;
-        Object[] res_speed = null;
-        Object[] res_distance = null;
-        Object[] res_time = null;
-        Object[] res_fft = null;
-        CDomainChange domainChange = null;
-        try{
-            domainChange = new CDomainChange();
-            res_adjust = domainChange.to_adjust(2,sourceData,out.getRatio());
-            t = (MWNumericArray) res_adjust[0];
-            out.setTimeXData(ArrayUtils.toObject(t.getIntData()));
-            k = (MWNumericArray) res_adjust[1];
-            out.setTimeYData(ArrayUtils.toObject(k.getDoubleData()));
-            k.getDoubleData();
-            res_time = domainChange.time_domain(3,k);
-            pk_array = (MWNumericArray)res_time[0];
-            out.setPk(pk_array.getDouble());
-            pk2pk_array = (MWNumericArray)res_time[1];
-            out.setPk2pk(pk2pk_array.getDouble());
-            rm_array = (MWNumericArray)res_time[2];
-            out.setRm(rm_array.getDouble());
-
-            res_speed = domainChange.to_integral(1,out.getFs(),k);
-            speed = (MWNumericArray) res_speed[0];
-
-            res_distance = domainChange.to_integral(1,out.getFs(),speed);
-            distance = (MWNumericArray) res_distance[0];
-
-            res_fft = domainChange.fft_domain(8,out.getFs(),distance);
-            ff_first_array = (MWNumericArray)res_fft[0];
-            out.setFf_first(ff_first_array.getDouble());
-            freq_first_array = (MWNumericArray)res_fft[1];
-            out.setFreq_first(freq_first_array.getDouble());
-            ff_second_array = (MWNumericArray)res_fft[2];
-            out.setFf_second(ff_second_array.getDouble());
-            freq_second_array = (MWNumericArray)res_fft[3];
-            out.setFreq_second(freq_second_array.getDouble());
-            ff_third_array = (MWNumericArray)res_fft[4];
-            out.setFf_third(ff_third_array.getDouble());
-            freq_third_array = (MWNumericArray)res_fft[5];
-            out.setFreq_third(freq_third_array.getDouble());
-            ff_array = (MWNumericArray)res_fft[6];
-            freq_array = (MWNumericArray)res_fft[7];
-            out.setFftYData(ArrayUtils.toObject(ff_array.getDoubleData()));
-            out.setFftXData(ArrayUtils.toObject(freq_array.getDoubleData()));
-        }catch(MWException e){
-            e.printStackTrace();
-        }finally{
-            MWArray.disposeArray(t);
-            MWArray.disposeArray(k);
-            MWArray.disposeArray(pk_array);
-            MWArray.disposeArray(pk2pk_array);
-            MWArray.disposeArray(rm_array);
-            MWArray.disposeArray(ff_first_array);
-            MWArray.disposeArray(freq_first_array);
-            MWArray.disposeArray(ff_second_array);
-            MWArray.disposeArray(freq_second_array);
-            MWArray.disposeArray(ff_third_array);
-            MWArray.disposeArray(freq_third_array);
-            MWArray.disposeArray(res_adjust);
-            MWArray.disposeArray(res_time);
-            MWArray.disposeArray(res_fft);
-            domainChange.dispose();
-        }
-
-        dis.close();
-        bis.close();
-
-        return out;
+        return fromByte(data, "distance");
     }
 }
