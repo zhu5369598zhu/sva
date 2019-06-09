@@ -194,6 +194,10 @@ public class InspectionResultEntity implements Serializable {
 	 */
 	private String endTime;
 	/**
+	 * 缺陷处理状态
+	 */
+	private Integer status;
+	/**
 	 * 上传时间
 	 */
 	private Date createTime;
@@ -732,5 +736,17 @@ public class InspectionResultEntity implements Serializable {
 	 */
 	public Integer getDeviceId() {
 		return deviceId;
+	}
+	/**
+	 * 设置：缺陷处理状态
+	 */
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+	/**
+	 * 获取：缺陷处理状态
+	 */
+	public Integer getStatus() {
+		return status;
 	}
 }
