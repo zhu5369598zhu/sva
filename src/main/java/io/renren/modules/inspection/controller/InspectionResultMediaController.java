@@ -173,6 +173,7 @@ public class InspectionResultMediaController {
                 fftChartEntity = FftUtils.accFromByte(inspectionResultMedia.getContent());
             }catch (IOException e){
                 e.printStackTrace();
+                return R.error(500,"上传数据格式错误，不能识别");
             }
         }
 
@@ -192,6 +193,7 @@ public class InspectionResultMediaController {
                 fftChartEntity = FftUtils.speedFromByte(inspectionResultMedia.getContent());
             }catch (IOException e){
                 e.printStackTrace();
+                return R.error(500,"上传数据格式错误，不能识别");
             }
         }
 
@@ -211,6 +213,7 @@ public class InspectionResultMediaController {
                 fftChartEntity = FftUtils.distanceFromByte(inspectionResultMedia.getContent());
             }catch (IOException e){
                 e.printStackTrace();
+                return R.error(500,"上传数据格式错误，不能识别");
             }
         }
 
