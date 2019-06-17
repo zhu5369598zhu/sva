@@ -39,9 +39,6 @@ public class OrderDefectiveServiceImpl extends ServiceImpl<OrderDefectiveDao, Or
     	String defectiveName = (String)params.get("defectiveName");
     	String exceptionId = (String)params.get("exceptionId");
     	
-    	String pageIndex = (String)params.get("page");
-    	String limit = (String)params.get("limit");
-        
         HashMap<String,Object> entityMap = new HashMap<String,Object>();
         if(deptId !=null && !deptId.equals("")) { 
         	List<Integer> deptIds = sysDeptService.queryRecursiveChildByParentId(Long.parseLong(deptId));
@@ -62,17 +59,9 @@ public class OrderDefectiveServiceImpl extends ServiceImpl<OrderDefectiveDao, Or
         }
         
         Page<OrderDefectiveEntity> page = new Query<OrderDefectiveEntity>(params).getPage();
-        List<OrderDefectiveEntity> orderDefectiveList = this.baseMapper.selectOrderDefective(entityMap);
-        
-        page.setTotal(orderDefectiveList.size());
-        
-        if(pageIndex !=null && !pageIndex.equals("")) {
-        	entityMap.put("pageIndex",10* (Integer.parseInt(pageIndex)-1));
-        }
-        if(limit !=null && !limit.equals("")) {
-        	entityMap.put("limit", Integer.parseInt(limit));
-        }
-        List<OrderDefectiveEntity> orderDefective = this.baseMapper.selectOrderDefective(entityMap);
+        List<OrderDefectiveEntity> orderDefective = this.baseMapper.selectOrderDefective(
+				page,
+        		entityMap);
         for(OrderDefectiveEntity defective: orderDefective) {
         	
         	

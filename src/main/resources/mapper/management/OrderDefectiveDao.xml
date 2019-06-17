@@ -59,10 +59,7 @@
 		
 		order by r.defective_id DESC 
 		
-		<if test="pageIndex!=null">
-			limit #{pageIndex}, #{limit}
-		</if>
-		
+
 		
 	</select>
 

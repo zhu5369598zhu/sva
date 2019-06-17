@@ -26,9 +26,6 @@ public class OrderManagementReportedServiceImpl extends ServiceImpl<OrderManagem
     @Override
     public PageUtils queryPage(Map<String, Object> params)  {
     	
-    	String pageIndex = (String)params.get("page");
-    	String limit = (String)params.get("limit"); 
-    	
     	String orderNumber = (String)params.get("orderNumber");
     	String orderName = (String)params.get("orderName"); 
     	//String orderStatus = (String)params.get("orderStatus");
@@ -44,9 +41,6 @@ public class OrderManagementReportedServiceImpl extends ServiceImpl<OrderManagem
         if(orderName !=null && !orderName.equals("")) {
         	entityMap.put("orderName", orderName);
         }
-        /*if(orderStatus !=null && !orderStatus.equals("")) {
-        	entityMap.put("orderStatus", orderStatus);
-        }*/
         if(deptId !=null && !deptId.equals("")) {
         	List<Integer> deptIds = sysDeptService.queryRecursiveChildByParentId(Long.parseLong(deptId));
         	entityMap.put("deptIds", deptIds);
@@ -63,17 +57,9 @@ public class OrderManagementReportedServiceImpl extends ServiceImpl<OrderManagem
         }
         
         Page<OrderManagementEntity> page = new Query<OrderManagementEntity>(params).getPage();
-        List<OrderManagementEntity> resultList = this.baseMapper.selectOrderManagement(entityMap);
-        
-        page.setTotal(resultList.size());
-        
-        if(pageIndex !=null && !pageIndex.equals("")) {
-        	entityMap.put("pageIndex",10* (Integer.parseInt(pageIndex)-1));
-        }
-        if(limit !=null && !limit.equals("")) {
-        	entityMap.put("limit", Integer.parseInt(limit)); 
-        }
-        List<OrderManagementEntity> List = this.baseMapper.selectOrderManagement(entityMap);
+        List<OrderManagementEntity> List = this.baseMapper.selectOrderManagement(
+        		page,
+        		entityMap);
         
         for(OrderManagementEntity orderManagement:List) {
         	

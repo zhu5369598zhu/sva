@@ -73,10 +73,7 @@
 			and r.create_time &lt;= CONCAT(#{endTime})
 		</if> 
 		ORDER BY r.order_id DESC 
-		<if test="pageIndex!=null">
-			limit #{pageIndex}, #{limit}
-		</if>
-		
+
 		
 		
 	</select>

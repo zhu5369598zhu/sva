@@ -74,10 +74,7 @@
 		    and r.order_status = 2 or r.order_status =7 
 		    
 		    order by r.order_id DESC 
-		<if test="pageIndex!=null">
-			limit #{pageIndex}, #{limit}
-		</if>
-		
+
 	</select>
 	
 

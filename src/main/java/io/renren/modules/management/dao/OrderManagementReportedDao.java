@@ -1,5 +1,6 @@
 package io.renren.modules.management.dao;
 
+import com.baomidou.mybatisplus.plugins.Page;
 import io.renren.modules.management.entity.OrderManagementEntity;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 
@@ -18,6 +19,6 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface OrderManagementReportedDao extends BaseMapper<OrderManagementEntity> {
 
-	List<OrderManagementEntity> selectOrderManagement(HashMap<String, Object> entityMap);
+	List<OrderManagementEntity> selectOrderManagement(Page<OrderManagementEntity> page,HashMap<String, Object> entityMap);
 	
 }
