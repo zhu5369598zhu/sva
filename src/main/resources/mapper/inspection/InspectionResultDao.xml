@@ -21,7 +21,7 @@
     </resultMap>
 
     <select id="selectResultList" resultType="io.renren.modules.inspection.entity.InspectionResultEntity" parameterType="io.renren.modules.inspection.entity.InspectionResultEntity">
-        select distinct r.id,d.device_name as device_name,r.item_id,i.name as item_name,t.name as inspection_type,i.unit,r.is_ok,r.exception_id
+        select distinct r.id,d.device_name as device_name,r.item_id,i.name as item_name,t.name as inspection_type,t.id as inspection_type_id,i.unit,r.is_ok,r.exception_id
         ,i.up_limit,i.upup_limit,i.down_limit,i.downdown_limit
         ,e.name as exception_name,r.result,r.start_time,r.end_time,r.create_time,r.turn_id,turn.name as turn_name,s.name as device_status,
         r.user_id,u.username,r.is_check,r.remark,l.name as device_level,r.status_id,d.device_dept as dept_id,d.device_code,r.is_here
