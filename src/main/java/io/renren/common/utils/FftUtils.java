@@ -7,9 +7,7 @@ import org.apache.commons.math3.fitting.WeightedObservedPoints;
 import org.apache.commons.math3.util.FastMath;
 import org.jtransforms.fft.DoubleFFT_1D;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.stream.DoubleStream;
 
@@ -68,7 +66,7 @@ public class FftUtils {
         PolynomialCurveFitter fitter = PolynomialCurveFitter.create(degree);
         double[] fit = fitter.fit(wop.toList());
         for(int i = 0; i< n; i++){
-            offset[i] = fit[0]*i + fit[1];
+            offset[i] = fit[1]*i + fit[0];
         }
 
         return offset;
@@ -80,7 +78,7 @@ public class FftUtils {
         double[] offset = polyFit(src,1);
         double[] result = new double[n];
         for(int i = 0; i < n; i++){
-            result[i] = (src[i] - data[i])/Fs;
+            result[i] = (src[i] - offset[i])/Fs;
         }
 
         return result;
@@ -118,23 +116,23 @@ public class FftUtils {
         for(int k = 0; k < dataLen; k++){
             sourceData[k] = dis.readInt();
         }
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < sourceData.length; i++){
+            sb.append(sourceData[i]).append("\n");
+        }
+        sb.deleteCharAt(sb.length() -1);
+        BufferedWriter bw = new BufferedWriter(new FileWriter("test.txt"));
+        bw.write(sb.toString());
+        bw.close();
 
         double[] k = toAmend(sourceData, out.getRatio());
-        out.setTimeYData(ArrayUtils.toObject(k));
+
 
         Integer[] t = new Integer[dataLen];
         for(int i = 0; i < dataLen; i++){
             t[i] = i;
         }
-        out.setTimeXData(t);
-        double pk = Arrays.stream(k).map(it->FastMath.abs(it)).max().getAsDouble();
-        out.setPk(pk);
-        double max = Arrays.stream(k).max().getAsDouble();
-        double min = Arrays.stream(k).min().getAsDouble();
-        double pk2pk = max - min;
-        out.setPk2pk(pk);
-        double rm = rms(k);
-        out.setRm(rm);
+
 
         if(type.equals("acc")){
 
@@ -144,6 +142,17 @@ public class FftUtils {
             k = calculate(k, out.getFs());
             k = calculate(k, out.getFs());
         }
+
+        out.setTimeYData(ArrayUtils.toObject(k));
+        out.setTimeXData(t);
+        double pk = Arrays.stream(k).map(it->FastMath.abs(it)).max().getAsDouble();
+        out.setPk(pk);
+        double max = Arrays.stream(k).max().getAsDouble();
+        double min = Arrays.stream(k).min().getAsDouble();
+        double pk2pk = max - min;
+        out.setPk2pk(pk2pk);
+        double rm = rms(k);
+        out.setRm(rm);
 
         double[] fft = doFft(k);
         Double[] fft_d = ArrayUtils.toObject(fft);
@@ -183,6 +192,9 @@ public class FftUtils {
         out.setFreq_third(freq_third);
         fft_list.remove(index);
         freq_list.remove(index);
+
+        bis.close();
+        dis.close();
 
         return out;
     }
