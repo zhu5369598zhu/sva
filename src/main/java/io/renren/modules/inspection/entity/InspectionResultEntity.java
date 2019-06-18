@@ -227,6 +227,37 @@ public class InspectionResultEntity implements Serializable {
 	 */
 	private List<InspectionResultMediaEntity> medias;
 	/**
+	 * 工单确认人
+	 */
+	@TableField(exist = false)
+	private String orderConfirmer;
+	/**
+	 * 工单确认人 id
+	 */
+	@TableField(exist = false)
+	private Integer orderConfirmerId;
+	/**
+	 * 工单确认时间
+	 */
+	@TableField(exist = false)
+	private Date confirmedTime;
+	/**
+	 * 工单状态
+	 */
+	@TableField(exist = false) 
+	private Integer orderStatus;
+	/**
+	 * 工单状态名称
+	 */
+	@TableField(exist = false)
+	private String orderStatusName;
+	/**
+	 * 缺陷工单主键id
+	 */
+	@TableField(exist = false)
+	private Integer defectiveId;
+	
+	/**
 	 * 设置：id
 	 */
 	public void setId(Integer id) {
@@ -748,5 +779,77 @@ public class InspectionResultEntity implements Serializable {
 	 */
 	public Integer getStatus() {
 		return status;
+	}
+	/**
+	 * 设置： 工单确认人
+	 */
+	public void setOrderConfirmer(String orderConfirmer) {
+		this.orderConfirmer = orderConfirmer;
+	}
+	/**
+	 * 获取：工单确认人
+	 */
+	public String getOrderConfirmer() {
+		return orderConfirmer;
+	}
+	/**
+	 * 设置： 工单确认人 id
+	 */
+	public void setOrderConfirmerId(Integer orderConfirmerId) {
+		this.orderConfirmerId = orderConfirmerId;
+	}
+	/**
+	 * 获取：工单确认人 id
+	 */
+	public Integer getOrderConfirmerId() {
+		return orderConfirmerId;
+	}
+	/**
+	 * 设置： 工单确认时间
+	 */
+	public void setConfirmedTime(Date confirmedTime) {
+		this.confirmedTime = confirmedTime;
+	}
+	/**
+	 * 获取：工单确认时间
+	 */
+	public Date getConfirmedTime() {
+		return confirmedTime;
+	}
+	/**
+	 * 设置： 工单状态
+	 */
+	public void setOrderStatus(Integer orderStatus) {
+		this.orderStatus = orderStatus;
+	}
+	/**
+	 * 获取：工单状态
+	 */
+	public Integer getOrderStatus() {
+		return orderStatus;
+	}
+	/**
+	 * 设置： 工单状态 名称
+	 */
+	public void setOrderStatusName(String orderStatusName) {
+		this.orderStatusName = orderStatusName;
+	}
+	/**
+	 * 获取：工单状态 名称
+	 */
+	public String getOrderStatusName() {
+		return orderStatusName;
+	}
+	/**
+	 * 设置： 缺陷工单主键id
+	 */
+	public void setDefectiveId(Integer defectiveId) {
+		this.defectiveId = defectiveId;
+	}
+	/**
+	 * 获取：缺陷工单主键id
+	 */
+	public Integer getDefectiveId() {
+		return defectiveId;
 	}
 }

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.management.dao.OrderRecordDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.management.entity.OrderRecordEntity" id="orderRecordMap">
+        <result property="recordId" column="record_id"/>
+        <result property="orderNumber" column="order_number"/>
+        <result property="defectiveId" column="defective_id"/>
+        <result property="defectiveNumber" column="defective_number"/>
+        <result property="orderPeople" column="order_people"/>
+        <result property="orderOpinion" column="order_opinion"/>
+        <result property="orderPeopleId" column="order_people_id"/>
+        <result property="orderType" column="order_type"/>
+        <result property="createTime" column="create_time"/>
+        <result property="requirementTime" column="requirement_time"/>
+        <result property="confirmedTime" column="confirmed_time"/>
+        <result property="actualTime" column="actual_time"/>
+        <result property="delayTime" column="delay_time"/>
+        <result property="nowTime" column="now_time"/>
+    </resultMap>
+
+
+</mapper>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.management.dao.OrderManagementFinishedDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.management.entity.OrderManagementEntity" id="orderManagementMap">
+        <result property="orderId" column="order_id"/>
+        <result property="orderNumber" column="order_number"/>
+        <result property="defectiveId" column="defective_id"/>
+        <result property="defectiveNumber" column="defective_number"/>
+        <result property="orderName" column="order_name"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="exceptionId" column="exception_id"/>
+        <result property="defectiveName" column="defective_name"/>
+        <result property="orderContent" column="order_content"/>
+        <result property="orderApplicant" column="order_applicant"/>
+        <result property="orderApplicantId" column="order_applicant_id"/>
+        <result property="orderApplicantOpinion" column="order_applicant_opinion"/>
+        <result property="orderAcceptor" column="order_acceptor"/>
+        <result property="orderAcceptorId" column="order_acceptor_id"/>
+        <result property="orderAcceptorOpinion" column="order_acceptor_opinion"/>
+        <result property="orderConfirmer" column="order_confirmer"/>
+        <result property="orderConfirmerId" column="order_confirmer_id"/>
+        <result property="orderConfirmerOpinion" column="order_confirmer_opinion"/>
+        <result property="createTime" column="create_time"/>
+        <result property="confirmedTime" column="confirmed_time"/>
+        <result property="actualTime" column="actual_time"/>
+        <result property="delayTime" column="delay_time"/>
+        <result property="processingResult" column="processing_result"/>
+        <result property="orderStatus" column="order_status"/>
+        <result property="orderType" column="order_type"/>
+        <result property="levelId" column="level_id"/>
+        <result property="orderDevice" column="order_device"/>
+    </resultMap>
+	
+	
+	<select id="selectOrderManagement" 
+		parameterType="java.util.HashMap" 
+		resultType="io.renren.modules.management.entity.OrderManagementEntity">
+		select 
+		 r.order_id, r.order_number, r.defective_id, r.defective_number, r.order_name, r.dept_id, r.exception_id,
+		 r.defective_name, r.order_content, r.order_applicant, r.order_applicant_id, r.order_applicant_opinion,
+		 r.order_acceptor,  r.order_acceptor_id, r.order_applicant_opinion, r.order_confirmer, r.order_confirmer_id,
+		 r.order_confirmer_opinion, r.create_time, r.confirmed_time, r.actual_time, r.delay_time, r.processing_result,
+		 r.order_status, r.order_type, r.level_id, r.order_device
+		
+		 from 
+		`tb_order_management` r
+		where 1=1
+		<if test="deptIds!=null">
+			and r.dept_id in
+			<foreach item="item" index="index" collection="deptIds" open="("
+				separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="orderNumber!=null">
+			and r.order_number like '%${orderNumber}%'
+		</if>
+		
+		<if test="orderName!=null">
+			and r.order_name like '%${orderName}%'
+		</if>
+		<if test="orderStatus!=null">
+			and r.order_status=#{orderStatus}
+		</if>
+		<if test="orderApplicantId!=null">
+			and r.order_applicant_id  =#{orderApplicantId}
+		</if> 
+		 <if test="startTime!=null">
+			and r.create_time &gt;= CONCAT(#{startTime})
+		</if>
+		<if test="endTime!=null">
+			and r.create_time &lt;= CONCAT(#{endTime})
+		</if> 
+		order by r.order_id DESC 
+
+	</select>
+	
+
+</mapper>

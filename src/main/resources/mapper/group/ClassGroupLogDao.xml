@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.group.dao.ClassGroupLogDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.group.entity.ClassGroupLogEntity" id="classGroupLogMap">
+        <result property="classId" column="class_id"/>
+        <result property="logNumber" column="log_number"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="classGroupName" column="class_group_name"/>
+        <result property="baseTurnId" column="base_turn_id"/>
+        <result property="logType" column="log_type"/>
+        <result property="logStatus" column="log_status"/>
+        <result property="noteTaker" column="note_taker"/>
+        <result property="handoverPerson" column="handover_person"/>
+        <result property="handoverPersonId" column="handover_person_id"/>
+        <result property="successor" column="successor"/>
+        <result property="successorId" column="successor_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="monitor" column="monitor"/>
+        <result property="shouldAttendance" column="should_attendance"/>
+        <result property="attendance" column="attendance"/>
+        <result property="actualArrival" column="actual_arrival"/>
+        <result property="notArrived" column="not_arrived"/>
+        <result property="topArrived" column="top_arrived"/>
+        <result property="reasonsAbsence" column="reasons_absence"/>
+        <result property="successionRecord" column="succession_record"/>
+        <result property="onDuty" column="on_duty"/>
+        <result property="superiorNotice" column="superior_notice"/>
+        <result property="accountConfession" column="account_confession"/>
+        <result property="personnelMentalState" column="personnel_mental_state"/>
+        <result property="mentalException" column="mental_exception"/>
+        <result property="laborProtectiveArticles" column="labor_protective_articles"/>
+        <result property="protectiveException" column="protective_exception"/>
+        <result property="tools" column="tools"/>
+        <result property="toolsException" column="tools_exception"/>
+        <result property="otherException" column="other_exception"/>
+        <result property="workTask" column="work_task"/>
+        <result property="dangerousPoint" column="dangerous_point"/>
+        <result property="preventiveMeasures" column="preventive_measures"/>
+        <result property="manAgreement" column="man_agreement"/>
+        <result property="teamMembers" column="team_members"/>
+        <result property="workSummary" column="work_summary"/>
+        <result property="personCharge" column="person_charge"/>
+        <result property="rejectReason" column="reject_reason"/>
+    </resultMap>
+
+
+</mapper>
