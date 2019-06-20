@@ -140,7 +140,7 @@ public class FftUtils {
             k = calculate(k, out.getFs());
         }else if(type.equals("distance")){
             k = calculate(k, out.getFs());
-            k = calculate(k, out.getFs());
+            k = calculate(k, out.getFs()/1000);
         }
 
         out.setTimeYData(ArrayUtils.toObject(k));
