@@ -213,6 +213,13 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DeviceEntity> impl
         return clearNode(root);
     }
 
+    /**
+     * 获取设备异常统计信息
+     */
+    public List<Map<String,Object>> getDeviceStatus(){
+        return baseMapper.getDeviceStatus();
+    }
+
     private void getLineTreeNodeData(Map<String,Object> node, Integer inspectionType){
         List<Map<String,Object>> lines = lineService.selectByDept((Long)node.get("id"));
         logger.error("node:" + node.toString());
