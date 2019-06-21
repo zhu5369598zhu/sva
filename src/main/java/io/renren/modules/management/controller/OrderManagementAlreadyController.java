@@ -77,8 +77,12 @@ public class OrderManagementAlreadyController {
             	orderManagement.setOrderTypeName("缺陷工单"); 
             }
             ExceptionEntity exception = exceptionService.selectById(orderManagement.getExceptionId());
-            orderManagement.setExceptionName(exception.getName()); 
-            
+            if(exception !=null){
+                orderManagement.setExceptionName(exception.getName());
+            }else{
+                orderManagement.setExceptionName("");
+            }
+
         return R.ok().put("ordermanagement", orderManagement);
     }
 
