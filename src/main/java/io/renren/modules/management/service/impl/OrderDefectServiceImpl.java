@@ -83,10 +83,28 @@ public class OrderDefectServiceImpl extends ServiceImpl<OrderDefectDao, OrderDef
             List<InspectionResultMediaEntity> mediaEntityList = mediaService.selectListByResultId(result.getId());
             result.setMedias(mediaEntityList);
             result.setDeviceName(result.getDeviceName() + "[" + result.getDeviceCode() + "]");
-            result.setLimits(result.getUpLimit().toString() + "/" + result.getUpupLimit().toString() + "/" +
-                    result.getDownLimit().toString() + "/" + result.getDowndownLimit().toString());
-            
-            
+            StringBuffer buffer = new StringBuffer(20);
+            if(result.getUpLimit() != null){
+                buffer.append(result.getUpLimit() + "/");
+            }else{
+                buffer.append("-/");
+            }
+            if(result.getUpupLimit() !=null){
+                buffer.append(result.getUpupLimit());
+            }else{
+                buffer.append("-/");
+            }
+            if(result.getDownLimit() !=null){
+                buffer.append(result.getDownLimit());
+            }else{
+                buffer.append("-/");
+            }
+            if(result.getDowndownLimit() !=null){
+                buffer.append(result.getDowndownLimit());
+            }else{
+                buffer.append("-/");
+            }
+            result.setLimits(buffer.toString());
             if(result.getOrderStatus() == null || result.getOrderStatus() ==0  ) {
             	result.setOrderStatusName("拟制中");
             }else if(result.getOrderStatus() ==1) {
