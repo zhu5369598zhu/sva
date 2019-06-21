@@ -14,14 +14,14 @@
     </resultMap>
 
     <select id="isExist" resultType="java.lang.Integer" parameterType="io.renren.modules.inspection.entity.ZoneEntity">
-		select count(*) from tb_zone where zone_name = #{zoneName}
+		select count(*) from tb_zone where is_delete=0 and (zone_name = #{zoneName}
         <if test="zoneCode!=''">
             or zone_code = #{zoneCode}
-        </if>
+        </if>)
 	</select>
 
     <select id="selectByName" resultType="io.renren.modules.inspection.entity.ZoneEntity" parameterType="io.renren.modules.inspection.entity.ZoneEntity">
-        select * from tb_zone where zone_name=#{zoneName} limit 1
+        select * from tb_zone where is_delete=0 and zone_name=#{zoneName} limit 1
     </select>
 
 </mapper>

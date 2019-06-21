@@ -341,7 +341,7 @@ public class InspectionItemController {
     @RequestMapping("/delete")
     @RequiresPermissions("inspection:inspectionitem:delete")
     public R delete(@RequestBody Long[] ids){
-
+        boolean isOk = false;
         for(Long itemId:ids){
             InspectionItemEntity item = inspectionItemService.selectById(itemId);
             if(item != null){
@@ -368,12 +368,15 @@ public class InspectionItemController {
                     }
                 }
 
+                item.setIsDelete(1);
+                isOk = inspectionItemService.updateById(item);
+                if(!isOk){
+                    break;
+                }
             }
         }
 
-        boolean isOK = inspectionItemService.deleteBatchIds(Arrays.asList(ids));
-
-        if(isOK){
+        if(isOk){
             return R.ok();
         }else{
             return R.error(500,"服务器错误");

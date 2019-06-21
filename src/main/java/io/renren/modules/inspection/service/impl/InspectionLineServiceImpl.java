@@ -40,6 +40,7 @@ public class InspectionLineServiceImpl extends ServiceImpl<InspectionLineDao, In
                 new Query<InspectionLineEntity>(params).getPage(),
                 new EntityWrapper<InspectionLineEntity>()
                         .eq(deptId!=null,"dept_id",deptId)
+                        .eq("is_delete",0)
                         .like(StringUtils.isNotBlank(name),"name",name)
 
         );

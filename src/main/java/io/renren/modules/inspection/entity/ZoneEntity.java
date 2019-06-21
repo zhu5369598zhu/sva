@@ -54,6 +54,12 @@ public class ZoneEntity implements Serializable {
 	private Integer orderNum;
 
 	/**
+	 * 是否删除
+	 */
+	private Integer isDelete;
+
+
+	/**
 	 * 设置：巡区id
 	 */
 	public void setZoneId(Integer zoneId) {
@@ -142,5 +148,17 @@ public class ZoneEntity implements Serializable {
 	 */
 	public Integer getOrderNum() {
 		return orderNum;
+	}
+	/**
+	 * 设置：是否删除
+	 */
+	public void setIsDelete(Integer isDelete) {
+		this.isDelete = isDelete;
+	}
+	/**
+	 * 获取：是否删除
+	 */
+	public Integer getIsDelete() {
+		return isDelete;
 	}
 }

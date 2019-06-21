@@ -56,6 +56,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
 		Page<SysUserEntity> page = this.selectPage(
 			new Query<SysUserEntity>(params).getPage(),
 			new EntityWrapper<SysUserEntity>()
+					.eq("is_delete",0)
 				.like(StringUtils.isNotBlank(username),"username", username)
 				.in("dept_id", deptIds)
 		);
@@ -80,6 +81,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
 
 		List<SysUserEntity> list = this.selectList(
 				new EntityWrapper<SysUserEntity>()
+						.eq("is_delete",0)
 						.like(StringUtils.isNotBlank(username),"username", username)
 						.in("dept_id", deptIds)
 		);
@@ -160,7 +162,14 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
 		for(Long userId :userIdList){
 			sysUserRoleService.deleteByUserId(userId);
 		}
-		this.deleteBatchIds(userIdList);
+		for(Long userId:userIdList){
+			SysUserEntity user = this.selectById(userId);
+			if(user != null){
+				user.setIsDelete(1);
+				this.deleteById(user);
+			}
+		}
+		//this.deleteBatchIds(userIdList);
 	}
 
 	@Override

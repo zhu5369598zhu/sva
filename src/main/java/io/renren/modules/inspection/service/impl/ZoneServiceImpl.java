@@ -33,8 +33,9 @@ public class ZoneServiceImpl extends ServiceImpl<ZoneDao, ZoneEntity> implements
         Page<ZoneEntity> page = this.selectPage(
                 new Query<ZoneEntity>(params).getPage(),
                 new EntityWrapper<ZoneEntity>()
-                        .like(StringUtils.isNotBlank(zoneName),"zone_name", zoneName)
                         .eq( deptId != null , "dept_id", deptId)
+                        .eq("is_delete",0)
+                        .like(StringUtils.isNotBlank(zoneName),"zone_name", zoneName)
         );
 
         for(ZoneEntity zoneEntity : page.getRecords()){
@@ -52,8 +53,9 @@ public class ZoneServiceImpl extends ServiceImpl<ZoneDao, ZoneEntity> implements
 
         List<ZoneEntity> list = this.selectList(
                 new EntityWrapper<ZoneEntity>()
-                        .like(StringUtils.isNotBlank(zoneName),"zone_name", zoneName)
                         .eq( deptId != null , "dept_id", deptId)
+                        .eq("is_delete",0)
+                        .like(StringUtils.isNotBlank(zoneName),"zone_name", zoneName)
         );
 
         for(ZoneEntity zoneEntity : list){

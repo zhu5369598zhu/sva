@@ -106,7 +106,8 @@ public class DeviceController {
                     .append("行[")
                     .append(device.getDeviceName())
                     .append("]");
-            if (deviceService.isExist(device.getDeviceName(), device.getDeviceCode()) > 0) {
+            Integer count = deviceService.isExist(device.getDeviceName(), device.getDeviceCode());
+            if ( count > 0) {
                 result.append("重复\r\n");
                 continue;
             }
@@ -379,6 +380,7 @@ public class DeviceController {
     @RequestMapping("/delete")
     @RequiresPermissions("inspection:device:delete")
     public R delete(@RequestBody Integer[] deviceIds){
+        boolean isOK = false;
         for(Integer deviceId:deviceIds){
             HashMap<String, Object> params = new HashMap<String, Object>();
             params.put("device_id", deviceId);
@@ -386,8 +388,16 @@ public class DeviceController {
             if(zoneDevices.size() > 0){
                 return R.error(400,"设备已绑定到巡区，无法删除，请先取消绑定。");
             }
+
+            DeviceEntity deviceEntity = deviceService.selectById(deviceId);
+            if (deviceEntity != null){
+                deviceEntity.setIsDelete(1);
+                isOK = deviceService.updateById(deviceEntity);
+                if(!isOK){
+                    break;
+                }
+            }
         }
-        boolean isOK = deviceService.deleteBatchIds(Arrays.asList(deviceIds));
 
         if(isOK){
             return R.ok();

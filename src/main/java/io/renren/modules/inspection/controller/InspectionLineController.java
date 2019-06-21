@@ -191,16 +191,23 @@ public class InspectionLineController {
     @RequestMapping("/delete")
     @RequiresPermissions("inspection:inspectionline:delete")
     public R delete(@RequestBody Integer[] ids){
+        boolean isOk = false;
         for(Integer lineId:ids){
             InspectionLineEntity line = lineService.selectById(lineId);
-            if(line != null && line.getIsPublish().equals(1)){
-                return R.error(400,"线路已发布，不能删除。");
+            if(line != null){
+                if(line.getIsPublish().equals(1)){
+                    return R.error(400,"线路已发布，不能删除。");
+                } else {
+                    line.setIsDelete(1);
+                    isOk = inspectionLineService.updateById(line);
+                    if(!isOk){
+                        break;
+                    }
+                }
             }
         }
 
-        boolean isOK = inspectionLineService.deleteBatchIds(Arrays.asList(ids));
-
-        if(isOK){
+        if(isOk){
             return R.ok();
         }else{
             return R.error(500,"服务器错误");
