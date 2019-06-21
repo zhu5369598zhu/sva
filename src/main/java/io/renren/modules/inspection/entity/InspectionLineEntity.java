@@ -89,6 +89,12 @@ public class InspectionLineEntity implements Serializable {
 	 */
 	@TableField(exist = false)
 	private String downloadStatus;
+
+	/**
+	 * 是否删除
+	 */
+	private Integer isDelete;
+
 	/**
 	 * 设置：ID
 	 */
@@ -281,6 +287,18 @@ public class InspectionLineEntity implements Serializable {
 	 */
 	public String getDownloadStatus() {
 		return downloadStatus;
+	}
+	/**
+	 * 设置：是否删除
+	 */
+	public void setIsDelete(Integer isDelete) {
+		this.isDelete = isDelete;
+	}
+	/**
+	 * 获取：是否删除
+	 */
+	public Integer getIsDelete() {
+		return isDelete;
 	}
 
 }

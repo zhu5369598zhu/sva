@@ -29,18 +29,18 @@
     </resultMap>
 
     <select id="selectByGuid" resultType="io.renren.modules.inspection.entity.InspectionItemEntity">
-		select * from tb_inspection_item where guid = #{guid}
+		select * from tb_inspection_item where is_delete=0 and guid = #{guid}
 	</select>
 
     <select id="selectByDevice" resultType="java.util.HashMap" parameterType="java.lang.Long">
-		select id, name as lable, '' as code, 'item' as type from tb_inspection_item where device_id = #{deviceId}
+		select id, name as lable, '' as code, 'item' as type from tb_inspection_item where is_delete=0 and device_id = #{deviceId}
         <if test="inspectionType!=null">
             and inspection_type=#{inspectionType}
         </if>
 	</select>
 
     <select id="isExist" resultType="java.lang.Integer" parameterType="io.renren.modules.inspection.entity.InspectionItemEntity">
-        select count(*) from tb_inspection_item i, tb_device d where d.device_id = i.device_id and name = #{itemName} and d.device_code=#{deviceCode}
+        select count(*) from tb_inspection_item i, tb_device d where is_delete=0 and d.device_id = i.device_id and name = #{itemName} and d.device_code=#{deviceCode}
 	</select>
 
 </mapper>

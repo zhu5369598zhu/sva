@@ -43,8 +43,9 @@ public class PdaServiceImpl extends ServiceImpl<PdaDao, PdaEntity> implements Pd
         Page<PdaEntity> page = this.selectPage(
                 new Query<PdaEntity>(params).getPage(),
                 new EntityWrapper<PdaEntity>()
-                        .like(StringUtils.isNotBlank(pdaName),"pda_name", pdaName)
+                        .eq("is_delete", 0)
                         .eq( deptId != null , "dept_id", deptId)
+                        .like(StringUtils.isNotBlank(pdaName),"pda_name", pdaName)
         );
 
         for(PdaEntity pdaEntity : page.getRecords()){
@@ -69,8 +70,9 @@ public class PdaServiceImpl extends ServiceImpl<PdaDao, PdaEntity> implements Pd
         Integer isInspect = 1;
         List<PdaEntity> pdaList = this.selectList(
                 new EntityWrapper<PdaEntity>()
-                        .like(StringUtils.isNotBlank(key),filterField, key)
                         .eq( deptId != null , "dept_id", deptId)
+                        .eq("is_delete",0)
+                        .like(StringUtils.isNotBlank(key),filterField, key)
         );
 
         HashMap<String, Object> publishParams = new HashMap<String, Object>();

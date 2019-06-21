@@ -92,8 +92,10 @@ public class SysUserEntity implements Serializable {
 	 */
 	private Integer status;
 	/**
-	 * 状态  0：禁用   1：正常
+	 * 是否删除
 	 */
+	private Integer isDelete;
+
 	@TableField(exist = false)
 	private String statusName;
 
@@ -316,5 +318,18 @@ public class SysUserEntity implements Serializable {
 
 	public void setStatusName(String statusName) {
 		this.statusName = statusName;
+	}
+
+	/**
+	 * 设置：是否删除
+	 */
+	public void setIsDelete(Integer isDelete) {
+		this.isDelete = isDelete;
+	}
+	/**
+	 * 获取：是否删除
+	 */
+	public Integer getIsDelete() {
+		return isDelete;
 	}
 }

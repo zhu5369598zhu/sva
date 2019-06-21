@@ -65,6 +65,7 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DeviceEntity> impl
                 new EntityWrapper<DeviceEntity>()
                         .like(StringUtils.isNotBlank(key),filterfield, key)
                         .eq( deptId != null , "device_dept", deptId)
+                        .eq("is_delete",0)
         );
 
         for(DeviceEntity deviceEntity : page.getRecords()){
@@ -95,6 +96,7 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DeviceEntity> impl
                 new EntityWrapper<DeviceEntity>()
                 .like(StringUtils.isNotBlank(key),filterfield, key)
                 .eq( deptId != null , "device_dept", deptId)
+                .eq("is_delete",0)
         );
 
         for(DeviceEntity deviceEntity : list){
@@ -148,6 +150,7 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DeviceEntity> impl
                         .like(StringUtils.isNotBlank(key),filterField, key)
                         .eq( deptId != null , "device_dept", deptId)
                         .eq(isInspect != null, "is_inspect", isInspect)
+                        .eq("is_delete",0)
         );
         List<Map<String, Object>> zoneDeviceList = zoneDeviceService.findDeviceByzoneId(zoneId);
 
@@ -226,7 +229,6 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DeviceEntity> impl
         logger.error("lines:" + lines.toString());
 
 
-
         for(Map<String,Object> line:lines){
             List<Map<String,Object>> devices = deviceService.selectByLine((Long)line.get("id"));
             line.put("children", devices);
@@ -297,11 +299,6 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DeviceEntity> impl
     @Override
     public List<Map<String,Object>> selectByLine(Long lineId) {
         return baseMapper.selectByLine(lineId);
-    }
-
-    @Override
-    public boolean updateBatchIds(Collection<? extends Serializable> Ids){
-        return this.deleteBatchIds(Ids);
     }
 
     @Override

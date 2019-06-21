@@ -131,6 +131,7 @@ public class PdaController {
     @RequestMapping("/delete")
     @RequiresPermissions("inspection:pda:delete")
     public R delete(@RequestBody Integer[] pdaIds){
+        boolean isOk = false;
         for(Integer pdaId:pdaIds){
             PdaEntity pdaEntity = pdaService.selectById(pdaId);
             if(pdaEntity != null){
@@ -145,11 +146,18 @@ public class PdaController {
                         }
                     }
                 }
+                pdaEntity.setIsDelete(1);
+                isOk = pdaService.updateById(pdaEntity);
+                if(!isOk){
+                    break;
+                }
             }
         }
-        pdaService.deleteBatchIds(Arrays.asList(pdaIds));
-
-        return R.ok();
+        if(isOk){
+            return R.ok();
+        }else{
+            return R.error(500,"服务器错误");
+        }
     }
 
 }

@@ -24,7 +24,7 @@
     </resultMap>
 
     <select id="findDeviceList" resultType="java.util.HashMap" parameterType="java.lang.Long">
-        select device_id as id, device_name as lable, device_code as code, 'device' as type from tb_device where is_inspect=1 and device_dept = #{deptId}
+        select device_id as id, device_name as lable, device_code as code, 'device' as type from tb_device where is_delete=0 and is_inspect=1 and device_dept = #{deptId}
         <if test="deviceName != null">
             and (device_name like '%${deviceName}%' or device_code like '%${deviceName}%')
         </if>
@@ -36,7 +36,7 @@
     </select>
 
     <select id="selectByCode" resultType="io.renren.modules.inspection.entity.DeviceEntity" parameterType="io.renren.modules.inspection.entity.DeviceEntity">
-        select * from tb_device where device_id != #{deviceId} and device_code = #{deviceCode}  limit 1
+        select * from tb_device where is_delete=0 and device_id != #{deviceId} and device_code = #{deviceCode}  limit 1
     </select>
 
     <select id="selectByLine" resultType="java.util.HashMap" parameterType="java.lang.Long">
@@ -44,22 +44,22 @@
         from tb_line_zone l
         left join tb_zone_device z on l.zone_id = z.zone_id
         left join tb_device d on d.device_id = z.device_id
-        where l.line_id=#{lineId}
+        where d.is_delete=0 and l.line_id=#{lineId}
     </select>
 
     <select id="isExist" resultType="java.lang.Integer" parameterType="io.renren.modules.inspection.entity.DeviceEntity">
-		select count(*) from tb_device where device_name = #{deviceName}
+		select count(*) from tb_device where is_delete=0 and (device_name = #{deviceName}
         <if test="deviceCode!=''">
             or device_code = #{deviceCode}
-        </if>
+        </if>)
 	</select>
 
     <select id="selectByDeviceName" resultType="io.renren.modules.inspection.entity.DeviceEntity" parameterType="io.renren.modules.inspection.entity.DeviceEntity">
-		select * from tb_device where device_name = #{deviceName}
+		select * from tb_device where is_delete=0 and device_name = #{deviceName}
 	</select>
 
     <select id="selectByDeviceCode" resultType="io.renren.modules.inspection.entity.DeviceEntity" parameterType="io.renren.modules.inspection.entity.DeviceEntity">
-		select * from tb_device where device_Code = #{deviceCode}
+		select * from tb_device where is_delete=0 and device_Code = #{deviceCode}
 	</select>
 
     <select id="getDeviceStatus" resultType="java.util.HashMap" parameterType="java.lang.Long">
@@ -69,7 +69,7 @@
         left join `tb_device` d on i.device_id=d.device_id
         left join `tb_device_level` l on d.device_level=l.`id`
         left join `tb_exception` e on r.exception_id=e.id
-        where d.device_id is not null and (e.id=1 or e.id=3 or e.id=6)
+        where d.is_delete=0 and d.device_id is not null and (e.id=1 or e.id=3 or e.id=6)
         group by l.id,e.id
 	</select>
 

@@ -68,6 +68,7 @@ public class InspectionItemServiceImpl extends ServiceImpl<InspectionItemDao, In
                 new EntityWrapper<InspectionItemEntity>()
                     .eq(deviceId!= null, "device_id", deviceId)
                     .eq(isCheck!= null, "is_check", isCheck)
+                    .eq("is_delete",0)
                     .like(StringUtils.isNotBlank(name), "name", name)
                     .orderBy("order_num")
         );
@@ -146,6 +147,7 @@ public class InspectionItemServiceImpl extends ServiceImpl<InspectionItemDao, In
                 new EntityWrapper<InspectionItemEntity>()
                         .eq(deviceId!= null, "device_id", deviceId)
                         .eq(isCheck!= null, "is_check", isCheck)
+                        .eq("is_delete",0)
                         .like(StringUtils.isNotBlank(name), "name", name)
                         .orderBy("order_num")
         );

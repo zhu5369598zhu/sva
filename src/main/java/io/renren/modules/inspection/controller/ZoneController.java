@@ -187,6 +187,7 @@ public class ZoneController {
     @RequestMapping("/delete")
     @RequiresPermissions("inspection:zone:delete")
     public R delete(@RequestBody Integer[] zoneIds){
+        boolean isOk = false;
         for(Integer zoneId:zoneIds){
             HashMap<String, Object> params = new HashMap<String, Object>();
             params.put("zone_id", zoneId);
@@ -205,10 +206,20 @@ public class ZoneController {
                 }
             }
 
+            ZoneEntity zone = zoneService.selectById(zoneId);
+            if(zone != null) {
+                zone.setIsDelete(1);
+                isOk = zoneService.updateById(zone);
+                if (!isOk) {
+                    break;
+                }
+            }
         }
-        zoneService.deleteBatchIds(Arrays.asList(zoneIds));
-
-        return R.ok();
+        if(isOk){
+            return R.ok();
+        }else{
+            return R.error(500,"服务器错误");
+        }
     }
 
 }

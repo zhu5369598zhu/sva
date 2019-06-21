@@ -718,24 +718,24 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
         if(turn != null){
             result.setTurnId(turn.getId().intValue());
         } else {
-            return "";
+            return "轮次没有找到";
         }
         SysUserEntity user = userService.selectByGuid(result.getUserGuid());
         if(user != null){
             result.setUserId(user.getUserId().intValue());
         } else {
-            return "";
+            return "用户没有找到";
         }
         InspectionItemEntity item = itemService.selectByGuid(result.getItemGuid());
         if(item != null){
             result.setItemId(item.getId());
         } else {
-            return "";
+            return "巡检项没有找到";
         }
 
         ExceptionEntity exception = exceptionService.selectById(result.getExceptionId());
         if(exception == null){
-            return "";
+            return "异常信息没有找到";
         }
 
         result.setGuid(UUID.randomUUID().toString());

@@ -53,10 +53,6 @@ public interface DeviceService extends IService<DeviceEntity> {
      */
     public List<DeviceEntity> findDeviceUnBind(String filterField, String key, Long zoneId);
 
-    /**
-     * 批量修改
-     */
-    public boolean updateBatchIds(Collection<? extends Serializable> Ids);
 
     public List<DeviceEntity> all (Map<String, Object> params);
 

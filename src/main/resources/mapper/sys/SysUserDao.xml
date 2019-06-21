@@ -18,18 +18,18 @@
 	</select>
 	
 	<select id="queryByUserName" resultType="io.renren.modules.sys.entity.SysUserEntity">
-		select * from sys_user where username = #{username}
+		select * from sys_user where is_delete=0 and username = #{username}
 	</select>
 
 	<select id="selectByGuid" resultType="io.renren.modules.sys.entity.SysUserEntity">
-		select * from sys_user where guid = #{guid}
+		select * from sys_user where is_delete=0 and guid = #{guid}
 	</select>
 
 	<select id="isExist" resultType="java.lang.Integer" parameterType="io.renren.modules.sys.entity.SysUserEntity">
-		select count(*) from sys_user where username = #{userName}
+		select count(*) from sys_user where is_delete=0 and (username = #{userName}
 		<if test="userCode!=''">
 			or user_code = #{userCode}
-		</if>
+		</if>)
 	</select>
 
 </mapper>

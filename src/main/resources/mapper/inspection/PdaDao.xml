@@ -14,7 +14,7 @@
     </resultMap>
 
     <select id="selectByMac" resultType="io.renren.modules.inspection.entity.PdaEntity">
-		select * from tb_pda where pda_mac = #{mac}
+		select * from tb_pda where is_delete=0 and pda_mac = #{mac}
 	</select>
 
 </mapper>
