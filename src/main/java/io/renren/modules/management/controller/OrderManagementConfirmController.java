@@ -43,7 +43,7 @@ public class OrderManagementConfirmController {
    
     @Autowired
     private OrderManagementConfirmService orderManagementConfirmService;
-    
+
     @Autowired
     private NewsService newsService;
     
@@ -75,9 +75,13 @@ public class OrderManagementConfirmController {
 				orderManagement.setOrderTypeName("填报工单");
 			}else if(orderManagement.getOrderType() ==1) {
 				orderManagement.setOrderTypeName("缺陷工单");
-			} 
+			}
 			ExceptionEntity exception = exceptionService.selectById(orderManagement.getExceptionId());
-            orderManagement.setExceptionName(exception.getName()); 
+			if(exception !=null){
+                orderManagement.setExceptionName(exception.getName());
+            }else{
+                orderManagement.setExceptionName("");
+            }
 			
         return R.ok().put("ordermanagement", orderManagement);
     }
