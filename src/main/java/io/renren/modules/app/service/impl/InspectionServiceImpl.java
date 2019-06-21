@@ -174,10 +174,14 @@ public class InspectionServiceImpl extends ServiceImpl<InspectionLineDao, Inspec
                         itemJson.put("InspectionType", itemEntity.getInspectionType());
                         itemJson.put("order_num", itemEntity.getOrderNum());
                         itemJson.put("precision", itemEntity.getPrecision());
+                        itemJson.put("upup_used",itemEntity.getUpupUsed());
                         itemJson.put("upup_limit", itemEntity.getUpLimit());
                         itemJson.put("up_limit", itemEntity.getUpupLimit());
+                        itemJson.put("up_used",itemEntity.getUpUsed());
                         itemJson.put("down_limit", itemEntity.getDownLimit());
+                        itemJson.put("down_used",itemEntity.getDownUsed());
                         itemJson.put("downdown_limit", itemEntity.getDowndownLimit());
+                        itemJson.put("downdown_used",itemEntity.getDownUsed());
                         itemJson.put("device_guid", deviceEntity.getGuid());
 
                         //抄表的单位特殊处理

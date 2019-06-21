@@ -61,4 +61,16 @@
     <select id="selectByDeviceCode" resultType="io.renren.modules.inspection.entity.DeviceEntity" parameterType="io.renren.modules.inspection.entity.DeviceEntity">
 		select * from tb_device where device_Code = #{deviceCode}
 	</select>
+
+    <select id="getDeviceStatus" resultType="java.util.HashMap" parameterType="java.lang.Long">
+		select l.name as source,e.name as target,count(*) as value
+        from `tb_inspection_result` r
+        left join `tb_inspection_item` i on r.item_id=i.id
+        left join `tb_device` d on i.device_id=d.device_id
+        left join `tb_device_level` l on d.device_level=l.`id`
+        left join `tb_exception` e on r.exception_id=e.id
+        where d.device_id is not null and (e.id=1 or e.id=3 or e.id=6)
+        group by l.id,e.id
+	</select>
+
 </mapper>

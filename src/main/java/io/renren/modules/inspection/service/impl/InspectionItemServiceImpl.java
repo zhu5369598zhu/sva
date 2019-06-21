@@ -243,7 +243,8 @@ public class InspectionItemServiceImpl extends ServiceImpl<InspectionItemDao, In
     @Override
     @Transactional
     public void update(InspectionItemEntity inspectionItemEntity){
-        this.updateById(inspectionItemEntity);
+        inspectionItemEntity.setIsCheck(1);
+        this.updateAllColumnById(inspectionItemEntity);
         if(inspectionItemEntity.getExtraList() != null){
             extraService.saveOrUpdate(inspectionItemEntity.getId(), inspectionItemEntity.getExtraList());
         }

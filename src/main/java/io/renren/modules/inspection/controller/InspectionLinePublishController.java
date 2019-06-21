@@ -79,6 +79,10 @@ public class InspectionLinePublishController {
         List<InspectionLinePublishEntity> linePublishEntities = new ArrayList<>(pdaIds.length);
 
         for(Integer i = 0; i < pdaIds.length;i++){
+            InspectionLinePublishEntity linePublishOld = inspectionLinePublishService.selectByParams(lineId,pdaIds[i]);
+            if(linePublishOld !=null){
+                inspectionLinePublishService.deleteById(linePublishOld.getId());
+            }
             InspectionLinePublishEntity linePublish = new InspectionLinePublishEntity();
             linePublish.setLineId(lineId);
             linePublish.setPdaId(pdaIds[i]);

@@ -247,6 +247,16 @@ public class DeviceController {
     }
 
     /**
+     * 获取设备异常状态
+     */
+    @RequestMapping("/getstatus")
+    public R getstatus(){
+        List<Map<String,Object>> statusList = deviceService.getDeviceStatus();
+
+        return R.ok().put("status", statusList);
+    }
+
+    /**
      * 选择未绑定到巡区的所有设备
      */
     @RequestMapping("/selectunbind")

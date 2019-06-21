@@ -30,4 +30,6 @@ public interface DeviceDao extends BaseMapper<DeviceEntity> {
 
     DeviceEntity selectByDeviceCode(@Param("deviceCode") String deviceCode);
 
+    List<Map<String,Object>> getDeviceStatus();
+
 }
