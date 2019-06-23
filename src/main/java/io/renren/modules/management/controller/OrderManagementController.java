@@ -1,10 +1,7 @@
 package io.renren.modules.management.controller;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -216,7 +213,15 @@ public class OrderManagementController {
     @RequestMapping("/delete")
     @RequiresPermissions("management:ordermanagement:delete")
     public R delete(@RequestBody Integer[] orderIds){
-			orderManagementService.deleteBatchIds(Arrays.asList(orderIds));
+
+		List<OrderManagementEntity> orderManagementList = orderManagementService.selectBatchIds(Arrays.asList(orderIds));
+		Integer[] integers = new Integer[orderIds.length];
+		for(int i=0 ;i< orderManagementList.size();i++){
+			if(orderManagementList.get(i).getOrderStatus() == 0){
+				integers[i] = orderManagementList.get(i).getOrderStatus();
+			}
+		}
+		orderManagementService.deleteBatchIds(Arrays.asList(integers));
 
         return R.ok();
     }

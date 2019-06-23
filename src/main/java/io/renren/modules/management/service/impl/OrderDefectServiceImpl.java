@@ -90,19 +90,19 @@ public class OrderDefectServiceImpl extends ServiceImpl<OrderDefectDao, OrderDef
                 buffer.append("-/");
             }
             if(result.getUpupLimit() !=null){
-                buffer.append(result.getUpupLimit());
+                buffer.append(result.getUpupLimit() + "/");
             }else{
                 buffer.append("-/");
             }
             if(result.getDownLimit() !=null){
-                buffer.append(result.getDownLimit());
+                buffer.append(result.getDownLimit() + "/");
             }else{
                 buffer.append("-/");
             }
             if(result.getDowndownLimit() !=null){
-                buffer.append(result.getDowndownLimit());
+                buffer.append(result.getDowndownLimit() );
             }else{
-                buffer.append("-/");
+                buffer.append("-");
             }
             result.setLimits(buffer.toString());
             if(result.getOrderStatus() == null || result.getOrderStatus() ==0  ) {
