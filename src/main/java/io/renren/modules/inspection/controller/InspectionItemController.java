@@ -283,6 +283,14 @@ public class InspectionItemController {
     @RequiresPermissions("inspection:inspectionitem:info")
     public R info(@PathVariable("id") Integer id){
         InspectionItemEntity inspectionItem = inspectionItemService.selectById(id);
+        //如果是抄表，单位重新读取
+        if (inspectionItem.getInspectionType().equals(3)) {
+            UnitEntity unit = unitService.selectById(inspectionItem.getUnit());
+            if(unit != null){
+                inspectionItem.setUnit(unit.getName());
+            }
+        }
+
         List<InspectionItemExtraEntity> extras = extraService.selectList(
                 new EntityWrapper<InspectionItemExtraEntity>()
                         .eq(id != null, "item_id", id)
