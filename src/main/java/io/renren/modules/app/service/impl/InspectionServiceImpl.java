@@ -129,16 +129,18 @@ public class InspectionServiceImpl extends ServiceImpl<InspectionLineDao, Inspec
                 Map<String, Object> lineZoneJson = new HashMap<>();
                 Map<String, Object> zoneJson = new HashMap<>();
                 ZoneEntity zone = zoneService.selectById(lineZoneEntity.getZoneId());
-                lineZoneJson.put("line_guid", lineEntity.getGuid());
-                lineZoneJson.put("zone_guid", zone.getGuid());
-                lineZoneJson.put("orderNum", lineZoneEntity.getOrderNum());
-                lineZoneList.add(lineZoneJson);
+                if (zone != null && zone.getIsDelete() != 1){
+                    lineZoneJson.put("line_guid", lineEntity.getGuid());
+                    lineZoneJson.put("zone_guid", zone.getGuid());
+                    lineZoneJson.put("orderNum", lineZoneEntity.getOrderNum());
+                    lineZoneList.add(lineZoneJson);
 
-                zoneJson.put("zone_guid", zone.getGuid());
-                zoneJson.put("zoneName", zone.getZoneName());
-                zoneJson.put("zoneCode", zone.getZoneCode());
-                zoneJson.put("order_num", zone.getOrderNum());
-                zoneList.add(zoneJson);
+                    zoneJson.put("zone_guid", zone.getGuid());
+                    zoneJson.put("zoneName", zone.getZoneName());
+                    zoneJson.put("zoneCode", zone.getZoneCode());
+                    zoneJson.put("order_num", zone.getOrderNum());
+                    zoneList.add(zoneJson);
+                }
 
                 //获取设备
                 Map<String, Object> zoneDeviceParams = new HashMap<>();
@@ -146,82 +148,86 @@ public class InspectionServiceImpl extends ServiceImpl<InspectionLineDao, Inspec
                 List<ZoneDeviceEntity> zoneDeviceEntities = zoneDeviceService.selectByMap(zoneDeviceParams);
                 for(ZoneDeviceEntity zoneDeviceEntity : zoneDeviceEntities) {
                     DeviceEntity deviceEntity = deviceService.selectById(zoneDeviceEntity.getDeviceId());
-                    Map<String, Object> zoneDeviceJson = new HashMap<>();
-                    zoneDeviceJson.put("zone_guid",zone.getGuid());
-                    zoneDeviceJson.put("device_guid",deviceEntity.getGuid());
-                    zoneDeviceJson.put("orderNum",zoneDeviceEntity.getOrderNum());
-                    zoneDeviceList.add(zoneDeviceJson);
+                    if(deviceEntity != null && deviceEntity.getIsDelete() != 1){
+                        Map<String, Object> zoneDeviceJson = new HashMap<>();
+                        zoneDeviceJson.put("zone_guid",zone.getGuid());
+                        zoneDeviceJson.put("device_guid",deviceEntity.getGuid());
+                        zoneDeviceJson.put("orderNum",zoneDeviceEntity.getOrderNum());
+                        zoneDeviceList.add(zoneDeviceJson);
 
-                    Map<String, Object> deviceJson = new HashMap<>();
-                    deviceJson.put("device_guid", deviceEntity.getGuid());
-                    deviceJson.put("deviceName", deviceEntity.getDeviceName());
-                    deviceJson.put("deviceCode", deviceEntity.getDeviceCode());
-                    deviceJson.put("deviceNum", deviceEntity.getDeviceNum());
-                    deviceList.add(deviceJson);
+                        Map<String, Object> deviceJson = new HashMap<>();
+                        deviceJson.put("device_guid", deviceEntity.getGuid());
+                        deviceJson.put("deviceName", deviceEntity.getDeviceName());
+                        deviceJson.put("deviceCode", deviceEntity.getDeviceCode());
+                        deviceJson.put("deviceNum", deviceEntity.getDeviceNum());
+                        deviceList.add(deviceJson);
+                    }
+
 
                     //获取巡检项
                     Map<String, Object> itemParams = new HashMap<>();
                     itemParams.put("device_id", deviceEntity.getDeviceId());
                     List<InspectionItemEntity> itemEntities = itemService.selectByMap(itemParams);
                     for(InspectionItemEntity itemEntity : itemEntities){
-                        Map<String,Object> itemJson = new HashMap<>();
-                        itemJson.put("item_guid", itemEntity.getGuid());
-                        itemJson.put("name", itemEntity.getName());
-                        itemJson.put("defaultRpm", itemEntity.getDefaultRpm());
-                        itemJson.put("emissivity", itemEntity.getEmissivity());
-                        itemJson.put("frequency", itemEntity.getFrequency());
-                        itemJson.put("remark", itemEntity.getRemark());
-                        itemJson.put("InspectionType", itemEntity.getInspectionType());
-                        itemJson.put("order_num", itemEntity.getOrderNum());
-                        itemJson.put("precision", itemEntity.getPrecision());
-                        itemJson.put("upup_used",itemEntity.getUpupUsed());
-                        itemJson.put("upup_limit", itemEntity.getUpLimit());
-                        itemJson.put("up_limit", itemEntity.getUpupLimit());
-                        itemJson.put("up_used",itemEntity.getUpUsed());
-                        itemJson.put("down_limit", itemEntity.getDownLimit());
-                        itemJson.put("down_used",itemEntity.getDownUsed());
-                        itemJson.put("downdown_limit", itemEntity.getDowndownLimit());
-                        itemJson.put("downdown_used",itemEntity.getDownUsed());
-                        itemJson.put("device_guid", deviceEntity.getGuid());
+                        if(itemEntity.getIsDelete() != 1){
+                            Map<String,Object> itemJson = new HashMap<>();
+                            itemJson.put("item_guid", itemEntity.getGuid());
+                            itemJson.put("name", itemEntity.getName());
+                            itemJson.put("defaultRpm", itemEntity.getDefaultRpm());
+                            itemJson.put("emissivity", itemEntity.getEmissivity());
+                            itemJson.put("frequency", itemEntity.getFrequency());
+                            itemJson.put("remark", itemEntity.getRemark());
+                            itemJson.put("InspectionType", itemEntity.getInspectionType());
+                            itemJson.put("order_num", itemEntity.getOrderNum());
+                            itemJson.put("precision", itemEntity.getPrecision());
+                            itemJson.put("upup_used",itemEntity.getUpupUsed());
+                            itemJson.put("upup_limit", itemEntity.getUpLimit());
+                            itemJson.put("up_limit", itemEntity.getUpupLimit());
+                            itemJson.put("up_used",itemEntity.getUpUsed());
+                            itemJson.put("down_limit", itemEntity.getDownLimit());
+                            itemJson.put("down_used",itemEntity.getDownUsed());
+                            itemJson.put("downdown_limit", itemEntity.getDowndownLimit());
+                            itemJson.put("downdown_used",itemEntity.getDownUsed());
+                            itemJson.put("device_guid", deviceEntity.getGuid());
 
-                        //抄表的单位特殊处理
-                        if (itemEntity.getInspectionType() == 3){
-                            UnitEntity unitEntity = unitService.selectById(itemEntity.getUnit());
-                            if(unitEntity != null){
-                                itemJson.put("unit", unitEntity.getName());
+                            //抄表的单位特殊处理
+                            if (itemEntity.getInspectionType() == 3){
+                                UnitEntity unitEntity = unitService.selectById(itemEntity.getUnit());
+                                if(unitEntity != null){
+                                    itemJson.put("unit", unitEntity.getName());
+                                }
+                            }else{
+                                itemJson.put("unit", itemEntity.getUnit());
                             }
-                        }else{
-                            itemJson.put("unit", itemEntity.getUnit());
+
+                            itemList.add(itemJson);
+
+
+                            //获取观察扩展
+                            Map<String, Object> extraParams = new HashMap<>();
+                            extraParams.put("item_id", itemEntity.getId());
+                            List<InspectionItemExtraEntity> extras = extraService.selectByMap(extraParams);
+                            for (InspectionItemExtraEntity extra : extras) {
+                                Map<String, Object> extraJson = new HashMap<>();
+                                extraJson.put("extra_guid", extra.getGuid());
+                                extraJson.put("name", extra.getName());
+                                extraJson.put("exceptionId", extra.getExceptionId());
+                                extraJson.put("item_guid", itemEntity.getGuid());
+                                extraList.add(extraJson);
+                            }
+
+                            //获取预设扩展
+                            Map<String, Object> prosuppositionParams = new HashMap<>();
+                            prosuppositionParams.put("item_id", itemEntity.getId());
+                            List<InspectionItemPresuppositionEntity> presuppositions = presuppositionService.selectByMap(prosuppositionParams);
+                            for (InspectionItemPresuppositionEntity presupposition : presuppositions) {
+                                Map<String, Object> presuppositionJson = new HashMap<>();
+                                presuppositionJson.put("presupposition_guid", presupposition.getGuid());
+                                presuppositionJson.put("name", presupposition.getName());
+                                presuppositionJson.put("item_guid", itemEntity.getGuid());
+                                presuppositionList.add(presuppositionJson);
+                            }
                         }
-
-                        itemList.add(itemJson);
-
-                        //获取观察扩展
-                        Map<String, Object> extraParams = new HashMap<>();
-                        extraParams.put("item_id", itemEntity.getId());
-                        List<InspectionItemExtraEntity> extras = extraService.selectByMap(extraParams);
-                        for (InspectionItemExtraEntity extra : extras) {
-                            Map<String, Object> extraJson = new HashMap<>();
-                            extraJson.put("extra_guid", extra.getGuid());
-                            extraJson.put("name", extra.getName());
-                            extraJson.put("exceptionId", extra.getExceptionId());
-                            extraJson.put("item_guid", itemEntity.getGuid());
-                            extraList.add(extraJson);
-                        }
-
-                        //获取预设扩展
-                        Map<String, Object> prosuppositionParams = new HashMap<>();
-                        prosuppositionParams.put("item_id", itemEntity.getId());
-                        List<InspectionItemPresuppositionEntity> presuppositions = presuppositionService.selectByMap(prosuppositionParams);
-                        for (InspectionItemPresuppositionEntity presupposition : presuppositions) {
-                            Map<String, Object> presuppositionJson = new HashMap<>();
-                            presuppositionJson.put("presupposition_guid", presupposition.getGuid());
-                            presuppositionJson.put("name", presupposition.getName());
-                            presuppositionJson.put("item_guid", itemEntity.getGuid());
-                            presuppositionList.add(presuppositionJson);
-                        }
-
-
                     }
                 }
             }
@@ -302,19 +308,20 @@ public class InspectionServiceImpl extends ServiceImpl<InspectionLineDao, Inspec
                 List<ClassWorkerEntity> workerEntities = workerService.selectByMap(workerParams);
                 for(ClassWorkerEntity worker : workerEntities) {
                     SysUserEntity user = userService.selectById(worker.getUserId());
-                    Map<String,Object> classGroupWorkerJson = new HashMap<>();
-                    classGroupWorkerJson.put("worker_guid",user.getGuid());
-                    classGroupWorkerJson.put("class_group_guid", classGroupEntity.getGuid());
-                    classGroupWorkerList.add(classGroupWorkerJson);
-                    Map<String,Object> workerJson = new HashMap<>();
-                    workerJson.put("worker_guid", user.getGuid());
-                    workerJson.put("userName", user.getUsername());
-                    workerJson.put("userCode", user.getUserCode());
-                    workerJson.put("password", user.getPassword());
-                    workerJson.put("salt", user.getSalt());
-                    workerList.add(workerJson);
+                    if(user != null && user.getIsDelete() != 1){
+                        Map<String,Object> classGroupWorkerJson = new HashMap<>();
+                        classGroupWorkerJson.put("worker_guid",user.getGuid());
+                        classGroupWorkerJson.put("class_group_guid", classGroupEntity.getGuid());
+                        classGroupWorkerList.add(classGroupWorkerJson);
+                        Map<String,Object> workerJson = new HashMap<>();
+                        workerJson.put("worker_guid", user.getGuid());
+                        workerJson.put("userName", user.getUsername());
+                        workerJson.put("userCode", user.getUserCode());
+                        workerJson.put("password", user.getPassword());
+                        workerJson.put("salt", user.getSalt());
+                        workerList.add(workerJson);
+                    }
                 }
-
             }
         }
 
