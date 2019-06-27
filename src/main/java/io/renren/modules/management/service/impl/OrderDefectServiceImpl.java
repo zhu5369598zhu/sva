@@ -106,11 +106,11 @@ public class OrderDefectServiceImpl extends ServiceImpl<OrderDefectDao, OrderDef
             }
             result.setLimits(buffer.toString());
             if(result.getOrderStatus() == null || result.getOrderStatus() ==0  ) {
-            	result.setOrderStatusName("拟制中");
-            }else if(result.getOrderStatus() ==1) {
             	result.setOrderStatusName("待确认");
+            }else if(result.getOrderStatus() ==1) {
+            	result.setOrderStatusName("已确认");
             }else if(result.getOrderStatus() ==2) {
-            	result.setOrderStatusName("已确认"); 
+            	result.setOrderStatusName("已挂起");
             }
                                                                                                                                                        
         }
