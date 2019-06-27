@@ -17,4 +17,5 @@ public interface ZoneDao extends BaseMapper<ZoneEntity> {
 
     Integer isExist(@Param("zoneName") String zoneName, @Param("zoneCode") String zoneCode);
     ZoneEntity selectByName(@Param("zoneName") String zoneName);
+    public ZoneEntity selectByZoneCode(@Param("zoneCode") String zoneCode);
 }

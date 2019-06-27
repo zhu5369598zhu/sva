@@ -47,9 +47,12 @@ public class AppUpgradeController {
         response.setContentType("image/png");
 
         AppUpgradeEntity app = appUpgradeService.selectById(1);
-
         ServletOutputStream out = response.getOutputStream();
-        out.write(app.getAppQrcode());
+        if(app !=null && app.getAppQrcode() != null)
+        {
+            out.write(app.getAppQrcode());
+        }
+
         IOUtils.closeQuietly(out);
         response.setContentLength(app.getAppQrcode().length);
     }

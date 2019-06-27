@@ -57,7 +57,7 @@ public class DeviceQrcodeController {
         response.setContentType("image/png");
 
         DeviceQrcodeEntity qrcode = deviceQrcodeService.selectByDeviceId(deviceId);
-        if(qrcode != null){
+        if(qrcode != null && qrcode.getData() != null){
             ServletOutputStream out = response.getOutputStream();
             out.write(qrcode.getData());
             IOUtils.closeQuietly(out);

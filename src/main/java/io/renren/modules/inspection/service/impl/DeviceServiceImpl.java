@@ -70,7 +70,9 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DeviceEntity> impl
 
         for(DeviceEntity deviceEntity : page.getRecords()){
             SysDeptEntity deptEntity = deptService.selectById(deviceEntity.getDeviceDept());
-            deviceEntity.setDeptName(deptEntity.getName());
+            if(deptEntity != null){
+                deviceEntity.setDeptName(deptEntity.getName());
+            }
         }
         for(DeviceEntity deviceEntity : page.getRecords()){
             DeviceLevelEntity level = levelService.selectById(deviceEntity.getDeviceLevel());

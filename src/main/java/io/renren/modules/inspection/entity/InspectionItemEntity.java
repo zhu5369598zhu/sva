@@ -127,6 +127,20 @@ public class InspectionItemEntity implements Serializable {
 	 * 是否启用下限
 	 */
 	private Integer downUsed;
+
+	public String getLimits() {
+		return limits;
+	}
+
+	public void setLimits(String limits) {
+		this.limits = limits;
+	}
+
+	/**
+	 * 限制范围
+	 */
+	@TableField(exist = false)
+	public String limits;
 	/**
 	 * 备注
 	 */
@@ -403,6 +417,7 @@ public class InspectionItemEntity implements Serializable {
 	public Double getDownLimit() {
 		return downLimit;
 	}
+
 	/**
 	 * 获取：备注
 	 */

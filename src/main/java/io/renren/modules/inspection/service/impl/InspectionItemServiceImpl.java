@@ -70,6 +70,7 @@ public class InspectionItemServiceImpl extends ServiceImpl<InspectionItemDao, In
                     .eq(isCheck!= null, "is_check", isCheck)
                     .eq("is_delete",0)
                     .like(StringUtils.isNotBlank(name), "name", name)
+                    .orderBy("device_id")
                     .orderBy("order_num")
         );
 
@@ -87,6 +88,10 @@ public class InspectionItemServiceImpl extends ServiceImpl<InspectionItemDao, In
                 inspectionItemEntity.setInspectionStatusName(inspectionStatusEntity.getName());
             }
 
+            if(inspectionItemEntity.getUpLimit() != null && inspectionItemEntity.getUpupLimit() != null && inspectionItemEntity.getDownLimit() !=null && inspectionItemEntity.getDowndownLimit() !=null)
+                inspectionItemEntity.setLimits(inspectionItemEntity.getUpupLimit().toString() + "/" + inspectionItemEntity.getUpLimit().toString() + "/" +
+                        inspectionItemEntity.getDownLimit().toString() + "/" + inspectionItemEntity.getDowndownLimit().toString());
+
             //如果是抄表，单位重新读取
             if (inspectionItemEntity.getInspectionType().equals(3)) {
                 UnitEntity unit = unitService.selectById(inspectionItemEntity.getUnit());
@@ -96,10 +101,14 @@ public class InspectionItemServiceImpl extends ServiceImpl<InspectionItemDao, In
             }
 
             SamplingFrequencyEntity samplingFrequencyEntity = samplingFrequencyService.selectById(inspectionItemEntity.getFrequency());
-            inspectionItemEntity.setFrequencyName(samplingFrequencyEntity.getName());
+            if(samplingFrequencyEntity != null) {
+                inspectionItemEntity.setFrequencyName(samplingFrequencyEntity.getName());
+            }
 
             SamplingPrecisionEntity samplingPrecisionEntity = samplingPrecisionService.selectById(inspectionItemEntity.getPrecision());
-            inspectionItemEntity.setPrecisionName(samplingPrecisionEntity.getName());
+            if(samplingPrecisionEntity != null) {
+                inspectionItemEntity.setPrecisionName(samplingPrecisionEntity.getName());
+            }
 
             Integer itemId = inspectionItemEntity.getId();
 

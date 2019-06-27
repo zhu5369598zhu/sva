@@ -163,7 +163,12 @@ public class ZoneController {
     public R save(@RequestBody ZoneEntity zone){
             zone.setCreateTime(new Date());
             zone.setGuid(UUID.randomUUID().toString());
-			zoneService.insert(zone);
+            ZoneEntity tmp = zoneService.selectByZoneCode(zone.getZoneCode());
+            if(tmp == null){
+                zoneService.insert(zone);
+            }else{
+        return R.error(400, "编码已绑定过其它巡区，不能再次绑定。");
+    }
 
         return R.ok();
     }
@@ -175,7 +180,16 @@ public class ZoneController {
     @RequestMapping("/update")
     @RequiresPermissions("inspection:zone:update")
     public R update(@RequestBody ZoneEntity zone){
-			zoneService.updateById(zone);
+        ZoneEntity tmp = zoneService.selectByZoneCode(zone.getZoneCode());
+        if(tmp != null){
+            if(tmp.getZoneId() == zone.getZoneId()){
+                zoneService.updateById(zone);
+            } else {
+                return R.error(400, "编码已绑定过其它巡区，不能再次绑定。");
+            }
+        }else{
+            zoneService.updateById(zone);
+        }
 
         return R.ok();
     }
@@ -200,7 +214,7 @@ public class ZoneController {
             if(lineZoneEntities.size() > 0){
                 for(LineZoneEntity lineZoneEntity:lineZoneEntities){
                     InspectionLineEntity lineEntity = lineService.selectById(lineZoneEntity.getLineId());
-                    if(lineEntity != null){
+                    if(lineEntity != null && lineEntity.getIsDelete() == 0){
                         return R.error(400,"该巡区已绑定到巡检线路[" + lineEntity.getName() + "]，请选解除绑定再删除。");
                     }
                 }
