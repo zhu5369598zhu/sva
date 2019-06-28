@@ -29,6 +29,7 @@ public class DeviceDocServiceImpl extends ServiceImpl<DeviceDocDao, DeviceDocEnt
         Page<DeviceDocEntity> page = this.selectPage(
                 new Query<DeviceDocEntity>(params).getPage(),
                 new EntityWrapper<DeviceDocEntity>()
+                .setSqlSelect("id","guid","device_id","category","filename","user_id","create_time")
                 .eq("device_id", deviceId)
                 .eq("category", category)
                 .orderBy("create_time", false)
@@ -36,6 +37,7 @@ public class DeviceDocServiceImpl extends ServiceImpl<DeviceDocDao, DeviceDocEnt
 
         for(DeviceDocEntity doc : page.getRecords()){
             SysUserEntity user = userService.selectById(doc.getUserId());
+            doc.setData(null);
             doc.setUserName(user.getUsername());
         }
 

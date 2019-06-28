@@ -18,16 +18,16 @@ import java.util.UUID;
 public class InspectionItemPresuppositionServiceImpl extends ServiceImpl<InspectionItemPresuppositionDao, InspectionItemPresuppositionEntity> implements InspectionItemPresuppositionService {
 
     @Override
-    public void saveOrUpdate( Integer itemId, List<InspectionItemPresuppositionEntity> extraList){
+    public void saveOrUpdate( Integer itemId, List<InspectionItemPresuppositionEntity> presuppositionList){
         this.deleteByMap(new MapUtils().put("item_id", itemId));
 
-        if(extraList.size() > 0){
-            for(InspectionItemPresuppositionEntity presupposition: extraList){
+        if(presuppositionList.size() > 0){
+            for(InspectionItemPresuppositionEntity presupposition: presuppositionList){
                 presupposition.setItemId(itemId);
                 presupposition.setGuid(UUID.randomUUID().toString());
             }
 
-            this.insertBatch(extraList);
+            this.insertBatch(presuppositionList);
         }
     }
 

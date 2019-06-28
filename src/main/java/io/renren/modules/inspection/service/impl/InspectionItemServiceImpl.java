@@ -184,10 +184,14 @@ public class InspectionItemServiceImpl extends ServiceImpl<InspectionItemDao, In
             }
 
             SamplingFrequencyEntity samplingFrequencyEntity = samplingFrequencyService.selectById(inspectionItemEntity.getFrequency());
-            inspectionItemEntity.setFrequencyName(samplingFrequencyEntity.getName());
+            if(samplingFrequencyEntity != null){
+                inspectionItemEntity.setFrequencyName(samplingFrequencyEntity.getName());
+            }
 
             SamplingPrecisionEntity samplingPrecisionEntity = samplingPrecisionService.selectById(inspectionItemEntity.getPrecision());
-            inspectionItemEntity.setPrecisionName(samplingPrecisionEntity.getName());
+            if(samplingPrecisionEntity != null){
+                inspectionItemEntity.setPrecisionName(samplingPrecisionEntity.getName());
+            }
 
             Integer itemId = inspectionItemEntity.getId();
 

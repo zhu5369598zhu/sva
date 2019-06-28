@@ -4,6 +4,9 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.Map;
 
+import io.renren.common.utils.FftUtils;
+import io.renren.modules.inspection.entity.FftChartEntity;
+import io.renren.modules.inspection.entity.InspectionRandomResultEntity;
 import io.renren.modules.inspection.entity.InspectionResultMediaEntity;
 import io.renren.modules.inspection.service.InspectionRandomResultService;
 import org.apache.commons.io.IOUtils;
@@ -158,6 +161,65 @@ public class InspectionRondomResultMediaController {
         return R.ok().put("page", page);
     }
 
+    /**
+     * 加速度
+     */
+    @RequestMapping("/acc/{uuid}")
+    @RequiresPermissions("inspection:inspectionrondomresultmedia:info")
+    public R acc(@PathVariable("uuid") String uuid){
+        FftChartEntity fftChartEntity = null;
+        InspectionRandomResultMediaEntity Media = mediaService.selectByGuid(uuid);
+        if(Media != null && Media.getType().equals("data") && Media.getContent() != null){
+            try{
+                fftChartEntity = FftUtils.accFromByte(Media.getContent());
+            }catch (IOException e){
+                e.printStackTrace();
+                return R.error(500,"上传数据格式错误，不能识别");
+            }
+        }
+
+        return R.ok().put("chart", fftChartEntity);
+    }
+
+    /**
+     * 速度
+     */
+    @RequestMapping("/speed/{uuid}")
+    @RequiresPermissions("inspection:inspectionrondomresultmedia:info")
+    public R speed(@PathVariable("uuid") String uuid){
+        FftChartEntity fftChartEntity = null;
+        InspectionRandomResultMediaEntity Media = mediaService.selectByGuid(uuid);
+        if(Media != null && Media.getType().equals("data") && Media.getContent() != null){
+            try{
+                fftChartEntity = FftUtils.speedFromByte(Media.getContent());
+            }catch (IOException e){
+                e.printStackTrace();
+                return R.error(500,"上传数据格式错误，不能识别");
+            }
+        }
+
+        return R.ok().put("chart", fftChartEntity);
+    }
+
+    /**
+     * 位移
+     */
+    @RequestMapping("/distance/{uuid}")
+    @RequiresPermissions("inspection:inspectionrondomresultmedia:info")
+    public R distance(@PathVariable("uuid") String uuid){
+        FftChartEntity fftChartEntity = null;
+        InspectionRandomResultMediaEntity Media = mediaService.selectByGuid(uuid);
+        if(Media != null && Media.getType().equals("data") && Media.getContent() != null){
+            try{
+                fftChartEntity = FftUtils.distanceFromByte(Media.getContent());
+            }catch (IOException e){
+                e.printStackTrace();
+                return R.error(500,"上传数据格式错误，不能识别");
+            }
+        }
+
+        return R.ok().put("chart", fftChartEntity);
+    }
 
     /**
      * 信息

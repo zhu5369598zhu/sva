@@ -60,7 +60,7 @@ public class DeviceQrcodeController {
         if(qrcode != null && qrcode.getData() != null){
             ServletOutputStream out = response.getOutputStream();
             out.write(qrcode.getData());
-            IOUtils.closeQuietly(out);
+            out.close();
             response.setContentLength(qrcode.getData().length);
         }else{
             response.setContentLength(0);

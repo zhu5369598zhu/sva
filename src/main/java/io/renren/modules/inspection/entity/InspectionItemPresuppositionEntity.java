@@ -28,6 +28,16 @@ public class InspectionItemPresuppositionEntity implements Serializable {
      */
     private String name;
     /**
+     * 异常等级id
+     */
+    private Integer exceptionId;
+    /**
+     * 异常等级
+     */
+    @TableField(exist = false)
+    private String exceptionName;
+
+    /**
      * 获取：id
      */
     public Integer getId() { return id; }
@@ -59,5 +69,22 @@ public class InspectionItemPresuppositionEntity implements Serializable {
      * 设置：guid
      */
     public void setGuid(String guid) { this.guid = guid; }
+    /**
+     * 获取：异常id
+     */
+    public Integer getExceptionId() { return exceptionId; }
+    /**
+     * 设置：异常id
+     */
+    public void setExceptionId(Integer exceptionId) { this.exceptionId = exceptionId; }
+
+    /**
+     * 获取：异常
+     */
+    public String getExceptionName() { return exceptionName; }
+    /**
+     * 设置：异常
+     */
+    public void setExceptionName(String exceptionName) { this.exceptionName = exceptionName; }
 
 }
