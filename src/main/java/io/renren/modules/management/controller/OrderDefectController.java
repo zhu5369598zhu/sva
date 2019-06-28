@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Random;
 
+import io.renren.modules.inspection.entity.InspectionResultEntity;
+import io.renren.modules.inspection.service.InspectionResultService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,7 +53,9 @@ public class OrderDefectController {
 	
 	@Autowired
 	private OrderRecordService orderRecordService;
-	
+
+	@Autowired
+	private InspectionResultService inspectionResultService;
 	/**
      * 列表
      */
@@ -123,7 +127,16 @@ public class OrderDefectController {
     @RequestMapping("/orderupdate")
     @RequiresPermissions("management:orderdefect:orderupdate")
     public R orderupdate(@RequestBody OrderDefectiveEntity orderDefective){
-    	orderDefectService.updateById(orderDefective);
+		Integer resultId = orderDefective.getResultId();
+		InspectionResultEntity inspectionResult = new InspectionResultEntity();
+		inspectionResult.setId(resultId);
+		inspectionResult.setStatus(1); // 已处理状态
+		inspectionResultService.updateById(inspectionResult);
+
+		orderDefective.setCreateTime(new Date());
+		orderDefective.setConfirmedTime(new Date());
+		orderDefectService.insert(orderDefective);
+    	//orderDefectService.updateById(orderDefective);
     	String orderNumber = OrderUtils.orderDefectNumber(); // 工单编号
     	// 填报缺陷工单 转到 工单管理  
     	OrderManagementEntity managementEntity = new OrderManagementEntity();
@@ -172,6 +185,19 @@ public class OrderDefectController {
 		
     	return R.ok();
     }
-    
-	
+
+	/**
+	 * 挂起
+	 */
+	@RequestMapping("/hangup")
+	@RequiresPermissions("management:orderdefect:hangup")
+	public R hangup(@RequestParam Map<String, Object> params){
+		String resultId = params.get("resultId").toString();
+		InspectionResultEntity inspectionResult = new InspectionResultEntity();
+		inspectionResult.setId(Integer.parseInt(resultId));
+		inspectionResult.setStatus(2); // 挂起状态
+		inspectionResultService.updateById(inspectionResult);
+		return R.ok();
+	}
+
 }
