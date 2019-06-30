@@ -1,5 +1,6 @@
 package io.renren.modules.management.service.impl;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -65,12 +66,23 @@ public class OrderDefectServiceImpl extends ServiceImpl<OrderDefectDao, OrderDef
         if(orderStatus != null && !orderStatus.equals("")) {
         	resultEntity.setOrderStatus(Integer.parseInt(orderStatus)); 
         }
-        
+
         if(startTime != null && !startTime.equals("")){
-            resultEntity.setStartTime(startTime);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try{
+                resultEntity.setStartTime(sdf.parse(startTime));
+            }catch(java.text.ParseException e){
+
+            }
+
         }
         if(endTime != null && !endTime.equals("")){
-            resultEntity.setEndTime(endTime);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try{
+                resultEntity.setEndTime(sdf.parse(endTime));
+            }catch(java.text.ParseException e){
+
+            }
         }
 
         Page<InspectionResultEntity> page = new Query<InspectionResultEntity>(params).getPage();

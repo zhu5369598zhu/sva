@@ -22,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
@@ -130,10 +132,21 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
             resultEntity.setInspectionTypeId(Integer.parseInt(inspectionTypeId));
         }
         if(startTime != null && !startTime.equals("")){
-            resultEntity.setStartTime(startTime);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try{
+                resultEntity.setStartTime(sdf.parse(startTime));
+            }catch(java.text.ParseException e){
+
+            }
+
         }
         if(endTime != null && !endTime.equals("")){
-            resultEntity.setEndTime(endTime);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try{
+                resultEntity.setEndTime(sdf.parse(endTime));
+            }catch(java.text.ParseException e){
+
+            }
         }
 
         List<InspectionResultEntity> resultList = this.baseMapper.selectResultList(resultEntity);
@@ -279,11 +292,23 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
             resultEntity.setInspectionTypeId(Integer.parseInt(inspectionTypeId));
         }
         if(startTime != null && !startTime.equals("")){
-            resultEntity.setStartTime(startTime);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try{
+                resultEntity.setStartTime(sdf.parse(startTime));
+            }catch(java.text.ParseException e){
+
+            }
+
         }
         if(endTime != null && !endTime.equals("")){
-            resultEntity.setEndTime(endTime);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try{
+                resultEntity.setEndTime(sdf.parse(endTime));
+            }catch(java.text.ParseException e){
+
+            }
         }
+
         List<Map<String,Object>> resultExceptionList = this.baseMapper.selectExceptionGroupByDevice(
                 resultEntity
         );
@@ -378,11 +403,23 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
             resultEntity.setInspectionTypeId(Integer.parseInt(inspectionTypeId));
         }
         if(startTime != null && !startTime.equals("")){
-            resultEntity.setStartTime(startTime);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try{
+                resultEntity.setStartTime(sdf.parse(startTime));
+            }catch(java.text.ParseException e){
+
+            }
+
         }
         if(endTime != null && !endTime.equals("")){
-            resultEntity.setEndTime(endTime);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try{
+                resultEntity.setEndTime(sdf.parse(endTime));
+            }catch(java.text.ParseException e){
+
+            }
         }
+
         List<Map<String,Object>> resultExceptionList = this.baseMapper.selectExceptionGroupByDevice(
                 resultEntity
         );
@@ -513,11 +550,23 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
             resultEntity.setInspectionTypeId(Integer.parseInt(inspectionTypeId));
         }
         if(startTime != null && !startTime.equals("")){
-            resultEntity.setStartTime(startTime);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try{
+                resultEntity.setStartTime(sdf.parse(startTime));
+            }catch(java.text.ParseException e){
+
+            }
+
         }
         if(endTime != null && !endTime.equals("")){
-            resultEntity.setEndTime(endTime);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try{
+                resultEntity.setEndTime(sdf.parse(endTime));
+            }catch(java.text.ParseException e){
+
+            }
         }
+        
         List<Map<String,Object>> resultExceptionList = this.baseMapper.selectExceptionGroupByItem(
                 resultEntity
         );
@@ -590,7 +639,7 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
     }
 
     @Override
-    public PageUtils selectResultPage(Map<String, Object> params) {
+    public PageUtils selectResultPage(Map<String, Object> params)  {
         String id = (String)params.get("id");
         String lineId = (String)params.get("lineId");
         String deviceId = (String)params.get("deviceId");
@@ -653,10 +702,21 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
             resultEntity.setInspectionTypeId(Integer.parseInt(inspectionTypeId));
         }
         if(startTime != null && !startTime.equals("")){
-            resultEntity.setStartTime(startTime);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try{
+                resultEntity.setStartTime(sdf.parse(startTime));
+            }catch(java.text.ParseException e){
+
+            }
+
         }
         if(endTime != null && !endTime.equals("")){
-            resultEntity.setEndTime(endTime);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try{
+                resultEntity.setEndTime(sdf.parse(endTime));
+            }catch(java.text.ParseException e){
+
+            }
         }
 
         Page<InspectionResultEntity> page = new Query<InspectionResultEntity>(params).getPage();
@@ -752,6 +812,12 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
         } else {
             return "用户没有找到";
         }
+
+        ExceptionEntity exception = exceptionService.selectById(result.getExceptionId());
+        if(exception == null && result.getExceptionId() != 0){
+            return "异常信息没有找到";
+        }
+
         InspectionItemEntity item = itemService.selectByGuid(result.getItemGuid());
         if(item != null){
             result.setItemId(item.getId());
@@ -759,11 +825,12 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
             return "巡检项没有找到";
         }
 
-        ExceptionEntity exception = exceptionService.selectById(result.getExceptionId());
-        if(exception == null && result.getExceptionId() != 0){
-            return "异常信息没有找到";
+        Integer exceptionId = result.getExceptionId();
+        if(exceptionId > 1){
+            result.setIsOk(0);
+        }else if (exceptionId == 0){
+            result.setIsOk(1);
         }
-
         result.setGuid(UUID.randomUUID().toString());
         result.setCreateTime(new java.util.Date());
 

@@ -121,6 +121,7 @@ public class AppInspectionRandomController {
         InspectionRandomResultEntity resultEntity = resultService.selectByGuid(result);
 
         if(resultEntity == null){
+            System.out.println("random巡检结果没有找到：" + result);
             return R.error(400, "巡检结果没有找到");
         } else {
             //上传文件
