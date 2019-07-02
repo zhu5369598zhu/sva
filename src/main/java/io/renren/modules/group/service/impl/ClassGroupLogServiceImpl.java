@@ -39,8 +39,7 @@ public class ClassGroupLogServiceImpl extends ServiceImpl<ClassGroupLogDao, Clas
     	String classGroupName = params.get("classGroupName").toString();
     	String baseTurnId = params.get("baseTurnId").toString();
     	String logType = params.get("logType").toString();
-    	String logStatus = params.get("logStatus").toString(); 
-    	
+    	String logStatus = params.get("logStatus").toString();
         Page<ClassGroupLogEntity> page = this.selectPage(
                 new Query<ClassGroupLogEntity>(params).getPage(),
                 new EntityWrapper<ClassGroupLogEntity>()
@@ -50,7 +49,6 @@ public class ClassGroupLogServiceImpl extends ServiceImpl<ClassGroupLogDao, Clas
                 .like(StringUtils.isNotBlank(baseTurnId),"base_turn_id", baseTurnId)
                 .like(StringUtils.isNotBlank(logType),"log_type", logType)
                 .like(StringUtils.isNotBlank(logStatus),"log_status", logStatus).orderBy("class_id",false)
-                
         );
         
         for(ClassGroupLogEntity classGroupLogEntity: page.getRecords()) {
@@ -58,9 +56,9 @@ public class ClassGroupLogServiceImpl extends ServiceImpl<ClassGroupLogDao, Clas
         	if(classGroupLogEntity.getLogType().equals("1")) { //班长日志
         		classGroupLogEntity.setLogTypeName("班长日志");
         	}else if(classGroupLogEntity.getLogType().equals("2")) {//班前日志
-        		classGroupLogEntity.setLogTypeName("班前日志");
+        		classGroupLogEntity.setLogTypeName("班前会");
         	}else if(classGroupLogEntity.getLogType().equals("3")) {//班后日志
-        		classGroupLogEntity.setLogTypeName("班后日志");
+        		classGroupLogEntity.setLogTypeName("班后会");
         	}
         	// 获取日志状态名称
         	if(classGroupLogEntity.getLogStatus().equals("1")) {//拟制中
@@ -69,9 +67,10 @@ public class ClassGroupLogServiceImpl extends ServiceImpl<ClassGroupLogDao, Clas
         		classGroupLogEntity.setLogStatusName("待确认");
         	}else if(classGroupLogEntity.getLogStatus().equals("3")) {
         		classGroupLogEntity.setLogStatusName("已确认");
-        	}else if(classGroupLogEntity.getLogStatus().equals("4")) {
-        		classGroupLogEntity.setLogStatusName("已驳回");
         	}
+			if(classGroupLogEntity.getLogStatus().equals("4")|| classGroupLogEntity.getLogUserStatus().equals("4")) {
+				classGroupLogEntity.setLogStatusName("待确认有驳回");
+			}
         	
         	// 获取部门(车间工段) 名称
         	SysDeptEntity sysDeptEntity = sysDeptService.selectById(classGroupLogEntity.getDeptId());

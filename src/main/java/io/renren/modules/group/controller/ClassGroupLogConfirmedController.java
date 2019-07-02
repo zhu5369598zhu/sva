@@ -47,7 +47,7 @@ public class ClassGroupLogConfirmedController {
      * 列表
      */
     @RequestMapping("/list")
-    @RequiresPermissions("group:classgrouplog:list")
+    @RequiresPermissions("group:classgrouplogconfirmed:list")
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = classGroupLogConfirmedService.queryPage(params);
 
@@ -59,7 +59,7 @@ public class ClassGroupLogConfirmedController {
      * 信息
      */
     @RequestMapping("/info/{classId}")
-    @RequiresPermissions("group:classgrouplog:info")
+    @RequiresPermissions("group:classgrouplogconfirmed:info")
     public R info(@PathVariable("classId") Integer classId){
 			ClassGroupLogEntity classGroupLog = classGroupLogConfirmedService.selectById(classId);
 
@@ -70,7 +70,7 @@ public class ClassGroupLogConfirmedController {
      * 保存
      */
     @RequestMapping("/save")
-    @RequiresPermissions("group:classgrouplog:save")
+    @RequiresPermissions("group:classgrouplogconfirmed:save")
     public R save(@RequestBody ClassGroupLogEntity classGroupLog){
     	classGroupLogConfirmedService.insert(classGroupLog);
     	
@@ -81,7 +81,7 @@ public class ClassGroupLogConfirmedController {
      * 修改
      */
     @RequestMapping("/update")
-    @RequiresPermissions("group:classgrouplog:update")
+    @RequiresPermissions("group:classgrouplogconfirmed:update")
     public R update(@RequestBody ClassGroupLogEntity classGroupLog){
     	if(classGroupLog.getLogType().equals("1")) { // 班长日志
     		if(classGroupLog.getLogStatus().equals("3")) { // 已确认
@@ -93,7 +93,7 @@ public class ClassGroupLogConfirmedController {
         		newEntity.setUpdateTime(new Date());
         		newsService.update(newEntity, new EntityWrapper<NewsEntity>().eq("news_number", classGroupLog.getLogNumber()));
         	}else if(classGroupLog.getLogStatus().equals("4")) { // 已驳回
-        		// 查询之前是否有 驳回记录  ，没有就添加，有就修改
+        		// 查询之前是否有 驳回记录  ，没有就添加，有就修改 并且把 待确认状态的 通知 改为 无效状态
         		NewsEntity news= newsService.selectOne(new EntityWrapper<NewsEntity>()
     					.eq("news_type", 2)
     					.eq("news_name", "您有一条驳回的班长日志")
@@ -108,6 +108,7 @@ public class ClassGroupLogConfirmedController {
             		newEntity.setCreateTime(new Date());
             		newEntity.setUpdateTime(new Date()); 
             		newsService.insertOrUpdate(newEntity);
+
         		}else {
         			NewsEntity newEntity = new NewsEntity();
         			newEntity.setUpdateTime(new Date()); 
@@ -117,8 +118,17 @@ public class ClassGroupLogConfirmedController {
         					.eq("user_id", classGroupLog.getHandoverPersonId())
         					.eq("news_number", classGroupLog.getLogNumber()));
         		}
-        		
-        		classGroupLog.setLogStatus("2"); 
+				NewsEntity newEntity = new NewsEntity();
+				//newEntity.setNewsName("您有一条待确认班前日志");
+				newEntity.setNewsNumber(classGroupLog.getLogNumber());
+				newEntity.setNewsType(0);
+				//newEntity.setUserId(classGroupLog.getHandoverPersonId());
+				newEntity.setUpdateTime(new Date());
+				newsService.update(newEntity,
+						new EntityWrapper<NewsEntity>()
+								.eq("news_number", classGroupLog.getLogNumber())
+								.eq("user_id", classGroupLog.getSuccessorId()));
+				//classGroupLog.setLogStatus("2");
         	}
     	}else if(classGroupLog.getLogType().equals("2")) { // 班前日志
     		if(classGroupLog.getLogStatus().equals("3")) { // 已确认   都确认完的情况下 才能进行修改
@@ -240,7 +250,7 @@ public class ClassGroupLogConfirmedController {
      * 删除
      */
     @RequestMapping("/delete")
-    @RequiresPermissions("group:classgrouplog:delete")
+    @RequiresPermissions("group:classgrouplogconfirmed:delete")
     public R delete(@RequestBody Integer[] classIds){
     	classGroupLogConfirmedService.deleteBatchIds(Arrays.asList(classIds));
 
@@ -251,12 +261,16 @@ public class ClassGroupLogConfirmedController {
      * 日志编码
      */
     @RequestMapping("/logNumber")
-    @RequiresPermissions("group:classgrouplog:logNumber")
+    @RequiresPermissions("group:classgrouplogconfirmed:logNumber")
     public R dataNumber() {
-    	
-        String orderNumber = OrderUtils.orderNumber();
+		SimpleDateFormat sdf=new SimpleDateFormat("yyMMdd");
+		String newDate=sdf.format(new Date());
+
+		List<ClassGroupLogEntity> list = classGroupLogConfirmedService.selectList(new EntityWrapper<ClassGroupLogEntity>().like("log_number",newDate));
+
+		String logNumber = OrderUtils.orderNumber(list.size());
         
-    	return R.ok().put("logNumber", orderNumber);
+    	return R.ok().put("logNumber", logNumber);
     }
 	
 	

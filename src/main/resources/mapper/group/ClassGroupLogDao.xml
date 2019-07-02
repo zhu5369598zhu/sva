@@ -41,6 +41,7 @@
         <result property="preventiveMeasures" column="preventive_measures"/>
         <result property="manAgreement" column="man_agreement"/>
         <result property="teamMembers" column="team_members"/>
+        <result property="teamMembersIds" column="team_members_ids"/>
         <result property="workSummary" column="work_summary"/>
         <result property="personCharge" column="person_charge"/>
         <result property="rejectReason" column="reject_reason"/>

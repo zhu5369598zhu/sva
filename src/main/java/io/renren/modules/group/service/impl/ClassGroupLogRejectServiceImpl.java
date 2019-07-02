@@ -72,9 +72,9 @@ public class ClassGroupLogRejectServiceImpl extends ServiceImpl<ClassGroupLogRej
         	if(classGroupLogEntity.getLogType().equals("1")) { //班长日志
         		classGroupLogEntity.setLogTypeName("班长日志");
         	}else if(classGroupLogEntity.getLogType().equals("2")) {//班前日志
-        		classGroupLogEntity.setLogTypeName("班前日志");
+        		classGroupLogEntity.setLogTypeName("班前会");
         	}else if(classGroupLogEntity.getLogType().equals("3")) {//班后日志
-        		classGroupLogEntity.setLogTypeName("班后日志");
+        		classGroupLogEntity.setLogTypeName("班后会");
         	}
         	// 获取日志状态名称
         	if(classGroupLogEntity.getLogUserStatus().equals("1")) {//拟制中
@@ -94,6 +94,16 @@ public class ClassGroupLogRejectServiceImpl extends ServiceImpl<ClassGroupLogRej
         	// 获取班次(轮次) 名称
         	BaseTurnEntity baseTurnEntity = baseTurnService.selectById(classGroupLogEntity.getBaseTurnId());
         	classGroupLogEntity.setBaseTurnName(baseTurnEntity.getName());
+
+			String user_id = params.get("userid").toString();
+			String news_number = classGroupLogEntity.getLogNumber();
+
+			List<NewsEntity> selectList = newsService.selectList(
+					new EntityWrapper<NewsEntity>()
+							.eq("user_id", Integer.parseInt(user_id))
+							.eq("news_number", news_number)
+							.eq("news_type", 2));
+			classGroupLogEntity.setNewsCounts(selectList.size());
         }
         
         
