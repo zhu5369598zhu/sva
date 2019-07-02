@@ -128,8 +128,9 @@ public class AppInspectionController {
         }
         resultService.deleteByAppResultGuid(appResultGuid);
         String guid = resultService.insertResult(inspectionResult);
-        if(guid.equals("")){
-            return R.error(500, "服务器内部错误");
+        //特列处理，对guid生成失败的错误进行提示
+        if(guid.length() < 30){
+            return R.error(500, guid);
         } else {
             return R.ok().put("guid", guid);
         }
@@ -146,7 +147,7 @@ public class AppInspectionController {
         InspectionResultEntity resultEntity = resultService.selectByGuid(result);
 
         if(resultEntity == null){
-            return R.error(400, "巡检结果没有找到");
+            return R.error(400, "巡检结果没有找到,上传附件失败");
         } else {
             //上传文件
             InspectionResultMediaEntity mediaEntity = new InspectionResultMediaEntity();

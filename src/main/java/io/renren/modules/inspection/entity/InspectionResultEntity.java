@@ -188,11 +188,11 @@ public class InspectionResultEntity implements Serializable {
 	/**
 	 * 开始巡检时间
 	 */
-	private String startTime;
+	private Date startTime;
 	/**
 	 * 结束巡检时间
 	 */
-	private String endTime;
+	private Date endTime;
 	/**
 	 * 缺陷处理状态
 	 */
@@ -448,25 +448,25 @@ public class InspectionResultEntity implements Serializable {
 	/**
 	 * 设置：开始巡检时间
 	 */
-	public void setStartTime(String startTime) {
+	public void setStartTime(Date startTime) {
 		this.startTime = startTime;
 	}
 	/**
 	 * 获取：开始巡检时间
 	 */
-	public String getStartTime() {
+	public Date getStartTime() {
 		return startTime;
 	}
 	/**
 	 * 设置：结束巡检时间
 	 */
-	public void setEndTime(String endTime) {
+	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
 	}
 	/**
 	 * 获取：结束巡检时间
 	 */
-	public String getEndTime() {
+	public Date getEndTime() {
 		return endTime;
 	}
 	/**

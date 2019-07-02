@@ -24,7 +24,7 @@
     </resultMap>
 
     <select id="selectResultList" resultType="io.renren.modules.inspection.entity.InspectionRandomResultEntity" parameterType="io.renren.modules.inspection.entity.InspectionRandomResultEntity">
-        select r.id, r.factory, r.dept, r.workshop, r.device_name, r.device_code, r.name, t.name as inspection_type,
+        select r.id, r.factory, r.dept, r.workshop, r.device_name, r.device_code, r.name, t.id as inspection_type_id, t.name as inspection_type,
         r.result, t.unit, u.username, r.start_time, r.end_time, r.remark, r.create_time
         from
         `tb_inspection_random_result` r

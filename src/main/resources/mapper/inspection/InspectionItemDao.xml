@@ -40,7 +40,7 @@
 	</select>
 
     <select id="isExist" resultType="java.lang.Integer" parameterType="io.renren.modules.inspection.entity.InspectionItemEntity">
-        select count(*) from tb_inspection_item i, tb_device d where is_delete=0 and d.device_id = i.device_id and name = #{itemName} and d.device_code=#{deviceCode}
+        select count(*) from tb_inspection_item i, tb_device d where i.is_delete=0 and d.device_id = i.device_id and name = #{itemName} and d.device_code=#{deviceCode}
 	</select>
 
 </mapper>

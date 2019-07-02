@@ -69,8 +69,8 @@ public class InspectionItemController {
     public R upload(HttpServletRequest request, @RequestParam("file") MultipartFile file) throws Exception {
         String[] mustHeader = {"所属设备<device_name>", "设备编码<device_code>", "巡检项<name>", "巡检类型名称<inspection_type_name>",
                 "单位<unit>", "检时状态标记<inspection_status>", "发射率<emissivity>", "采样频率<frequency_name>", "采样点数<precision_name>",
-                "上限<up_limit>", "上上限<upup_limit>", "下限<down_limit>", "下下限<downdown_limit>", "扩展<extras>",
-                "扩展异常<exceptions>", "描述<remark>", "默认转速<default_rpm>"};
+                "上限报警<up_used>","上限<up_limit>", "上上限危险<upup_used>", "上上限<upup_limit>", "下限报警<down_used>", "下限<down_limit>",
+                "下下限危险<downdwon_used>", "下下限<downdown_limit>", "扩展<extras>", "扩展异常<exceptions>", "描述<remark>", "默认转速<default_rpm>"};
         List<String[]> rows = PoiUtils.readExcel(file);
         if (!Arrays.equals(rows.get(0), mustHeader)) {
             return R.error(400, "导入数据格式错误，导入失败。");
@@ -83,58 +83,72 @@ public class InspectionItemController {
         List<InspectionItemEntity> items = new ArrayList<>(rows.size());
         for(String[] row: rows){
             InspectionItemEntity item = new InspectionItemEntity();
-            if(!row[0].isEmpty()) {
-                item.setDeviceName(row[0]);
+            try{
+                if(!row[0].isEmpty()) {
+                    item.setDeviceName(row[0]);
+                }
+                if(!row[1].isEmpty()) {
+                    item.setDeviceCode(row[1]);
+                }
+                if(!row[2].isEmpty()) {
+                    item.setName(row[2]);
+                }
+                if(!row[3].isEmpty()) {
+                    item.setInspectionTypeName(row[3]);
+                }
+                if(!row[4].isEmpty()) {
+                    item.setUnit(row[4]);
+                }
+                if(!row[5].isEmpty()) {
+                    item.setInspectionStatusName(row[5]);
+                }
+                if(!row[6].isEmpty()) {
+                    item.setEmissivity(Double.valueOf(row[6]));
+                }
+                if(!row[7].isEmpty()) {
+                    item.setFrequencyName(row[7]);
+                }
+                if(!row[8].isEmpty()) {
+                    item.setPrecisionName(row[8]);
+                }
+                if(!row[9].isEmpty()){
+                    item.setUpUsed(Integer.valueOf(row[9]));
+                }
+                if(!row[10].isEmpty()){
+                    item.setUpLimit(Double.valueOf(row[10]));
+                }
+                if(!row[11].isEmpty()) {
+                    item.setUpupUsed(Integer.valueOf(row[11]));
+                }
+                if(!row[12].isEmpty()) {
+                    item.setUpupLimit(Double.valueOf(row[12]));
+                }
+                if(!row[13].isEmpty()) {
+                    item.setDownUsed(Integer.valueOf(row[13]));
+                }
+                if(!row[14].isEmpty()) {
+                    item.setDownLimit(Double.valueOf(row[14]));
+                }
+                if(!row[15].isEmpty()) {
+                    item.setDowndownUsed(Integer.valueOf(row[15]));
+                }
+                if(!row[16].isEmpty()) {
+                    item.setDowndownLimit(Double.valueOf(row[16]));
+                }
+                if(!row[17].isEmpty()) {
+                    item.setExtras(row[17]);
+                }
+                if(!row[18].isEmpty()) {
+                    item.setExtraExceptions(row[18]);
+                }
+                if(!row[19].isEmpty()) {
+                    item.setRemark(row[19]);
+                }
+                if(!row[20].isEmpty()) {
+                    item.setDefaultRpm(Integer.valueOf(row[20]));
+                }
+            }catch (ArrayIndexOutOfBoundsException e){
             }
-            if(!row[1].isEmpty()) {
-                item.setDeviceCode(row[1]);
-            }
-            if(!row[2].isEmpty()) {
-                item.setName(row[2]);
-            }
-            if(!row[3].isEmpty()) {
-                item.setInspectionTypeName(row[3]);
-            }
-            if(!row[4].isEmpty()) {
-                item.setUnit(row[4]);
-            }
-            if(!row[5].isEmpty()) {
-                item.setInspectionStatusName(row[5]);
-            }
-            if(!row[6].isEmpty()) {
-                item.setEmissivity(Double.valueOf(row[6]));
-            }
-            if(!row[7].isEmpty()) {
-                item.setFrequencyName(row[7]);
-            }
-            if(!row[8].isEmpty()) {
-                item.setPrecisionName(row[8]);
-            }
-            if(!row[9].isEmpty()){
-                item.setUpLimit(Double.valueOf(row[9]));
-            }
-            if(!row[10].isEmpty()) {
-                item.setUpupLimit(Double.valueOf(row[10]));
-            }
-            if(!row[11].isEmpty()) {
-                item.setDownLimit(Double.valueOf(row[11]));
-            }
-            if(!row[12].isEmpty()) {
-                item.setDowndownLimit(Double.valueOf(row[12]));
-            }
-            if(!row[13].isEmpty()) {
-                item.setExtras(row[13]);
-            }
-            if(!row[14].isEmpty()) {
-                item.setExtraExceptions(row[14]);
-            }
-            if(!row[15].isEmpty()) {
-                item.setRemark(row[15]);
-            }
-            if(!row[16].isEmpty()) {
-                item.setDefaultRpm(Integer.valueOf(row[16]));
-            }
-
             items.add(item);
         }
         return R.ok().put("list", items);
@@ -309,7 +323,13 @@ public class InspectionItemController {
                 new EntityWrapper<InspectionItemPresuppositionEntity>()
                         .eq(id != null, "item_id", id)
         );
-        if(extras != null){
+        if(presuppositions != null){
+            for(InspectionItemPresuppositionEntity presupposition : presuppositions){
+                ExceptionEntity exception = exceptionService.selectById(presupposition.getExceptionId());
+                if(exception != null){
+                    presupposition.setExceptionName(exception.getName());
+                }
+            }
             inspectionItem.setPresuppositionList(presuppositions);
         }
 
@@ -353,14 +373,6 @@ public class InspectionItemController {
         for(Long itemId:ids){
             InspectionItemEntity item = inspectionItemService.selectById(itemId);
             if(item != null){
-                Integer hasData = resultService.selectCount(
-                        new EntityWrapper<InspectionResultEntity>()
-                                .eq("item_id",item.getId())
-                );
-                if(hasData > 0 ){
-                    return R.error(400,"该巡检项已上传巡检数据，若删除则无法查看巡检数据，无法删除。");
-                }
-
                 HashMap<String, Object> params = new HashMap<String, Object>();
                 params.put("device_id", item.getDeviceId());
                 List<ZoneDeviceEntity>  zoneDevices = zoneDeviceService.selectByMap(params);

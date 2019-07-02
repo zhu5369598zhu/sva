@@ -6,14 +6,8 @@ import io.renren.modules.inspection.dao.InspectionLineDao;
 import io.renren.modules.inspection.dao.PeriodTurnDao;
 import io.renren.modules.inspection.entity.*;
 import io.renren.modules.inspection.service.*;
-import io.renren.modules.setting.entity.ExceptionEntity;
-import io.renren.modules.setting.entity.InspectionStatusEntity;
-import io.renren.modules.setting.entity.InspectionTypeEntity;
-import io.renren.modules.setting.entity.UnitEntity;
-import io.renren.modules.setting.service.ExceptionService;
-import io.renren.modules.setting.service.InspectionStatusService;
-import io.renren.modules.setting.service.InspectionTypeService;
-import io.renren.modules.setting.service.UnitService;
+import io.renren.modules.setting.entity.*;
+import io.renren.modules.setting.service.*;
 import io.renren.modules.sys.entity.SysDeptEntity;
 import io.renren.modules.sys.entity.SysUserEntity;
 import io.renren.modules.sys.service.SysDeptService;
@@ -70,13 +64,16 @@ public class InspectionServiceImpl extends ServiceImpl<InspectionLineDao, Inspec
     private InspectionStatusService statusService;
     @Autowired
     private InspectionItemPresuppositionService presuppositionService;
-
     @Autowired
     private InspectionLinePublishService publishService;
     @Autowired
     private PdaService pdaService;
     @Autowired
     private UnitService unitService;
+    @Autowired
+    private SamplingPrecisionService precisionService;
+    @Autowired
+    private SamplingFrequencyService frequencyService;
 
     @Override
     public HashMap<String, Object> download(SysUserEntity userEntity, String pdaMac) {
@@ -175,11 +172,23 @@ public class InspectionServiceImpl extends ServiceImpl<InspectionLineDao, Inspec
                             itemJson.put("name", itemEntity.getName());
                             itemJson.put("defaultRpm", itemEntity.getDefaultRpm());
                             itemJson.put("emissivity", itemEntity.getEmissivity());
-                            itemJson.put("frequency", itemEntity.getFrequency());
+                            if(itemEntity.getFrequency() != null){
+                                SamplingFrequencyEntity frequencyEntity = frequencyService.selectById(itemEntity.getFrequency());
+                                itemJson.put("frequency", frequencyEntity.getName());
+                            }else{
+                                itemJson.put("frequency", itemEntity.getFrequency());
+                            }
+                            if(itemEntity.getFrequency() != null){
+                                SamplingPrecisionEntity precisionEntity = precisionService.selectById(itemEntity.getPrecision());
+                                itemJson.put("precision", precisionEntity.getName());
+                            }else{
+                                itemJson.put("precision", itemEntity.getPrecision());
+                            }
+
                             itemJson.put("remark", itemEntity.getRemark());
                             itemJson.put("InspectionType", itemEntity.getInspectionType());
                             itemJson.put("order_num", itemEntity.getOrderNum());
-                            itemJson.put("precision", itemEntity.getPrecision());
+
                             itemJson.put("upup_used",itemEntity.getUpupUsed());
                             itemJson.put("upup_limit", itemEntity.getUpLimit());
                             itemJson.put("up_limit", itemEntity.getUpupLimit());
@@ -224,6 +233,7 @@ public class InspectionServiceImpl extends ServiceImpl<InspectionLineDao, Inspec
                                 Map<String, Object> presuppositionJson = new HashMap<>();
                                 presuppositionJson.put("presupposition_guid", presupposition.getGuid());
                                 presuppositionJson.put("name", presupposition.getName());
+                                presuppositionJson.put("exceptionId", presupposition.getExceptionId());
                                 presuppositionJson.put("item_guid", itemEntity.getGuid());
                                 presuppositionList.add(presuppositionJson);
                             }

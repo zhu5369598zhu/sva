@@ -11,7 +11,9 @@ import io.renren.common.utils.MapUtils;
 import io.renren.modules.inspection.entity.*;
 import io.renren.modules.inspection.service.*;
 import io.renren.modules.setting.entity.ExceptionEntity;
+import io.renren.modules.setting.entity.UnitEntity;
 import io.renren.modules.setting.service.ExceptionService;
+import io.renren.modules.setting.service.UnitService;
 import io.renren.modules.sys.entity.SysUserEntity;
 import io.renren.modules.sys.service.SysDeptService;
 import io.renren.modules.sys.service.SysUserService;
@@ -20,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
@@ -59,6 +63,8 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
     InspectionItemExtraService extraService;
     @Autowired
     InspectionItemPresuppositionService presuppositionService;
+    @Autowired
+    UnitService unitService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -126,10 +132,21 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
             resultEntity.setInspectionTypeId(Integer.parseInt(inspectionTypeId));
         }
         if(startTime != null && !startTime.equals("")){
-            resultEntity.setStartTime(startTime);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try{
+                resultEntity.setStartTime(sdf.parse(startTime));
+            }catch(java.text.ParseException e){
+
+            }
+
         }
         if(endTime != null && !endTime.equals("")){
-            resultEntity.setEndTime(endTime);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try{
+                resultEntity.setEndTime(sdf.parse(endTime));
+            }catch(java.text.ParseException e){
+
+            }
         }
 
         List<InspectionResultEntity> resultList = this.baseMapper.selectResultList(resultEntity);
@@ -150,6 +167,14 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
                 result.setIsCheckName("否");
             } else if(result.getIsCheck().equals(1)){
                 result.setIsCheckName("是");
+            }
+
+            //如果是抄表，单位重新读取
+            if (result.getInspectionType().equals("抄表")) {
+                UnitEntity unit = unitService.selectById(result.getUnit());
+                if(unit != null){
+                    result.setUnit(unit.getName());
+                }
             }
 
             if(result.getInspectionType().equals("观察") && result.getResult() != null){
@@ -267,11 +292,23 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
             resultEntity.setInspectionTypeId(Integer.parseInt(inspectionTypeId));
         }
         if(startTime != null && !startTime.equals("")){
-            resultEntity.setStartTime(startTime);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try{
+                resultEntity.setStartTime(sdf.parse(startTime));
+            }catch(java.text.ParseException e){
+
+            }
+
         }
         if(endTime != null && !endTime.equals("")){
-            resultEntity.setEndTime(endTime);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try{
+                resultEntity.setEndTime(sdf.parse(endTime));
+            }catch(java.text.ParseException e){
+
+            }
         }
+
         List<Map<String,Object>> resultExceptionList = this.baseMapper.selectExceptionGroupByDevice(
                 resultEntity
         );
@@ -366,11 +403,23 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
             resultEntity.setInspectionTypeId(Integer.parseInt(inspectionTypeId));
         }
         if(startTime != null && !startTime.equals("")){
-            resultEntity.setStartTime(startTime);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try{
+                resultEntity.setStartTime(sdf.parse(startTime));
+            }catch(java.text.ParseException e){
+
+            }
+
         }
         if(endTime != null && !endTime.equals("")){
-            resultEntity.setEndTime(endTime);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try{
+                resultEntity.setEndTime(sdf.parse(endTime));
+            }catch(java.text.ParseException e){
+
+            }
         }
+
         List<Map<String,Object>> resultExceptionList = this.baseMapper.selectExceptionGroupByDevice(
                 resultEntity
         );
@@ -501,11 +550,23 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
             resultEntity.setInspectionTypeId(Integer.parseInt(inspectionTypeId));
         }
         if(startTime != null && !startTime.equals("")){
-            resultEntity.setStartTime(startTime);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try{
+                resultEntity.setStartTime(sdf.parse(startTime));
+            }catch(java.text.ParseException e){
+
+            }
+
         }
         if(endTime != null && !endTime.equals("")){
-            resultEntity.setEndTime(endTime);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try{
+                resultEntity.setEndTime(sdf.parse(endTime));
+            }catch(java.text.ParseException e){
+
+            }
         }
+        
         List<Map<String,Object>> resultExceptionList = this.baseMapper.selectExceptionGroupByItem(
                 resultEntity
         );
@@ -523,7 +584,8 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
             HashMap<String, Object> device = (HashMap<String, Object>)yAxis.get(item.get("itemName").toString());
             if ( device == null){
                 HashMap<String, Object> exception = new HashMap<>();
-                if(item.get("exception").toString().equals("正常") || item.get("exception").toString().equals("一般")){
+                if(item.get("exception").toString().equals
+                        ("正常") || item.get("exception").toString().equals("一般")){
                     exception.put("正常",(Long)item.get("count"));
                     exception.put("异常",0L);
                 }else{
@@ -577,7 +639,7 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
     }
 
     @Override
-    public PageUtils selectResultPage(Map<String, Object> params) {
+    public PageUtils selectResultPage(Map<String, Object> params)  {
         String id = (String)params.get("id");
         String lineId = (String)params.get("lineId");
         String deviceId = (String)params.get("deviceId");
@@ -640,10 +702,21 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
             resultEntity.setInspectionTypeId(Integer.parseInt(inspectionTypeId));
         }
         if(startTime != null && !startTime.equals("")){
-            resultEntity.setStartTime(startTime);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try{
+                resultEntity.setStartTime(sdf.parse(startTime));
+            }catch(java.text.ParseException e){
+
+            }
+
         }
         if(endTime != null && !endTime.equals("")){
-            resultEntity.setEndTime(endTime);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try{
+                resultEntity.setEndTime(sdf.parse(endTime));
+            }catch(java.text.ParseException e){
+
+            }
         }
 
         Page<InspectionResultEntity> page = new Query<InspectionResultEntity>(params).getPage();
@@ -652,16 +725,27 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
                 resultEntity
         );
 
+
         for(InspectionResultEntity result: list){
+            //如果是抄表，单位重新读取
+            if (result.getInspectionType().equals("抄表")) {
+                UnitEntity unit = unitService.selectById(result.getUnit());
+                if(unit != null){
+                    result.setUnit(unit.getName());
+                }
+            }
+
             if(result.getInspectionType().equals("观察") && result.getResult() != null){
                 InspectionItemExtraEntity extraEntity = extraService.selectByGuid(result.getResult());
-                ExceptionEntity exceptionEntity = exceptionService.selectById(extraEntity.getExceptionId());
-                if(exceptionEntity != null){
-                    result.setExceptionId(exceptionEntity.getId());
-                    result.setExceptionName(exceptionEntity.getName());
-                    result.setResult(exceptionEntity.getName());
-                }else{
-                    result.setResult("无效数据");
+                if(extraEntity != null){
+                    ExceptionEntity exceptionEntity = exceptionService.selectById(extraEntity.getExceptionId());
+                    if(exceptionEntity != null){
+                        result.setExceptionId(exceptionEntity.getId());
+                        result.setExceptionName(exceptionEntity.getName());
+                        result.setResult(exceptionEntity.getName());
+                    }else{
+                        result.setResult("无效数据");
+                    }
                 }
             }
 
@@ -674,6 +758,8 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
                         InspectionItemPresuppositionEntity presupposition = presuppositionService.selectByGuid(el);
                         if (presupposition != null) {
                             presuppositionList.add(presupposition.getName());
+                        }else {
+                            result.setResult("无效数据");
                         }
                     }
                     result.setResult(org.apache.commons.lang.StringUtils.join(presuppositionList.toArray(), '/'));
@@ -686,7 +772,7 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
             result.setMedias(mediaEntityList);
             result.setDeviceName(result.getDeviceName() + "[" + result.getDeviceCode() + "]");
             if(result.getUpLimit() != null && result.getUpupLimit() != null && result.getDownLimit() !=null && result.getDowndownLimit() !=null)
-            result.setLimits(result.getUpLimit().toString() + "/" + result.getUpupLimit().toString() + "/" +
+            result.setLimits(result.getUpupLimit().toString() + "/" + result.getUpLimit().toString() + "/" +
                     result.getDownLimit().toString() + "/" + result.getDowndownLimit().toString());
         }
         page.setRecords(list);
@@ -726,6 +812,12 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
         } else {
             return "用户没有找到";
         }
+
+        ExceptionEntity exception = exceptionService.selectById(result.getExceptionId());
+        if(exception == null && result.getExceptionId() != 0){
+            return "异常信息没有找到";
+        }
+
         InspectionItemEntity item = itemService.selectByGuid(result.getItemGuid());
         if(item != null){
             result.setItemId(item.getId());
@@ -733,11 +825,12 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
             return "巡检项没有找到";
         }
 
-        ExceptionEntity exception = exceptionService.selectById(result.getExceptionId());
-        if(exception == null){
-            return "异常信息没有找到";
+        Integer exceptionId = result.getExceptionId();
+        if(exceptionId > 1){
+            result.setIsOk(0);
+        }else if (exceptionId == 0){
+            result.setIsOk(1);
         }
-
         result.setGuid(UUID.randomUUID().toString());
         result.setCreateTime(new java.util.Date());
 

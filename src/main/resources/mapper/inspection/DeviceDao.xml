@@ -48,10 +48,10 @@
     </select>
 
     <select id="isExist" resultType="java.lang.Integer" parameterType="io.renren.modules.inspection.entity.DeviceEntity">
-		select count(*) from tb_device where is_delete=0 and (device_name = #{deviceName}
+		select count(*) from tb_device where is_delete=0
         <if test="deviceCode!=''">
-            or device_code = #{deviceCode}
-        </if>)
+            and device_code = #{deviceCode}
+        </if>
 	</select>
 
     <select id="selectByDeviceName" resultType="io.renren.modules.inspection.entity.DeviceEntity" parameterType="io.renren.modules.inspection.entity.DeviceEntity">

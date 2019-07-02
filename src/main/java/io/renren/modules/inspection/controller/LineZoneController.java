@@ -100,7 +100,11 @@ public class LineZoneController {
             filterField = "zone_code";
         }
 
-        Long deptId = Long.valueOf((String)params.get("deptId"));
+        Long deptId = null;
+        String dept = (String)params.get("deptId");
+        if(dept != null){
+            deptId = Long.valueOf(dept);
+        }
         Long lineId = Long.valueOf((String)params.get("lineId"));
         List<ZoneEntity> zoneList = lineZoneService.findZoneUnBind(filterField, key, deptId, lineId);
 

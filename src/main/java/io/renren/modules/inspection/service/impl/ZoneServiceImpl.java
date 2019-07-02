@@ -75,4 +75,9 @@ public class ZoneServiceImpl extends ServiceImpl<ZoneDao, ZoneEntity> implements
     public ZoneEntity selectByName(String zoneName){
         return baseMapper.selectByName(zoneName);
     }
+
+    @Override
+    public ZoneEntity selectByZoneCode(String zoneCode){
+        return baseMapper.selectByZoneCode(zoneCode);
+    }
 }

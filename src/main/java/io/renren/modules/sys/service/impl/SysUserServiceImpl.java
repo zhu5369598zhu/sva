@@ -138,12 +138,21 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
 	@Override
 	@Transactional
 	public void update(SysUserEntity user) {
+		SysUserEntity tmp = this.selectById(user.getUserId());
+
 		if(StringUtils.isBlank(user.getPassword())){
-			user.setPassword(null);
+			user.setPassword(tmp.getPassword());
 		}else{
 			user.setPassword(new Sha256Hash(user.getPassword(), user.getSalt()).toHex());
 		}
-		this.updateById(user);
+
+		user.setGuid(tmp.getGuid());
+		user.setCreateTime(tmp.getCreateTime());
+		user.setIsDelete(0);
+		this.updateAllColumnById(user);
+
+
+
 
 		/*
 		//检查角色是否越权
