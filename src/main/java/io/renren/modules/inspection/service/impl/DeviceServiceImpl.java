@@ -221,6 +221,13 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DeviceEntity> impl
     /**
      * 获取设备异常统计信息
      */
+    public List<Map<String,Object>> getDeviceExceptionTop(Integer deviceLevelId, String startTime,String endTime){
+        return baseMapper.getDeviceExceptionTop(deviceLevelId,startTime,endTime);
+    }
+
+    /**
+     * 获取设备异常统计信息
+     */
     public List<Map<String,Object>> getDeviceStatus(){
         return baseMapper.getDeviceStatus();
     }

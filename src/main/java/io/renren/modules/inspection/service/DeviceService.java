@@ -3,6 +3,7 @@ package io.renren.modules.inspection.service;
 import com.baomidou.mybatisplus.service.IService;
 import io.renren.common.utils.PageUtils;
 import io.renren.modules.inspection.entity.DeviceEntity;
+import org.apache.ibatis.annotations.Param;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -35,6 +36,11 @@ public interface DeviceService extends IService<DeviceEntity> {
      * 获取设备异常统计信息
      */
     public List<Map<String,Object>> getDeviceStatus();
+
+    /**
+     * 获取设备异常统计排名
+     */
+    public List<Map<String,Object>> getDeviceExceptionTop(Integer deviceLevelId, String startTime,String endTime);
 
     /**
      * 根据部门id查询设备

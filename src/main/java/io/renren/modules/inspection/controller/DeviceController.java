@@ -258,6 +258,24 @@ public class DeviceController {
     }
 
     /**
+     * 获取设备异常排名
+     */
+    @RequestMapping("/getexceptiontop")
+    public R getDeviceExceptionTop(@RequestParam Map<String, Object> params){
+        String level = (String)params.get("levelId");
+        String startTime = (String)params.get("startTime");
+        String endTime = (String)params.get("endTime");
+        Integer levelId = 0;
+        if(level != null && !level.equals("")){
+            levelId = Integer.parseInt(level);
+        }
+        List<Map<String,Object>> topList = deviceService.getDeviceExceptionTop(levelId,startTime,endTime);
+
+        return R.ok().put("topList", topList);
+    }
+
+
+    /**
      * 选择未绑定到巡区的所有设备
      */
     @RequestMapping("/selectunbind")

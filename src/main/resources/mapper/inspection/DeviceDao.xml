@@ -69,8 +69,29 @@
         left join `tb_device` d on i.device_id=d.device_id
         left join `tb_device_level` l on d.device_level=l.`id`
         left join `tb_exception` e on r.exception_id=e.id
-        where d.is_delete=0 and d.device_id is not null and (e.id=1 or e.id=3 or e.id=6)
+        where d.is_delete=0 and d.device_id is not null
         group by l.id,e.id
+	</select>
+
+    <select id="getDeviceExceptionTop" resultType="java.util.HashMap" parameterType="java.lang.Long">
+        select d.device_name as deviceName,count(r.id) as exceptionCount
+        from `tb_inspection_result` r
+        left join `tb_inspection_item` i on r.item_id=i.id
+        left join `tb_device` d on i.device_id=d.device_id
+        left join `tb_device_level` l on d.device_level=l.`id`
+        left join `tb_exception` e on r.exception_id=e.id
+        where d.is_delete=0 and d.device_id is not null
+        <if test="levelId!=0">
+          and l.id=#{levelId}
+        </if>
+        <if test="startTime!=null">
+          and r.start_time&gt;=#{startTime}
+        </if>
+        <if test="startTime!=null">
+            and r.start_time&lt;=#{startTime}
+        </if>
+        group by d.device_id
+        order by count(r.id) desc limit 5
 	</select>
 
 </mapper>
