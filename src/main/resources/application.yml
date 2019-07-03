@@ -85,3 +85,5 @@ renren:
     expire: 604800
     header: token
 
+company:
+  userName: "WQ"

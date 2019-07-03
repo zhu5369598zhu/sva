@@ -3,6 +3,7 @@ package io.renren.modules.group.service.impl;
 import java.util.List;
 import java.util.Map;
 
+import io.renren.modules.inspection.entity.ClassGroupEntity;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,8 @@ public class ClassGroupLogConfirmedServiceImpl extends ServiceImpl<ClassGroupLog
 	
 	@Autowired
 	private NewsService newsService;
-	
+
+
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
 		
@@ -75,9 +77,9 @@ public class ClassGroupLogConfirmedServiceImpl extends ServiceImpl<ClassGroupLog
         	if(classGroupLogEntity.getLogType().equals("1")) { //班长日志
         		classGroupLogEntity.setLogTypeName("班长日志");
         	}else if(classGroupLogEntity.getLogType().equals("2")) {//班前日志
-        		classGroupLogEntity.setLogTypeName("班前日志");
+        		classGroupLogEntity.setLogTypeName("班前会");
         	}else if(classGroupLogEntity.getLogType().equals("3")) {//班后日志
-        		classGroupLogEntity.setLogTypeName("班后日志");
+        		classGroupLogEntity.setLogTypeName("班后会");
         	}
         	// 获取日志状态名称
         	if(classGroupLogEntity.getLogStatus().equals("1")) {//拟制中
@@ -97,9 +99,19 @@ public class ClassGroupLogConfirmedServiceImpl extends ServiceImpl<ClassGroupLog
         	// 获取班次(轮次) 名称
         	BaseTurnEntity baseTurnEntity = baseTurnService.selectById(classGroupLogEntity.getBaseTurnId());
         	classGroupLogEntity.setBaseTurnName(baseTurnEntity.getName());
+
+			String user_id = params.get("userid").toString();
+            String news_number = classGroupLogEntity.getLogNumber();
+			List<NewsEntity> selectList = newsService.selectList(
+					new EntityWrapper<NewsEntity>()
+							.eq("user_id", Integer.parseInt(user_id))
+							.eq("news_number", news_number)
+							.eq("news_type", 1));
+			classGroupLogEntity.setNewsCounts(selectList.size());
         }
         
         return new PageUtils(page);
 	}
+
 
 }

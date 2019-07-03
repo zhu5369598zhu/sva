@@ -1,11 +1,14 @@
 package io.renren.modules.group.service;
 
+import java.util.List;
 import java.util.Map;
 
 import com.baomidou.mybatisplus.service.IService;
 
 import io.renren.common.utils.PageUtils;
 import io.renren.modules.group.entity.ClassGroupLogEntity;
+import io.renren.modules.inspection.entity.ClassGroupEntity;
+
 /**
  * 班组日志(待确认)
  *
@@ -14,6 +17,7 @@ import io.renren.modules.group.entity.ClassGroupLogEntity;
  * @date 2019-05-05 16:24:44
  */
 public interface ClassGroupLogConfirmedService extends IService<ClassGroupLogEntity>{
+
 
 	PageUtils queryPage(Map<String, Object> params);
 }

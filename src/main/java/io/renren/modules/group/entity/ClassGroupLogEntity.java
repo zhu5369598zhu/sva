@@ -193,7 +193,6 @@ public class ClassGroupLogEntity implements Serializable {
 	/**
 	 * 班组成员 id
 	 */
-	@TableField(exist = false)
 	private String teamMembersIds;
 	/**
 	 * 工作总结
@@ -207,6 +206,12 @@ public class ClassGroupLogEntity implements Serializable {
 	 * 驳回原因
 	 */
 	private String rejectReason;
+
+	/**
+	 * 是否跟自己有关
+	 */
+	@TableField(exist = false)
+	private Integer newsCounts;
 
 	/**
 	 * 设置：
@@ -749,7 +754,13 @@ public class ClassGroupLogEntity implements Serializable {
 	public void setRejectReason(String rejectReason) {
 		this.rejectReason = rejectReason;
 	}
-	
-	
+	/**
+	 * 获取：是否跟自己有关
+	 */
+	public Integer getNewsCounts(){ return  newsCounts;}
+	/**
+	 * 设置：是否跟自己有关
+	 */
+	public void setNewsCounts(Integer newsCounts){ this.newsCounts = newsCounts;}
 	
 }

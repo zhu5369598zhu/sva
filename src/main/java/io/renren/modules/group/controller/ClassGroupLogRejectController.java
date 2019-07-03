@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
+import io.renren.common.utils.OrderUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -87,12 +88,13 @@ public class ClassGroupLogRejectController {
     public R update(@RequestBody ClassGroupLogEntity classGroupLog){
     	classGroupLogRejectService.updateById(classGroupLog);
     	if(classGroupLog.getLogType().equals("1")) {  // 班长日志 （可能改 接班人）
-    		NewsEntity newsEntity = newsService.selectOne(new EntityWrapper<NewsEntity>().eq("news_number", classGroupLog.getLogNumber()).eq("news_type", 1));
-    		if(!newsEntity.getUserId().equals(classGroupLog.getSuccessorId())) { // 更换 接班人
-    			newsEntity.setUserId(classGroupLog.getSuccessorId());
-    			newsEntity.setUpdateTime(new Date()); 
-    			newsService.updateById(newsEntity);
-    		}
+    		NewsEntity newsEntity = newsService.selectOne(new EntityWrapper<NewsEntity>().eq("news_number", classGroupLog.getLogNumber()).eq("news_type", 0));
+			// 更换 状态为 通知状态 可能更换 接班人
+			newsEntity.setUserId(classGroupLog.getSuccessorId());
+			newsEntity.setNewsType(1);
+			newsEntity.setUpdateTime(new Date());
+			newsService.updateById(newsEntity);
+
     		// 驳回的通知 改为 0
     		NewsEntity entity = new NewsEntity();
     		entity.setNewsType(0);
@@ -229,18 +231,15 @@ public class ClassGroupLogRejectController {
     @RequestMapping("/logNumber")
     @RequiresPermissions("group:classgrouplog:logNumber")
     public R dataNumber() {
-    	
-    	String str = "SWQ";
-        SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMddHHmmss");
-        String newDate=sdf.format(new Date());
-        Random random=new Random();
-        String result="";
-        for(int i=0;i<3;i++){
-        result+=random.nextInt(10);
-        }
-        String sb =str+newDate+result;
+
+		SimpleDateFormat sdf=new SimpleDateFormat("yyMMdd");
+		String newDate=sdf.format(new Date());
+
+		List<ClassGroupLogEntity> list = classGroupLogRejectService.selectList(new EntityWrapper<ClassGroupLogEntity>().like("log_number",newDate));
+
+		String logNumber = OrderUtils.orderNumber(list.size());
         
-    	return R.ok().put("logNumber", sb);
+    	return R.ok().put("logNumber", logNumber);
     }
     
     
