@@ -118,7 +118,7 @@ public class ClassGroupLogConfirmedController {
         					.eq("user_id", classGroupLog.getHandoverPersonId())
         					.eq("news_number", classGroupLog.getLogNumber()));
         		}
-				NewsEntity newEntity = new NewsEntity();
+				/*NewsEntity newEntity = new NewsEntity();
 				//newEntity.setNewsName("您有一条待确认班前日志");
 				newEntity.setNewsNumber(classGroupLog.getLogNumber());
 				newEntity.setNewsType(0);
@@ -127,7 +127,7 @@ public class ClassGroupLogConfirmedController {
 				newsService.update(newEntity,
 						new EntityWrapper<NewsEntity>()
 								.eq("news_number", classGroupLog.getLogNumber())
-								.eq("user_id", classGroupLog.getSuccessorId()));
+								.eq("user_id", classGroupLog.getSuccessorId()));*/
 				//classGroupLog.setLogStatus("2");
         	}
     	}else if(classGroupLog.getLogType().equals("2")) { // 班前日志

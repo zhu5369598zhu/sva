@@ -33,7 +33,7 @@
 		resultType="io.renren.modules.inspection.entity.InspectionResultEntity"
 		parameterType="io.renren.modules.inspection.entity.InspectionResultEntity">
 		select r.id,d.device_name as device_name,r.item_id,i.name as
-		item_name,t.name as inspection_type,i.unit,r.is_ok,r.exception_id
+		item_name,defective.defective_number as defectiveNumber,r.hang_up as hangUp, t.name as inspection_type,i.unit,r.is_ok,r.exception_id
 		,i.up_limit,i.upup_limit,i.down_limit,i.downdown_limit
 		,e.name as
 		exception_name,r.result,r.start_time,r.end_time,r.create_time,r.turn_id,turn.name
@@ -55,7 +55,7 @@
 		left join `tb_device_level` l on l.id = d.device_level
     left join `tb_order_defective` defective on defective.result_id = r.id
 		where 1=1
-		and r.is_ok = 0 
+		and r.is_ok != 0
 		<if test="deptIds!=null">
 			and d.device_dept in
 			<foreach item="item" index="index" collection="deptIds" open="("
@@ -64,7 +64,7 @@
 			</foreach>
 		</if>
 		<if test="orderStatus!=null">
-		    and IFNULL(defective.order_status,0) =${orderStatus}
+		    and IFNULL(r.status,0) =${orderStatus}
 		</if>
 		<if test="startTime!=null">
 			and r.start_time &gt;= CONCAT(#{startTime},' 00:00:00')
@@ -72,6 +72,7 @@
 		<if test="endTime!=null">
 			and r.end_time &lt;= CONCAT(#{endTime},' 23:59:59')
 		</if>
+		order by r.id DESC
 	</select>
 	
 	<select

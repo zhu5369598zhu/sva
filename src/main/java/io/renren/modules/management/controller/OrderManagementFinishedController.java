@@ -1,10 +1,7 @@
 package io.renren.modules.management.controller;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -156,9 +153,10 @@ public class OrderManagementFinishedController {
     @RequestMapping("/managementNumber")
     @RequiresPermissions("management:ordermanagementfinished:managementNumber")
     public R managementNumber() {
-    	
-    	String orderNumber = OrderUtils.orderDefectNumber();
-        
+        SimpleDateFormat sdf=new SimpleDateFormat("yyMMdd");
+        String newDate=sdf.format(new Date());
+        List<OrderManagementEntity> list = orderManagementFinishedService.selectList(new EntityWrapper<OrderManagementEntity>().like("order_number",newDate));
+        String orderNumber = OrderUtils.orderManagementNumber(list.size());
     	return R.ok().put("managementNumber", orderNumber);
     }
     

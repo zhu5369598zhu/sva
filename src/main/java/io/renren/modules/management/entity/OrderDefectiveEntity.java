@@ -3,6 +3,7 @@ package io.renren.modules.management.entity;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.baomidou.mybatisplus.enums.FieldStrategy;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -115,6 +116,7 @@ public class OrderDefectiveEntity implements Serializable {
 	/**
 	 * 要求完成时间  
 	 */
+	@TableField(strategy= FieldStrategy.IGNORED)
 	private Date requirementTime;
 	/**
 	 * 归属设备

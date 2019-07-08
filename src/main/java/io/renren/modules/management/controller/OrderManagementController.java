@@ -3,6 +3,8 @@ package io.renren.modules.management.controller;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import io.renren.modules.inspection.entity.InspectionResultEntity;
+import io.renren.modules.inspection.service.InspectionResultService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -58,6 +60,9 @@ public class OrderManagementController {
     
     @Autowired
     private OrderDefectiveService orderDefectiveService;
+
+	@Autowired
+	private InspectionResultService inspectionResultService;
     /**
      * 列表
      */
@@ -85,9 +90,9 @@ public class OrderManagementController {
         		orderManagement.setOrderTypeName("填报工单");
         	}else if(orderManagement.getOrderType() ==1) {
         		orderManagement.setOrderTypeName("缺陷工单");
-        	}/*else if(orderManagement.getOrderType() ==2) {
+        	}else if(orderManagement.getOrderType() ==2) {
         		orderManagement.setOrderTypeName("巡检缺陷工单");
-        	}*/
+        	}
         	if(orderManagement.getOrderStatus() ==0) {
         		orderManagement.setOrderStatusName("拟制中");
         	}else if(orderManagement.getOrderStatus()==1) {
@@ -95,26 +100,31 @@ public class OrderManagementController {
         	}else if(orderManagement.getOrderStatus()==2) {
         		orderManagement.setOrderStatusName("已受理待上报");
         	}else if(orderManagement.getOrderStatus()==3) {
-        		orderManagement.setOrderStatusName("已上报待确认");
+        		orderManagement.setOrderStatusName("已上报待审核");
         	}else if(orderManagement.getOrderStatus()==4) {
         		orderManagement.setOrderStatusName("已确认待完结");
         	}else if(orderManagement.getOrderStatus()==5) {
         		orderManagement.setOrderStatusName("已完结");
         	}else if(orderManagement.getOrderStatus()==6) {
-        		orderManagement.setOrderStatusName("已下发被打回");
+        		orderManagement.setOrderStatusName("已下发被拒绝");
         	}else if(orderManagement.getOrderStatus()==7) {
-        		orderManagement.setOrderStatusName("已上报被打回");
+        		orderManagement.setOrderStatusName("已上报被拒绝");
         	}else if(orderManagement.getOrderStatus()==8) {
         		orderManagement.setOrderStatusName("已确认不结算"); 
-        	}
-			
-        	ExceptionEntity exception = exceptionService.selectById(orderManagement.getExceptionId());
+        	}else if(orderManagement.getOrderStatus()==9){
+				orderManagement.setOrderStatusName("已转单待确认");
+			}
+
+		SysDeptEntity sysDeptEntity1 = sysDeptService.selectById(orderManagement.getDeptId());
+        orderManagement.setDeptName(sysDeptEntity.getName());
+		ExceptionEntity exception = exceptionService.selectById(orderManagement.getExceptionId());
         	if(exception !=null) {
         		orderManagement.setExceptionName(exception.getName()); 
         	}else {
         		orderManagement.setExceptionName(""); 
         	}
-            
+
+
         	OrderDefectiveEntity defectiveEntity = orderDefectiveService.selectById(orderManagement.getDefectiveId());
         	if(defectiveEntity !=null) {
         		orderManagement.setDefectiveDevice(defectiveEntity.getDefectiveDevice());
@@ -132,8 +142,13 @@ public class OrderManagementController {
     @RequestMapping("/save")
     @RequiresPermissions("management:ordermanagement:save")
     public R save(@RequestBody OrderManagementEntity orderManagement){
-    		orderManagement.setCreateTime(new Date()); 
-			orderManagementService.insert(orderManagement);
+		SimpleDateFormat sdf=new SimpleDateFormat("yyMMdd");
+		String newDate=sdf.format(new Date());
+		List<OrderManagementEntity> list = orderManagementService.selectList(new EntityWrapper<OrderManagementEntity>().like("order_number",newDate));
+		String orderNumber = OrderUtils.orderManagementNumber(list.size());
+    	orderManagement.setOrderNumber(orderNumber);
+		orderManagement.setCreateTime(new Date());
+		orderManagementService.insert(orderManagement);
 
         return R.ok();
     }
@@ -164,7 +179,7 @@ public class OrderManagementController {
 			if(entity !=null) {
 				NewsEntity newsEntity = new NewsEntity();
 			    newsEntity.setUserId(orderManagement.getOrderAcceptorId());
-			    newsEntity.setNewsName("您有一条已下发待受理的工单日志"); 
+			    newsEntity.setNewsName("您有一条已下发待受理的工单");
 			    newsEntity.setNewsNumber(orderManagement.getOrderNumber());
 			    newsEntity.setNewsType(3);
 			    newsEntity.setUpdateTime(new Date());
@@ -177,7 +192,7 @@ public class OrderManagementController {
 				// 确认派单 通知 受理人  
 			    NewsEntity newsEntity = new NewsEntity();
 			    newsEntity.setUserId(orderManagement.getOrderAcceptorId());
-			    newsEntity.setNewsName("您有一条已下发待受理的工单日志"); 
+			    newsEntity.setNewsName("您有一条已下发待受理的工单");
 			    newsEntity.setNewsNumber(orderManagement.getOrderNumber());
 			    newsEntity.setNewsType(3);
 			    newsEntity.setUpdateTime(new Date());
@@ -218,7 +233,7 @@ public class OrderManagementController {
 		Integer[] integers = new Integer[orderIds.length];
 		for(int i=0 ;i< orderManagementList.size();i++){
 			if(orderManagementList.get(i).getOrderStatus() == 0){
-				integers[i] = orderManagementList.get(i).getOrderStatus();
+				integers[i] = orderManagementList.get(i).getOrderId();
 			}
 		}
 		orderManagementService.deleteBatchIds(Arrays.asList(integers));
@@ -232,13 +247,67 @@ public class OrderManagementController {
     @RequestMapping("/managementNumber")
     @RequiresPermissions("management:ordermanagement:managementNumber")
     public R managementNumber() {
-    	
-        String orderNumber = OrderUtils.orderDefectNumber();
+
+		SimpleDateFormat sdf=new SimpleDateFormat("yyMMdd");
+		String newDate=sdf.format(new Date());
+		List<OrderManagementEntity> list = orderManagementService.selectList(new EntityWrapper<OrderManagementEntity>().like("order_number",newDate));
+		String orderNumber = OrderUtils.orderManagementNumber(list.size());
         
     	return R.ok().put("managementNumber", orderNumber);
     }
-    
-    
-    
+
+	/**
+	 * 拒绝转单
+	 */
+	@RequestMapping("/disagreelower")
+	@RequiresPermissions("management:ordermanagement:disagreelower")
+    public R disagreelower(@RequestBody OrderManagementEntity orderManagement){
+		OrderDefectiveEntity defectiveEntity = orderDefectiveService.selectById(orderManagement.getDefectiveId());
+
+		// 0 填报工单，1缺陷工单,2 巡检缺陷工单
+		Integer orderType = orderManagement.getOrderType();
+		if(orderType == 1){ // 填报缺陷工单
+			// 修改通知
+			NewsEntity newsEntity = new NewsEntity();
+			newsEntity.setUserId(defectiveEntity.getDefectiveNameId());
+			newsEntity.setNewsName("您有一条转工单被拒绝的填报缺陷");
+			newsEntity.setNewsType(11);
+			newsEntity.setNewsNumber(defectiveEntity.getDefectiveNumber());
+			newsEntity.setUpdateTime(new Date());
+			newsService.update(newsEntity,new EntityWrapper<NewsEntity>()
+					.eq("news_number",orderManagement.getOrderNumber()));
+			// 修改 缺陷工单为 拟制中的状态
+			defectiveEntity.setOrderStatus(0);
+			defectiveEntity.setOrderConfirmer(null);
+			defectiveEntity.setOrderConfirmerId(null);
+			defectiveEntity.setOrderConfirmerOpinion(null);
+			defectiveEntity.setConfirmedTime(null);
+			defectiveEntity.setRequirementTime(null);
+			orderDefectiveService.updateAllColumnById(defectiveEntity);
+
+
+		}else if(orderType ==2){// 巡检缺陷工单
+			// 修改通知
+			NewsEntity newsEntity = new NewsEntity();
+			newsEntity.setUserId(defectiveEntity.getDefectiveNameId());
+			newsEntity.setNewsName("您有一条转工单被拒绝的巡检异常缺陷");
+			newsEntity.setNewsType(12);
+			newsEntity.setNewsNumber(defectiveEntity.getDefectiveNumber());
+			newsEntity.setUpdateTime(new Date());
+			newsService.update(newsEntity,new EntityWrapper<NewsEntity>()
+					.eq("news_number",orderManagement.getOrderNumber()));
+
+			Integer resultId = defectiveEntity.getResultId();
+			InspectionResultEntity inspectionResult = new InspectionResultEntity();
+			inspectionResult.setId(resultId);
+			inspectionResult.setStatus(0); // 被拒绝
+			inspectionResultService.updateById(inspectionResult);
+		}
+		Integer defectiveId = orderManagement.getDefectiveId();
+
+
+		boolean isok = orderManagementService.deleteById(orderManagement.getOrderId());// 删除工单
+		return R.ok();
+	}
 
 }

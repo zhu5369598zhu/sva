@@ -77,7 +77,9 @@ public class OrderDefectiveServiceImpl extends ServiceImpl<OrderDefectiveDao, Or
         		defective.setOrderStatusName("待确认");
         	}else if(defective.getOrderStatus() ==2) {
         		defective.setOrderStatusName("已转"); 
-        	}
+        	}else if(defective.getOrderStatus() ==3){
+        		defective.setOrderStatusName("被拒绝");
+			}
         	
         	SysDeptEntity sysDeptEntity = sysDeptService.selectById(defective.getDeptId());
         	defective.setDeptName(sysDeptEntity.getName()); 

@@ -1,11 +1,10 @@
 package io.renren.modules.management.controller;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
+import io.renren.modules.setting.entity.OrderExceptionEntity;
+import io.renren.modules.setting.service.OrderExceptionService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,9 +48,9 @@ public class OrderManagementReportedController {
     
     @Autowired
     private OrderRecordService orderRecordService;
-    
+
     @Autowired
-    private ExceptionService exceptionService;
+    private OrderExceptionService orderExceptionService;
     /**
      * 列表
      */
@@ -75,13 +74,35 @@ public class OrderManagementReportedController {
 				orderManagement.setOrderTypeName("填报工单"); 
 			}else if(orderManagement.getOrderType() ==1) {
 				orderManagement.setOrderTypeName("缺陷工单");
-			} 
-			ExceptionEntity exception = exceptionService.selectById(orderManagement.getExceptionId());
+			}
+        OrderExceptionEntity exception = orderExceptionService.selectById(orderManagement.getExceptionId());
 			if(exception !=null){
                 orderManagement.setExceptionName(exception.getName());
             }else{
                 orderManagement.setExceptionName("");
             }
+            if(orderManagement.getOrderStatus() ==0) {
+                orderManagement.setOrderStatusName("拟制中");
+            }else if(orderManagement.getOrderStatus()==1) {
+                orderManagement.setOrderStatusName("已下发待受理");
+            }else if(orderManagement.getOrderStatus()==2) {
+                orderManagement.setOrderStatusName("已受理待上报");
+            }else if(orderManagement.getOrderStatus()==3) {
+                orderManagement.setOrderStatusName("已上报待审核");
+            }else if(orderManagement.getOrderStatus()==4) {
+                orderManagement.setOrderStatusName("已确认待完结");
+            }else if(orderManagement.getOrderStatus()==5) {
+                orderManagement.setOrderStatusName("已完结");
+            }else if(orderManagement.getOrderStatus()==6) {
+                orderManagement.setOrderStatusName("已下发被拒绝");
+            }else if(orderManagement.getOrderStatus()==7) {
+                orderManagement.setOrderStatusName("已上报被拒绝");
+            }else if(orderManagement.getOrderStatus()==8) {
+                orderManagement.setOrderStatusName("已确认不结算");
+            }else if(orderManagement.getOrderStatus()==9){
+                orderManagement.setOrderStatusName("已转单待确认");
+            }
+
 			
         return R.ok().put("ordermanagement", orderManagement);
     }
@@ -115,12 +136,10 @@ public class OrderManagementReportedController {
     @RequestMapping("/orderupdate")
     @RequiresPermissions("management:ordermanagementreported:orderupdate")
     public R orderupdate(@RequestBody OrderManagementEntity orderManagement){
-    	orderManagementReportedService.updateById(orderManagement);
-    	
     	if(orderManagement.getOrderStatus() == 3) { // 上报
     		NewsEntity newsEntity = new NewsEntity();
     		newsEntity.setUserId(orderManagement.getOrderConfirmerId());
-    		newsEntity.setNewsName("您有一条已上报待确认的工单日志");
+    		newsEntity.setNewsName("您有一条已上报待审核的工单");
     		newsEntity.setNewsType(6);
     		newsEntity.setUpdateTime(new Date());
     		newsService.update(newsEntity, new EntityWrapper<NewsEntity>()
@@ -140,13 +159,23 @@ public class OrderManagementReportedController {
     		OrderRecordEntity record = new OrderRecordEntity();
     		record.setNowTime(new Date()); // 当前时间
     		record.setOrderNumber(orderManagement.getOrderNumber());
-    		record.setOrderOpinion("进行延时，延时到"+orderManagement.getDelayTime()); // 工单主题当结论
+    		record.setOrderOpinion("进行延时"); // 工单主题当结论
     		record.setOrderPeople(orderManagement.getOrderAcceptor());
     		record.setOrderPeopleId(2);//受理人
     		record.setOrderType(orderManagement.getOrderType());
     		
     		orderRecordService.insert(record);
+    		orderManagement.setOrderStatus(3);// 上报
+            NewsEntity newsEntity = new NewsEntity();
+            newsEntity.setUserId(orderManagement.getOrderConfirmerId());
+            newsEntity.setNewsName("您有一条已上报待审核的工单");
+            newsEntity.setNewsType(6);
+            newsEntity.setUpdateTime(new Date());
+            newsService.update(newsEntity, new EntityWrapper<NewsEntity>()
+                    .eq("news_number", orderManagement.getOrderNumber())
+            );
     	}
+        orderManagementReportedService.updateById(orderManagement);
         return R.ok();
     }
     
@@ -168,8 +197,10 @@ public class OrderManagementReportedController {
     @RequestMapping("/managementNumber")
     @RequiresPermissions("management:ordermanagementreported:managementNumber")
     public R managementNumber() {
-    	
-    	String orderNumber = OrderUtils.orderDefectNumber();
+        SimpleDateFormat sdf=new SimpleDateFormat("yyMMdd");
+        String newDate=sdf.format(new Date());
+        List<OrderManagementEntity> list = orderManagementReportedService.selectList(new EntityWrapper<OrderManagementEntity>().like("order_number",newDate));
+        String orderNumber = OrderUtils.orderManagementNumber(list.size());
         
     	return R.ok().put("managementNumber", orderNumber);
     }

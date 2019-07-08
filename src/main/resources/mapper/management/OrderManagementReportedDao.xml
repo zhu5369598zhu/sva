@@ -70,10 +70,12 @@
 		</if>
 		<if test="endTime!=null">
 			and r.create_time &lt;= CONCAT(#{endTime})
-		</if> 
-		    and r.order_status = 2 or r.order_status =7 
-		    
-		    order by r.order_id DESC 
+		</if>
+		and (
+		r.order_status = 2
+		or r.order_status =7
+		)
+		order by r.order_id DESC
 
 	</select>
 	

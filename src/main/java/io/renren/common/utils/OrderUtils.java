@@ -18,31 +18,43 @@ public class OrderUtils {
 
     @Value("${company.userName: WQ}")
     private static String companyName;
-	
+
+
+
+
 	/**
      * 缺陷工单编号
      */
-    public static String orderDefectNumber() {
+    public static String orderDefectNumber(Integer num) {
     	
-    	String str = "WQGD";
-        SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMddHHmmss");
+    	String str = companyName+"QX";
+        SimpleDateFormat sdf=new SimpleDateFormat("yyMMdd");
         String newDate=sdf.format(new Date());
-        Random random=new Random();
-        String result="";
-        for(int i=0;i<3;i++){
-        result+=random.nextInt(10);
-        }
-        String orderNumber =str+newDate+result;
-
+        String newString = String.format("%03d", num+1);
+        String orderNumber = str + newDate + newString;
     	return  orderNumber;
     }
-	
+
+    /**
+     * 缺陷工单编号
+     */
+    public static String orderManagementNumber(Integer num) {
+
+        String str = companyName+"GD";
+        SimpleDateFormat sdf=new SimpleDateFormat("yyMMdd");
+        String newDate=sdf.format(new Date());
+        String newString = String.format("%03d", num+1);
+        String orderNumber = str + newDate + newString;
+        return  orderNumber;
+    }
+
+
     /**
      * 班组工单编号
      */
     public static String orderNumber(Integer num) {
 
-        String str ="WQBZ";
+        String str =companyName+"BZ";
         SimpleDateFormat sdf=new SimpleDateFormat("yyMMdd");
         String newDate=sdf.format(new Date());
         String newString = String.format("%03d", num+1);

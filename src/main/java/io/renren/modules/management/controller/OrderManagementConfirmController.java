@@ -1,10 +1,7 @@
 package io.renren.modules.management.controller;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,7 +117,7 @@ public class OrderManagementConfirmController {
     		NewsEntity newsEntity = new NewsEntity();
     		newsEntity.setUserId(orderManagement.getOrderAcceptorId());
     		newsEntity.setNewsType(8);
-    		newsEntity.setNewsName("您有一条已上报待确认的工单日志被打回");
+    		newsEntity.setNewsName("您有一条已上报待确认的工单被拒绝");
     		newsEntity.setUpdateTime(new Date()); 
     		newsService.update(newsEntity, new EntityWrapper<NewsEntity>()
     				.eq("news_number", orderManagement.getOrderNumber())
@@ -129,20 +126,21 @@ public class OrderManagementConfirmController {
     		OrderRecordEntity record = new OrderRecordEntity();
 			record.setNowTime(new Date()); // 当前时间
 			record.setOrderNumber(orderManagement.getOrderNumber());
-			record.setOrderOpinion("确认打回"+orderManagement.getOrderConfirmerOpinion()); // 工单主题当结论
+			record.setOrderOpinion(orderManagement.getOrderConfirmerOpinion()); // 工单主题当结论
 			record.setOrderPeople(orderManagement.getOrderConfirmer());
 			record.setOrderPeopleId(3);//确认人
 			record.setOrderType(orderManagement.getOrderType());
 			
 			orderRecordService.insert(record);
-    		
-    	}else if(orderManagement.getOrderStatus() ==4) {
+
+            //orderManagement.setDelayTime(new Date()); // 申请时间 改为 null
+    	}else if(orderManagement.getOrderStatus() ==5) { // 已完结
     		orderManagement.setConfirmedTime(new Date()); // 确认时间
     		orderManagement.setActualTime(new Date()); // 点击上报就是 实际完成时间
-    		NewsEntity newsEntity = new NewsEntity();
+    		/*NewsEntity newsEntity = new NewsEntity();
     		newsEntity.setUserId(orderManagement.getOrderApplicantId());
     		newsEntity.setNewsType(7);
-    		newsEntity.setNewsName("您有一条已确认待完结的工单日志");
+    		newsEntity.setNewsName("您有一条已确认待完结的工单");
     		newsEntity.setUpdateTime(new Date()); 
     		newsService.update(newsEntity, new EntityWrapper<NewsEntity>()
     				.eq("news_number", orderManagement.getOrderNumber())
@@ -155,13 +153,28 @@ public class OrderManagementConfirmController {
 			record.setOrderOpinion("已确认处理完毕"); // 工单主题当结论
 			record.setOrderPeople(orderManagement.getOrderConfirmer());
 			record.setOrderPeopleId(3);//确认人
-			record.setOrderType(orderManagement.getOrderType());
+			record.setOrderType(orderManagement.getOrderType());*/
+            NewsEntity newsEntity = new NewsEntity();
+            newsEntity.setNewsType(0);
+            newsEntity.setUpdateTime(new Date());
+            newsService.update(newsEntity, new EntityWrapper<NewsEntity>()
+                    .eq("news_number", orderManagement.getOrderNumber()));
+
+            OrderRecordEntity record = new OrderRecordEntity();
+            record.setNowTime(new Date()); // 当前时间
+            record.setOrderNumber(orderManagement.getOrderNumber());
+            record.setOrderOpinion("已消除，同意完结"); // 工单主题当结论
+            record.setOrderPeople(orderManagement.getOrderConfirmerOpinion());
+            record.setOrderPeopleId(1);//确认人
+            record.setOrderType(orderManagement.getOrderType());
 			
 			orderRecordService.insert(record);
     		
     	}
     	
     	orderManagementConfirmService.updateById(orderManagement);
+    	//orderManagementConfirmService.update(orderManagement, new EntityWrapper<OrderManagementEntity>().eq("order_id",orderManagement.getOrderId()));
+        //orderManagementConfirmService.updateAllColumnById(orderManagement);
         return R.ok();
     }
     
@@ -183,9 +196,11 @@ public class OrderManagementConfirmController {
     @RequestMapping("/managementNumber")
     @RequiresPermissions("management:ordermanagementconfirm:managementNumber")
     public R managementNumber() {
-    	
-        String orderNubmer = OrderUtils.orderDefectNumber();
-        
+
+        SimpleDateFormat sdf=new SimpleDateFormat("yyMMdd");
+        String newDate=sdf.format(new Date());
+        List<OrderManagementEntity> list = orderManagementConfirmService.selectList(new EntityWrapper<OrderManagementEntity>().like("order_number",newDate));
+        String orderNubmer = OrderUtils.orderManagementNumber(list.size());
     	return R.ok().put("managementNumber", orderNubmer);
     }
     

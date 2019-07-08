@@ -256,7 +256,15 @@ public class InspectionResultEntity implements Serializable {
 	 */
 	@TableField(exist = false)
 	private Integer defectiveId;
-	
+	/**
+	 * 缺陷工单编号
+	 */
+	@TableField(exist = false)
+	private String defectiveNumber;
+	/**
+	 * 挂起原因
+	 */
+	private String hangUp;
 	/**
 	 * 设置：id
 	 */
@@ -852,4 +860,20 @@ public class InspectionResultEntity implements Serializable {
 	public Integer getDefectiveId() {
 		return defectiveId;
 	}
+	/**
+	 * 设置： 缺陷工单编号
+	 */
+	public void setDefectiveNumber(String defectiveNumber) { this.defectiveNumber = defectiveNumber; }
+	/**
+	 * 获取：缺陷工单编号
+	 */
+	public String getDefectiveNumber() { return defectiveNumber;}
+	/**
+	 * 设置：挂起原因
+	 */
+	public void setHangUp(String hangUp) { this.hangUp = hangUp; }
+	/**
+	 * 获取：挂起原因
+	 */
+	public String getHangUp() { return hangUp; }
 }

@@ -3,6 +3,7 @@ package io.renren.modules.management.entity;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.baomidou.mybatisplus.enums.FieldStrategy;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -120,6 +121,7 @@ public class OrderManagementEntity implements Serializable {
 	/**
 	 * 申请延期时间
 	 */
+	@TableField(strategy= FieldStrategy.IGNORED)
 	private Date delayTime;
 	/**
 	 * 处理结果
