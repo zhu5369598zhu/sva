@@ -190,8 +190,8 @@ public class InspectionServiceImpl extends ServiceImpl<InspectionLineDao, Inspec
                             itemJson.put("order_num", itemEntity.getOrderNum());
 
                             itemJson.put("upup_used",itemEntity.getUpupUsed());
-                            itemJson.put("upup_limit", itemEntity.getUpLimit());
-                            itemJson.put("up_limit", itemEntity.getUpupLimit());
+                            itemJson.put("upup_limit", itemEntity.getUpupLimit());
+                            itemJson.put("up_limit", itemEntity.getUpLimit());
                             itemJson.put("up_used",itemEntity.getUpUsed());
                             itemJson.put("down_limit", itemEntity.getDownLimit());
                             itemJson.put("down_used",itemEntity.getDownUsed());
