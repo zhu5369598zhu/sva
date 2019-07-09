@@ -162,6 +162,7 @@ public class OrderDefectController {
     	managementEntity.setDefectiveId(orderDefective.getDefectiveId());
     	managementEntity.setDefectiveName(orderDefective.getDefectiveName());
     	managementEntity.setDefectiveNumber(orderDefective.getDefectiveNumber());
+    	managementEntity.setDefectiveTheme(orderDefective.getDefectiveTheme());
     	managementEntity.setOrderName(orderDefective.getDefectiveTheme());
     	managementEntity.setDeptId(orderDefective.getDeptId());
     	managementEntity.setOrderContent(orderDefective.getOrderContent());

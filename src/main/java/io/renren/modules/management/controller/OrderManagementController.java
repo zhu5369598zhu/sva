@@ -5,6 +5,8 @@ import java.util.*;
 
 import io.renren.modules.inspection.entity.InspectionResultEntity;
 import io.renren.modules.inspection.service.InspectionResultService;
+import io.renren.modules.setting.entity.OrderExceptionEntity;
+import io.renren.modules.setting.service.OrderExceptionService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,8 +23,6 @@ import io.renren.modules.management.entity.OrderRecordEntity;
 import io.renren.modules.management.service.OrderDefectiveService;
 import io.renren.modules.management.service.OrderManagementService;
 import io.renren.modules.management.service.OrderRecordService;
-import io.renren.modules.setting.entity.ExceptionEntity;
-import io.renren.modules.setting.service.ExceptionService;
 import io.renren.modules.sys.entity.NewsEntity;
 import io.renren.modules.sys.entity.SysDeptEntity;
 import io.renren.modules.sys.service.NewsService;
@@ -54,10 +54,10 @@ public class OrderManagementController {
     
     @Autowired
     private OrderRecordService orderRecordService;
-    
-    @Autowired
-    private ExceptionService exceptionService;
-    
+
+	@Autowired
+	private OrderExceptionService orderExceptionService;
+
     @Autowired
     private OrderDefectiveService orderDefectiveService;
 
@@ -117,20 +117,18 @@ public class OrderManagementController {
 
 		SysDeptEntity sysDeptEntity1 = sysDeptService.selectById(orderManagement.getDeptId());
         orderManagement.setDeptName(sysDeptEntity.getName());
-		ExceptionEntity exception = exceptionService.selectById(orderManagement.getExceptionId());
-        	if(exception !=null) {
-        		orderManagement.setExceptionName(exception.getName()); 
-        	}else {
-        		orderManagement.setExceptionName(""); 
-        	}
-
-
-        	OrderDefectiveEntity defectiveEntity = orderDefectiveService.selectById(orderManagement.getDefectiveId());
-        	if(defectiveEntity !=null) {
-        		orderManagement.setDefectiveDevice(defectiveEntity.getDefectiveDevice());
-        	}else {
-        		orderManagement.setDefectiveDevice("");
-        	}
+		OrderExceptionEntity exception = orderExceptionService.selectById(orderManagement.getExceptionId());
+		if(exception !=null){
+			orderManagement.setExceptionName(exception.getName());
+		}else{
+			orderManagement.setExceptionName("");
+		}
+		OrderDefectiveEntity defectiveEntity = orderDefectiveService.selectById(orderManagement.getDefectiveId());
+		if(defectiveEntity !=null) {
+			orderManagement.setDefectiveDevice(defectiveEntity.getDefectiveDevice());
+		}else {
+			orderManagement.setDefectiveDevice("");
+		}
         	
         	
         return R.ok().put("ordermanagement", orderManagement);
@@ -185,9 +183,7 @@ public class OrderManagementController {
 			    newsEntity.setUpdateTime(new Date());
 				newsService.update(newsEntity, new EntityWrapper<NewsEntity>()
 						.eq("news_number",orderManagement.getOrderNumber())
-						.eq("news_type", 4)
 						);
-				
 			}else {
 				// 确认派单 通知 受理人  
 			    NewsEntity newsEntity = new NewsEntity();
@@ -196,23 +192,15 @@ public class OrderManagementController {
 			    newsEntity.setNewsNumber(orderManagement.getOrderNumber());
 			    newsEntity.setNewsType(3);
 			    newsEntity.setUpdateTime(new Date());
-				newsEntity.setCreateTime(new Date());
 				newsService.insert(newsEntity);
+
+
 			}
-			// 流程记录
-			OrderRecordEntity recordEntity = new OrderRecordEntity();
-			recordEntity.setNowTime(new Date()); // 当前时间
-			recordEntity.setOrderNumber(orderManagement.getOrderNumber());
-			recordEntity.setOrderOpinion(orderManagement.getOrderName()+",请安排处理!"); // 工单主题当结论
-		    recordEntity.setOrderPeople(orderManagement.getOrderApplicant());
-			recordEntity.setOrderPeopleId(1);// 填报人
-			recordEntity.setOrderType(orderManagement.getOrderType());
-			orderRecordService.insert(recordEntity);
-			
+
 			OrderRecordEntity record = new OrderRecordEntity();
 			record.setNowTime(new Date()); // 当前时间
 			record.setOrderNumber(orderManagement.getOrderNumber());
-			record.setOrderOpinion("请"+orderManagement.getOrderAcceptor()+",请安排处理!"); // 工单主题当结论
+			record.setOrderOpinion("请"+orderManagement.getOrderAcceptor()+",安排处理!"); // 工单主题当结论
 			record.setOrderPeople(orderManagement.getOrderApplicant());
 			record.setOrderPeopleId(1);// 填报人
 			record.setOrderType(orderManagement.getOrderType());

@@ -9,6 +9,7 @@
         <result property="orderNumber" column="order_number"/>
         <result property="defectiveId" column="defective_id"/>
         <result property="defectiveNumber" column="defective_number"/>
+		<result property="defectiveTheme" column="defective_theme"/>
         <result property="orderName" column="order_name"/>
         <result property="deptId" column="dept_id"/>
         <result property="exceptionId" column="exception_id"/>

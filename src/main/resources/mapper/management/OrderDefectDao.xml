@@ -63,6 +63,9 @@
 				#{item}
 			</foreach>
 		</if>
+		<if test="defectiveNumber!=null">
+			and defective.defective_number like '%${defectiveNumber}%'
+		</if>
 		<if test="orderStatus!=null">
 		    and IFNULL(r.status,0) =${orderStatus}
 		</if>

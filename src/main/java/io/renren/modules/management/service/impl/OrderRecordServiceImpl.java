@@ -28,14 +28,13 @@ public class OrderRecordServiceImpl extends ServiceImpl<OrderRecordDao, OrderRec
         
         for(OrderRecordEntity orderRecord: page.getRecords()) {
         	if(orderRecord.getOrderPeopleId() ==1) {
-        		orderRecord.setOrderPeopleName("缺陷确认人");
+        		orderRecord.setOrderPeopleName("工单操作人");
         	}else if(orderRecord.getOrderPeopleId() ==2) {
         		orderRecord.setOrderPeopleName("工单受理人");
         	}else if(orderRecord.getOrderPeopleId() ==3) {
         		orderRecord.setOrderPeopleName("工单审核人");
         	}
         }
-        
 
         return new PageUtils(page);
     }
