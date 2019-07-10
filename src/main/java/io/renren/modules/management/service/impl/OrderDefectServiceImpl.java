@@ -52,6 +52,7 @@ public class OrderDefectServiceImpl extends ServiceImpl<OrderDefectDao, OrderDef
 	public PageUtils queryPage(Map<String, Object> params) {
 	
 		String deptId = (String)params.get("deptId");
+		String defectiveNumber = (String) params.get("defectiveNumber");
 		String orderStatus = (String)params.get("orderStatus"); 
         String startTime = (String)params.get("startTime");
         String endTime = (String)params.get("endTime");
@@ -62,7 +63,9 @@ public class OrderDefectServiceImpl extends ServiceImpl<OrderDefectDao, OrderDef
         	List<Integer> deptIds = deptService.queryRecursiveChildByParentId(Long.parseLong(deptId));
             resultEntity.setDeptIds(deptIds);
         }
-
+        if(defectiveNumber !=null && !defectiveNumber.equals("")){
+            resultEntity.setDefectiveNumber(defectiveNumber);
+        }
         if(orderStatus != null && !orderStatus.equals("")) {
         	resultEntity.setOrderStatus(Integer.parseInt(orderStatus)); 
         }

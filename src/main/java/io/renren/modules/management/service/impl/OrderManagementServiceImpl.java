@@ -69,22 +69,31 @@ public class OrderManagementServiceImpl extends ServiceImpl<OrderManagementDao, 
         	}else if(orderManagement.getOrderStatus()==2) {
         		orderManagement.setOrderStatusName("已受理待上报");
         	}else if(orderManagement.getOrderStatus()==3) {
-        		orderManagement.setOrderStatusName("已上报待确认");
+        		orderManagement.setOrderStatusName("已上报待审核");
         	}else if(orderManagement.getOrderStatus()==4) {
         		orderManagement.setOrderStatusName("已确认待完结");
         	}else if(orderManagement.getOrderStatus()==5) {
         		orderManagement.setOrderStatusName("已完结");
         	}else if(orderManagement.getOrderStatus()==6) {
-        		orderManagement.setOrderStatusName("已下发被打回");
+        		orderManagement.setOrderStatusName("已下发被拒绝");
         	}else if(orderManagement.getOrderStatus()==7) {
-        		orderManagement.setOrderStatusName("已上报被打回");
+        		orderManagement.setOrderStatusName("已上报被拒绝");
         	}else if(orderManagement.getOrderStatus()==8) {
         		orderManagement.setOrderStatusName("已确认不结算"); 
-        	}
+        	}else if(orderManagement.getOrderStatus()==9){
+        		orderManagement.setOrderStatusName("已转单待确认");
+			}
+			Integer orderType = orderManagement.getOrderType();
+			if(orderType == 0){
+        		orderManagement.setOrderTypeName("工单");
+			}else if(orderType ==1){
+        		orderManagement.setOrderTypeName("缺陷填报工单");
+			}else if(orderType ==2){
+                orderManagement.setOrderTypeName("巡检异常工单");
+			}
         	
         	SysDeptEntity sysDeptEntity = sysDeptService.selectById(orderManagement.getDeptId());
         	orderManagement.setDeptName(sysDeptEntity.getName());
-        	
         }
         
         page.setRecords(List);

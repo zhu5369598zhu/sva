@@ -3,6 +3,7 @@ package io.renren.modules.management.entity;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.baomidou.mybatisplus.enums.FieldStrategy;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -35,6 +36,10 @@ public class OrderManagementEntity implements Serializable {
 	 * 缺陷工单编号
 	 */
 	private String defectiveNumber;
+	/**
+	 * 缺陷主题
+	 */
+	private String defectiveTheme;
 	/**
 	 * 工单主题
 	 */
@@ -120,6 +125,7 @@ public class OrderManagementEntity implements Serializable {
 	/**
 	 * 申请延期时间
 	 */
+	@TableField(strategy= FieldStrategy.IGNORED)
 	private Date delayTime;
 	/**
 	 * 处理结果
@@ -204,6 +210,18 @@ public class OrderManagementEntity implements Serializable {
 	 */
 	public String getDefectiveNumber() {
 		return defectiveNumber;
+	}
+	/**
+	 * 设置：缺陷工单主题
+	 */
+	public void setDefectiveTheme(String defectiveTheme) {
+		this.defectiveTheme = defectiveTheme;
+	}
+	/**
+	 * 获取：缺陷工单主题
+	 */
+	public String getDefectiveTheme() {
+		return defectiveTheme;
 	}
 	/**
 	 * 设置：工单主题

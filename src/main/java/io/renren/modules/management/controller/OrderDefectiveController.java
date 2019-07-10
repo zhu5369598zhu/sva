@@ -1,11 +1,13 @@
 package io.renren.modules.management.controller;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import io.renren.modules.setting.entity.OrderExceptionEntity;
+import io.renren.modules.setting.service.OrderExceptionService;
+import io.renren.modules.sys.entity.SysDeptEntity;
+import io.renren.modules.sys.service.SysDeptService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,16 +46,17 @@ public class OrderDefectiveController {
     private OrderDefectiveService orderDefectiveService;
     
     @Autowired
-    private ExceptionService exceptionService;
-    
-    @Autowired
     private NewsService newsService;
     
     @Autowired
-    private OrderRecordService orderRecordService;
-    
-    @Autowired
     private OrderManagementService orderManagementService;
+
+	@Autowired
+	private OrderExceptionService orderExceptionService;
+
+	@Autowired
+	private  SysDeptService sysDeptService;
+
     
     /**
      * 列表
@@ -88,10 +91,14 @@ public class OrderDefectiveController {
 			}else if(orderDefective.getDefectiveType() ==1) {
 				orderDefective.setDefectiveTypeName("填报缺陷异常");
 			}
-			ExceptionEntity exception = exceptionService.selectById(orderDefective.getExceptionId());
-			orderDefective.setExceptionName(exception.getName());  
-			
-        return R.ok().put("orderdefective", orderDefective);
+		OrderExceptionEntity exception = orderExceptionService.selectById(orderDefective.getExceptionId());
+
+		orderDefective.setExceptionName(exception.getName());
+
+		SysDeptEntity sysDeptEntity = sysDeptService.selectById(orderDefective.getDeptId());
+		orderDefective.setDeptName(sysDeptEntity.getName());
+
+		return R.ok().put("orderdefective", orderDefective);
     }
 
     /**
@@ -100,8 +107,13 @@ public class OrderDefectiveController {
     @RequestMapping("/save")
     @RequiresPermissions("management:orderdefective:save")
     public R save(@RequestBody OrderDefectiveEntity orderDefective){
-    	    orderDefective.setCreateTime(new Date()); 
-			orderDefectiveService.insert(orderDefective);
+		SimpleDateFormat sdf=new SimpleDateFormat("yyMMdd");
+		String newDate=sdf.format(new Date());
+		List<OrderDefectiveEntity> list = orderDefectiveService.selectList(new EntityWrapper<OrderDefectiveEntity>().like("defective_number", newDate));
+		String orderNumber = OrderUtils.orderDefectNumber(list.size());
+		orderDefective.setDefectiveNumber(orderNumber);
+    	orderDefective.setCreateTime(new Date());
+		orderDefectiveService.insert(orderDefective);
 
         return R.ok();
     }
@@ -125,40 +137,53 @@ public class OrderDefectiveController {
     @RequiresPermissions("management:orderdefective:orderupdate")
     public R orderupdate(@RequestBody OrderDefectiveEntity orderDefective){
     	orderDefectiveService.updateById(orderDefective);
-    	String orderNumber = OrderUtils.orderDefectNumber(); // 工单编号 
+		SimpleDateFormat sdf=new SimpleDateFormat("yyMMdd");
+		String newDate=sdf.format(new Date());
+		List<OrderManagementEntity> list = orderManagementService.selectList(new EntityWrapper<OrderManagementEntity>().like("order_number",newDate));
+
+		String orderNumber = OrderUtils.orderManagementNumber(list.size()); // 工单编号
     	// 填报缺陷工单 转到 工单管理  
     	OrderManagementEntity managementEntity = new OrderManagementEntity();
     	managementEntity.setOrderNumber(orderNumber);
     	managementEntity.setDefectiveId(orderDefective.getDefectiveId());
     	managementEntity.setDefectiveName(orderDefective.getDefectiveName());
     	managementEntity.setDefectiveNumber(orderDefective.getDefectiveNumber());
+    	managementEntity.setDefectiveTheme(orderDefective.getDefectiveTheme());
     	managementEntity.setOrderName(orderDefective.getDefectiveTheme());
     	managementEntity.setDeptId(orderDefective.getDeptId());
     	managementEntity.setOrderContent(orderDefective.getOrderContent());
-    	managementEntity.setOrderApplicant(orderDefective.getDefectiveName());// 工单填报人
-    	managementEntity.setOrderApplicantId(orderDefective.getDefectiveNameId());//工单填报人id
-    	managementEntity.setOrderAcceptor(orderDefective.getOrderAcceptor()); // 工单受理人 
-    	managementEntity.setOrderAcceptorId(orderDefective.getOrderAcceptorId()); // 工单受理人id
-    	managementEntity.setOrderApplicantOpinion(orderDefective.getDefectiveNameOpinion());
+    	managementEntity.setOrderApplicant(orderDefective.getOrderConfirmer());// 工单填报人
+    	managementEntity.setOrderApplicantId(orderDefective.getOrderConfirmerId());//工单填报人id
+		managementEntity.setOrderConfirmer(orderDefective.getOrderConfirmer());
+		managementEntity.setOrderConfirmerId(orderDefective.getOrderConfirmerId());
+		// managementEntity.setOrderAcceptor(orderDefective.getOrderAcceptor()); // 工单受理人
+    	// managementEntity.setOrderAcceptorId(orderDefective.getOrderAcceptorId()); // 工单受理人id
+    	// managementEntity.setOrderApplicantOpinion(orderDefective.getDefectiveNameOpinion());
     	managementEntity.setExceptionId(orderDefective.getExceptionId()); 
     	managementEntity.setCreateTime(new Date()); 
     	managementEntity.setRequirementTime(orderDefective.getRequirementTime());
-    	managementEntity.setOrderStatus(1);
+    	managementEntity.setOrderStatus(9);
     	managementEntity.setOrderType(1); // 缺陷工单
     	orderManagementService.insert(managementEntity);
     	
     	// 进行通知
     	NewsEntity newsEntity = new NewsEntity();
-	    newsEntity.setUserId(orderDefective.getOrderAcceptorId());
-	    newsEntity.setNewsName("您有一条已下发待受理的工单日志"); 
+	    newsEntity.setUserId(orderDefective.getOrderConfirmerId());
+	    newsEntity.setNewsName("您有一条已转单待确认的工单");
 	    newsEntity.setNewsNumber(orderNumber);
-	    newsEntity.setNewsType(3);
+	    newsEntity.setNewsType(9);
 	    newsEntity.setUpdateTime(new Date());
 		newsEntity.setCreateTime(new Date());
 		newsService.insert(newsEntity);
-		
+
+		// 修改之前的记录 为 0 ，使之成为 无效状态
+		NewsEntity news = new NewsEntity();
+		news.setNewsType(0);
+		news.setUpdateTime(new Date());
+		newsService.update(news, new EntityWrapper<NewsEntity>()
+				.eq("news_number",orderDefective.getDefectiveNumber()));
 		//进行记录
-		OrderRecordEntity recordEntity = new OrderRecordEntity();
+		/*OrderRecordEntity recordEntity = new OrderRecordEntity();
 		recordEntity.setOrderNumber(orderNumber);
 		recordEntity.setDefectiveId(orderDefective.getDefectiveId());
 		recordEntity.setDefectiveNumber(orderDefective.getDefectiveNumber());
@@ -169,7 +194,7 @@ public class OrderDefectiveController {
 		recordEntity.setCreateTime(orderDefective.getCreateTime());
 		recordEntity.setRequirementTime(orderDefective.getRequirementTime());
 		recordEntity.setNowTime(new Date());
-		orderRecordService.insert(recordEntity);
+		orderRecordService.insert(recordEntity);*/
 		
     	return R.ok();
     }
@@ -191,8 +216,10 @@ public class OrderDefectiveController {
     @RequestMapping("/managementNumber")
     @RequiresPermissions("management:orderdefective:managementNumber")
     public R managementNumber() {
-    	
-        String orderNumber = OrderUtils.orderDefectNumber();
+		SimpleDateFormat sdf=new SimpleDateFormat("yyMMdd");
+		String newDate=sdf.format(new Date());
+		List<OrderDefectiveEntity> list = orderDefectiveService.selectList(new EntityWrapper<OrderDefectiveEntity>().like("defective_number",newDate));
+		String orderNumber = OrderUtils.orderDefectNumber(list.size());
         
     	return R.ok().put("managementNumber", orderNumber);
     }

@@ -40,6 +40,14 @@ public class ClassGroupLogServiceImpl extends ServiceImpl<ClassGroupLogDao, Clas
     	String baseTurnId = params.get("baseTurnId").toString();
     	String logType = params.get("logType").toString();
     	String logStatus = params.get("logStatus").toString();
+		String logUserStatus = "";
+		if(logStatus.equals("4")){ // 待确认有驳回
+			logUserStatus = "4";
+			logStatus = "";
+		}else if(logStatus.equals("2")){ // 待确认状态
+			logUserStatus = "2";
+			logStatus = "";
+		}
         Page<ClassGroupLogEntity> page = this.selectPage(
                 new Query<ClassGroupLogEntity>(params).getPage(),
                 new EntityWrapper<ClassGroupLogEntity>()
@@ -48,7 +56,8 @@ public class ClassGroupLogServiceImpl extends ServiceImpl<ClassGroupLogDao, Clas
                 .like(StringUtils.isNotBlank(classGroupName),"class_group_name", classGroupName)
                 .like(StringUtils.isNotBlank(baseTurnId),"base_turn_id", baseTurnId)
                 .like(StringUtils.isNotBlank(logType),"log_type", logType)
-                .like(StringUtils.isNotBlank(logStatus),"log_status", logStatus).orderBy("class_id",false)
+                .like(StringUtils.isNotBlank(logStatus),"log_status", logStatus)
+				.like("log_user_status",logUserStatus).orderBy("class_id",false)
         );
         
         for(ClassGroupLogEntity classGroupLogEntity: page.getRecords()) {

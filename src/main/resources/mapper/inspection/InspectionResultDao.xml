@@ -18,6 +18,7 @@
         <result property="startTime" column="start_time"/>
         <result property="endTime" column="end_time"/>
         <result property="createTime" column="create_time"/>
+        <result property="hangUp" column="hang_up"/>
     </resultMap>
 
     <select id="selectResultList" resultType="io.renren.modules.inspection.entity.InspectionResultEntity" parameterType="io.renren.modules.inspection.entity.InspectionResultEntity">

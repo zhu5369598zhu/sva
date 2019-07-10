@@ -9,6 +9,7 @@
         <result property="orderNumber" column="order_number"/>
         <result property="defectiveId" column="defective_id"/>
         <result property="defectiveNumber" column="defective_number"/>
+		<result property="defectiveTheme" column="defective_theme"/>
         <result property="orderName" column="order_name"/>
         <result property="deptId" column="dept_id"/>
         <result property="exceptionId" column="exception_id"/>
@@ -70,10 +71,12 @@
 		</if>
 		<if test="endTime!=null">
 			and r.create_time &lt;= CONCAT(#{endTime})
-		</if> 
-		    and r.order_status = 2 or r.order_status =7 
-		    
-		    order by r.order_id DESC 
+		</if>
+		and (
+		r.order_status = 2
+		or r.order_status =7
+		)
+		order by r.order_id DESC
 
 	</select>
 	
