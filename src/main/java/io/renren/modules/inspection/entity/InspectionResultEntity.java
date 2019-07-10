@@ -3,6 +3,7 @@ package io.renren.modules.inspection.entity;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -188,11 +189,12 @@ public class InspectionResultEntity implements Serializable {
 	/**
 	 * 开始巡检时间
 	 */
-	private Date startTime;
+	private String startTime;
 	/**
 	 * 结束巡检时间
 	 */
-	private Date endTime;
+
+	private String endTime;
 	/**
 	 * 缺陷处理状态
 	 */
@@ -200,6 +202,7 @@ public class InspectionResultEntity implements Serializable {
 	/**
 	 * 上传时间
 	 */
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
 	private Date createTime;
 	/**
 	 * 上限
@@ -448,25 +451,26 @@ public class InspectionResultEntity implements Serializable {
 	/**
 	 * 设置：开始巡检时间
 	 */
-	public void setStartTime(Date startTime) {
+
+	public void setStartTime(String startTime) {
 		this.startTime = startTime;
 	}
 	/**
 	 * 获取：开始巡检时间
 	 */
-	public Date getStartTime() {
+	public String getStartTime() {
 		return startTime;
 	}
 	/**
 	 * 设置：结束巡检时间
 	 */
-	public void setEndTime(Date endTime) {
+	public void setEndTime(String endTime) {
 		this.endTime = endTime;
 	}
 	/**
 	 * 获取：结束巡检时间
 	 */
-	public Date getEndTime() {
+	public String getEndTime() {
 		return endTime;
 	}
 	/**

@@ -3,6 +3,7 @@ package io.renren.modules.inspection.controller;
 import java.io.ByteArrayOutputStream;
 import java.util.*;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import io.renren.common.annotation.SysLog;
 import io.renren.common.utils.*;
 import io.renren.modules.inspection.entity.DeviceQrcodeEntity;
@@ -258,22 +259,31 @@ public class DeviceController {
     }
 
     /**
+     * 获取设备异常状态
+     */
+    @RequestMapping("/getdevicetoinspection")
+    public R getDeviceToInspection(){
+        List<DeviceEntity> deviceList = deviceService.selectList(
+                new EntityWrapper<DeviceEntity>()
+                .eq("is_delete",0)
+                .eq("is_inspect",1)
+        );
+
+        return R.ok().put("deviceList", deviceList);
+    }
+
+    /**
      * 获取设备异常排名
      */
     @RequestMapping("/getexceptiontop")
-    public R getDeviceExceptionTop(@RequestParam Map<String, Object> params){
-        String level = (String)params.get("levelId");
+    public R getDeviceExceptionTop(@RequestBody Map<String, Object> params){
+        ArrayList<Integer> levelIds = (ArrayList<Integer>)params.get("levleIds");
         String startTime = (String)params.get("startTime");
         String endTime = (String)params.get("endTime");
-        Integer levelId = 0;
-        if(level != null && !level.equals("")){
-            levelId = Integer.parseInt(level);
-        }
-        List<Map<String,Object>> topList = deviceService.getDeviceExceptionTop(levelId,startTime,endTime);
+        List<Map<String,Object>> topList = deviceService.getDeviceExceptionTop(levelIds,startTime,endTime);
 
         return R.ok().put("topList", topList);
     }
-
 
     /**
      * 选择未绑定到巡区的所有设备

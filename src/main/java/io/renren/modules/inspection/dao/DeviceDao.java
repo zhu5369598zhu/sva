@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +32,7 @@ public interface DeviceDao extends BaseMapper<DeviceEntity> {
     DeviceEntity selectByDeviceCode(@Param("deviceCode") String deviceCode);
 
     List<Map<String,Object>> getDeviceStatus();
-    List<Map<String,Object>> getDeviceExceptionTop(@Param("levelId") Integer deviceLevelId, @Param("startTime") String startTime, @Param("endTime") String endTime);
+
+    List<Map<String,Object>> getDeviceExceptionTop(@Param("levelIds") ArrayList<Integer> levelIds, @Param("startTime") String startTime, @Param("endTime") String endTime);
 
 }

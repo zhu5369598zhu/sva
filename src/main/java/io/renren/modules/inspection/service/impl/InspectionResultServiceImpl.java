@@ -131,22 +131,13 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
         if(inspectionTypeId != null && !inspectionTypeId.equals("")) {
             resultEntity.setInspectionTypeId(Integer.parseInt(inspectionTypeId));
         }
-        if(startTime != null && !startTime.equals("")){
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            try{
-                resultEntity.setStartTime(sdf.parse(startTime));
-            }catch(java.text.ParseException e){
 
-            }
-
+        if(startTime != null && !startTime.equals("")) {
+            resultEntity.setStartTime(startTime);
         }
-        if(endTime != null && !endTime.equals("")){
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            try{
-                resultEntity.setEndTime(sdf.parse(endTime));
-            }catch(java.text.ParseException e){
 
-            }
+        if(endTime != null && !endTime.equals("")) {
+            resultEntity.setEndTime(endTime);
         }
 
         List<InspectionResultEntity> resultList = this.baseMapper.selectResultList(resultEntity);
@@ -205,6 +196,8 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
 
                 }
             }
+
+
 
         }
         return resultList;
@@ -291,22 +284,12 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
         if(inspectionTypeId != null && !inspectionTypeId.equals("")) {
             resultEntity.setInspectionTypeId(Integer.parseInt(inspectionTypeId));
         }
-        if(startTime != null && !startTime.equals("")){
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            try{
-                resultEntity.setStartTime(sdf.parse(startTime));
-            }catch(java.text.ParseException e){
-
-            }
-
+        if(startTime != null && !startTime.equals("")) {
+            resultEntity.setStartTime(startTime);
         }
-        if(endTime != null && !endTime.equals("")){
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            try{
-                resultEntity.setEndTime(sdf.parse(endTime));
-            }catch(java.text.ParseException e){
 
-            }
+        if(endTime != null && !endTime.equals("")) {
+            resultEntity.setEndTime(endTime);
         }
 
         List<Map<String,Object>> resultExceptionList = this.baseMapper.selectExceptionGroupByDevice(
@@ -402,22 +385,12 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
         if(inspectionTypeId != null && !inspectionTypeId.equals("")) {
             resultEntity.setInspectionTypeId(Integer.parseInt(inspectionTypeId));
         }
-        if(startTime != null && !startTime.equals("")){
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            try{
-                resultEntity.setStartTime(sdf.parse(startTime));
-            }catch(java.text.ParseException e){
-
-            }
-
+        if(startTime != null && !startTime.equals("")) {
+            resultEntity.setStartTime(startTime);
         }
-        if(endTime != null && !endTime.equals("")){
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            try{
-                resultEntity.setEndTime(sdf.parse(endTime));
-            }catch(java.text.ParseException e){
 
-            }
+        if(endTime != null && !endTime.equals("")) {
+            resultEntity.setEndTime(endTime);
         }
 
         List<Map<String,Object>> resultExceptionList = this.baseMapper.selectExceptionGroupByDevice(
@@ -491,6 +464,87 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
     }
 
     @Override
+    public Map<String,Object> selectExceptionGroupByTime(Map<String, Object> params) {
+        String startTime = (String)params.get("startTime");
+        String type = (String)params.get("type");
+
+        List<Map<String,Object>> resultExceptionList = this.baseMapper.selectExceptionGroupByTime(startTime,type);
+
+        LinkedHashSet<String>  legend = new LinkedHashSet();
+        LinkedHashSet<String>  category = new LinkedHashSet();
+        HashMap<String, Object> series = new HashMap();
+        HashMap<String, Object> yAxis = new HashMap<>();
+        HashMap<String, Object> json = new HashMap<>();
+        List<Long> aList = new ArrayList<>();
+        List<Long> bList = new ArrayList<>();
+        List<Long> cList = new ArrayList<>();
+        for(Map<String,Object> item:resultExceptionList){
+            category.add(item.get("time").toString());
+            HashMap<String, Object> time = (HashMap<String, Object>)yAxis.get(item.get("time").toString());
+            if ( time == null){
+                HashMap<String, Object> exception = new HashMap<>();
+                if(item.get("name").toString().equals("A类")) {
+                    exception.put("A类",(Long)item.get("count"));
+                }else {
+                    exception.put("A类",0L);
+                }
+                if(item.get("name").toString().equals("B类")){
+                    exception.put("B类",(Long)item.get("count"));
+                }else {
+                    exception.put("B类",0L);
+                }
+                if(item.get("name").toString().equals("C类")){
+                    exception.put("C类",(Long)item.get("count"));
+                }else{
+                    exception.put("C类",0L);
+                }
+                yAxis.put(item.get("time").toString(), exception);
+            } else {
+                if(item.get("name").toString().equals("A类")) {
+                    Long a = (Long)time.get("A类");
+                    time.remove("A类");
+                    a = a + (Long)item.get("count");
+                    time.put("A类",a);
+                }else if(item.get("name").toString().equals("B类")) {
+                    Long b = (Long)time.get("B类");
+                    time.remove("B类");
+                    b += (Long)item.get("count");
+                    time.put("B类",b);
+                }else if(item.get("name").toString().equals("C类")){
+                    Long c = (Long)time.get("C类");
+                    time.remove("C类");
+                    c += (Long)item.get("count");
+                    time.put("C类",c);
+                }
+                yAxis.remove(item.get("time").toString());
+                yAxis.put(item.get("time").toString(), time);
+            }
+        }
+        for(String item: category){
+            HashMap<String, Object> time = (HashMap<String, Object>)yAxis.get(item);
+            Long a = (Long)time.get("A类");
+            aList.add(a);
+            Long b = (Long)time.get("B类");
+            bList.add(b);
+            Long c = (Long)time.get("C类");
+            cList.add(c);
+        }
+
+        if (resultExceptionList.size() > 0){
+            series.put("A", aList);
+            series.put("B", bList);
+            series.put("C", cList);
+            legend.add("A类");
+            legend.add("B类");
+            legend.add("C类");
+        }
+        json.put("legend",legend);
+        json.put("category", category);
+        json.put("series", series);
+        return json;
+    }
+
+    @Override
     public Map<String,Object> selectExceptionGroupByItem(Map<String, Object> params) {
         String lineId = (String)params.get("lineId");
         String deviceId = (String)params.get("deviceId");
@@ -549,24 +603,14 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
         if(inspectionTypeId != null && !inspectionTypeId.equals("")) {
             resultEntity.setInspectionTypeId(Integer.parseInt(inspectionTypeId));
         }
-        if(startTime != null && !startTime.equals("")){
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            try{
-                resultEntity.setStartTime(sdf.parse(startTime));
-            }catch(java.text.ParseException e){
-
-            }
-
+        if(startTime != null && !startTime.equals("")) {
+            resultEntity.setStartTime(startTime);
         }
-        if(endTime != null && !endTime.equals("")){
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            try{
-                resultEntity.setEndTime(sdf.parse(endTime));
-            }catch(java.text.ParseException e){
 
-            }
+        if(endTime != null && !endTime.equals("")) {
+            resultEntity.setEndTime(endTime);
         }
-        
+
         List<Map<String,Object>> resultExceptionList = this.baseMapper.selectExceptionGroupByItem(
                 resultEntity
         );
@@ -701,22 +745,12 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
         if(inspectionTypeId != null && !inspectionTypeId.equals("")) {
             resultEntity.setInspectionTypeId(Integer.parseInt(inspectionTypeId));
         }
-        if(startTime != null && !startTime.equals("")){
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            try{
-                resultEntity.setStartTime(sdf.parse(startTime));
-            }catch(java.text.ParseException e){
-
-            }
-
+        if(startTime != null && !startTime.equals("")) {
+            resultEntity.setStartTime(startTime);
         }
-        if(endTime != null && !endTime.equals("")){
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            try{
-                resultEntity.setEndTime(sdf.parse(endTime));
-            }catch(java.text.ParseException e){
 
-            }
+        if(endTime != null && !endTime.equals("")) {
+            resultEntity.setEndTime(endTime);
         }
 
         Page<InspectionResultEntity> page = new Query<InspectionResultEntity>(params).getPage();

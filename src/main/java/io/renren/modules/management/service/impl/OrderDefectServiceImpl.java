@@ -67,24 +67,6 @@ public class OrderDefectServiceImpl extends ServiceImpl<OrderDefectDao, OrderDef
         	resultEntity.setOrderStatus(Integer.parseInt(orderStatus)); 
         }
 
-        if(startTime != null && !startTime.equals("")){
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            try{
-                resultEntity.setStartTime(sdf.parse(startTime));
-            }catch(java.text.ParseException e){
-
-            }
-
-        }
-        if(endTime != null && !endTime.equals("")){
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            try{
-                resultEntity.setEndTime(sdf.parse(endTime));
-            }catch(java.text.ParseException e){
-
-            }
-        }
-
         Page<InspectionResultEntity> page = new Query<InspectionResultEntity>(params).getPage();
         List<InspectionResultEntity> list = this.baseMapper.selectResultList(
                 page,

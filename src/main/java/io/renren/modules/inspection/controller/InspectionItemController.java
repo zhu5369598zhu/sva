@@ -291,6 +291,17 @@ public class InspectionItemController {
     }
 
     /**
+     * 列表
+     */
+    @RequestMapping("/getitemsbydevice")
+    @RequiresPermissions("inspection:inspectionitem:list")
+    public R getItemsByDevice(@RequestParam Map<String, Object> params){
+        List<InspectionItemEntity> list = inspectionItemService.all(params);
+
+        return R.ok().put("list", list);
+    }
+
+    /**
      * 信息
      */
     @RequestMapping("/info/{id}")

@@ -6,6 +6,7 @@ import io.renren.modules.inspection.entity.DeviceEntity;
 import org.apache.ibatis.annotations.Param;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,7 @@ public interface DeviceService extends IService<DeviceEntity> {
     /**
      * 获取设备异常统计排名
      */
-    public List<Map<String,Object>> getDeviceExceptionTop(Integer deviceLevelId, String startTime,String endTime);
+    public List<Map<String,Object>> getDeviceExceptionTop(ArrayList<Integer> levelIds, String startTime, String endTime);
 
     /**
      * 根据部门id查询设备

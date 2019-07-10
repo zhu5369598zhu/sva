@@ -88,6 +88,17 @@ public class InspectionResultController {
         return R.ok().put("data", data);
     }
 
+    /**
+     * 列表
+     */
+    @RequestMapping("/statisticsbytime")
+    @RequiresPermissions("inspection:inspectionresult:list")
+    public R statisticsByTime(@RequestParam Map<String, Object> params){
+        Map<String, Object> data = inspectionResultService.selectExceptionGroupByTime(params);
+
+        return R.ok().put("data", data);
+    }
+
 
     /**
      * 列表

@@ -36,6 +36,8 @@ public interface InspectionResultService extends IService<InspectionResultEntity
 
     Map<String,Object> selectExceptionGroupByDevice(Map<String, Object> params);
 
+    Map<String,Object> selectExceptionGroupByTime(Map<String, Object> params);
+
     Map<String,Object> selectExceptionGroupByItem(Map<String, Object> params);
 
 }
