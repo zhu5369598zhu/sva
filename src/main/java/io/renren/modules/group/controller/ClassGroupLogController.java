@@ -22,6 +22,8 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 
 import io.renren.modules.group.entity.ClassGroupLogEntity;
 import io.renren.modules.group.service.ClassGroupLogService;
+import io.renren.modules.setting.entity.BaseTurnEntity;
+import io.renren.modules.setting.service.BaseTurnService;
 import io.renren.modules.sys.entity.NewsEntity;
 import io.renren.modules.sys.service.NewsService;
 import io.renren.common.utils.OrderUtils;
@@ -48,6 +50,10 @@ public class ClassGroupLogController {
 
     @Autowired
     private SysDeptService sysDeptService;
+    
+    @Autowired
+    private BaseTurnService baseTurnService;
+
     /**
      * 列表
      */
@@ -70,6 +76,9 @@ public class ClassGroupLogController {
 		// 获取部门(车间工段) 名称
 		SysDeptEntity sysDeptEntity = sysDeptService.selectById(classGroupLog.getDeptId());
 		classGroupLog.setDeptName(sysDeptEntity.getName());
+
+		BaseTurnEntity baseTurn = baseTurnService.selectById(classGroupLog.getBaseTurnId());
+		classGroupLog.setBaseTurnName(baseTurn.getName());
         return R.ok().put("classgrouplog", classGroupLog);
     }
 

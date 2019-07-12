@@ -118,17 +118,14 @@ public class ClassGroupLogConfirmedController {
         					.eq("user_id", classGroupLog.getHandoverPersonId())
         					.eq("news_number", classGroupLog.getLogNumber()));
         		}
-				/*NewsEntity newEntity = new NewsEntity();
-				//newEntity.setNewsName("您有一条待确认班前日志");
-				newEntity.setNewsNumber(classGroupLog.getLogNumber());
+
+				NewsEntity newEntity = new NewsEntity();
 				newEntity.setNewsType(0);
-				//newEntity.setUserId(classGroupLog.getHandoverPersonId());
 				newEntity.setUpdateTime(new Date());
 				newsService.update(newEntity,
 						new EntityWrapper<NewsEntity>()
 								.eq("news_number", classGroupLog.getLogNumber())
-								.eq("user_id", classGroupLog.getSuccessorId()));*/
-				//classGroupLog.setLogStatus("2");
+								.eq("user_id", classGroupLog.getSuccessorId()));
         	}
     	}else if(classGroupLog.getLogType().equals("2")) { // 班前日志
     		if(classGroupLog.getLogStatus().equals("3")) { // 已确认   都确认完的情况下 才能进行修改
@@ -136,6 +133,7 @@ public class ClassGroupLogConfirmedController {
     			if(list.size()>1) { // 没有确认完，还是 待确认状态
     				classGroupLog.setLogStatus("2");
     			}else {
+    				classGroupLog.setLogUserStatus("3");
     				// 清理 已生成的 驳回通知
     				NewsEntity newEntity = new NewsEntity();
             		newEntity.setNewsNumber(classGroupLog.getLogNumber());
@@ -194,6 +192,7 @@ public class ClassGroupLogConfirmedController {
     			if(list.size()>1) { // 没有确认完，还是 待确认状态
     				classGroupLog.setLogStatus("2");
     			}else {
+    				classGroupLog.setLogUserStatus("3");
     				// 清理 已生成的 驳回通知
     				NewsEntity newEntity = new NewsEntity();
             		newEntity.setNewsNumber(classGroupLog.getLogNumber());

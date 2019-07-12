@@ -56,7 +56,8 @@
 		<if test="defectiveName!=null">
 			and r.defective_name=#{defectiveName}
 		</if>
-		
+
+		and r.defective_type = 1
 		order by r.defective_id DESC 
 		
 
