@@ -228,8 +228,10 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DeviceEntity> impl
     /**
      * 获取设备异常统计信息
      */
-    public List<Map<String,Object>> getDeviceStatus(){
-        return baseMapper.getDeviceStatus();
+    public List<Map<String,Object>> getDeviceStatus(Map<String, Object> params){
+        String startTime = (String)params.get("startTime");
+        String endTime = (String)params.get("endTime");
+        return baseMapper.getDeviceStatus(startTime,endTime);
     }
 
     private void getLineTreeNodeData(Map<String,Object> node, Integer inspectionType){

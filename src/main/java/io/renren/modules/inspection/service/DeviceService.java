@@ -36,7 +36,7 @@ public interface DeviceService extends IService<DeviceEntity> {
     /**
      * 获取设备异常统计信息
      */
-    public List<Map<String,Object>> getDeviceStatus();
+    public List<Map<String,Object>> getDeviceStatus(Map<String, Object> params);
 
     /**
      * 获取设备异常统计排名

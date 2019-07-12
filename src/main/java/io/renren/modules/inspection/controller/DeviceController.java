@@ -252,8 +252,8 @@ public class DeviceController {
      * 获取设备异常状态
      */
     @RequestMapping("/getstatus")
-    public R getstatus(){
-        List<Map<String,Object>> statusList = deviceService.getDeviceStatus();
+    public R getstatus(@RequestParam Map<String, Object> params){
+        List<Map<String,Object>> statusList = deviceService.getDeviceStatus(params);
 
         return R.ok().put("status", statusList);
     }
@@ -266,7 +266,7 @@ public class DeviceController {
         List<DeviceEntity> deviceList = deviceService.selectList(
                 new EntityWrapper<DeviceEntity>()
                 .eq("is_delete",0)
-                .eq("is_inspect",1)
+                .eq("is_show_dashboard",1)
         );
 
         return R.ok().put("deviceList", deviceList);

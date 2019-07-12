@@ -70,6 +70,12 @@
         left join `tb_device_level` l on d.device_level=l.`id`
         left join `tb_exception` e on r.exception_id=e.id
         where d.is_delete=0 and d.device_id is not null
+        <if test="startTime!=''">
+            and r.start_time&gt;=#{startTime}
+        </if>
+        <if test="endTime!=''">
+            and r.end_time&lt;=#{endTime}
+        </if>
         group by l.id,e.id
 	</select>
 
@@ -80,7 +86,7 @@
         left join `tb_device` d on i.device_id=d.device_id
         left join `tb_device_level` l on d.device_level=l.`id`
         left join `tb_exception` e on r.exception_id=e.id
-        where d.is_delete=0 and d.device_id is not null
+        where d.is_delete=0 and d.device_id is not null and is_ok=0
         <if test="levelIds!=null and levelIds.size > 0">
           and l.id in
             <foreach collection="levelIds" index="index" item="item" open="(" separator="," close=")">
@@ -94,7 +100,7 @@
             and r.end_time&lt;=#{endTime}
         </if>
         group by d.device_id
-        order by count(r.id) desc limit 5
+        order by count(r.id) desc limit 10
 	</select>
 
 </mapper>

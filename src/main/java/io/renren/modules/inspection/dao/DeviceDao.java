@@ -31,7 +31,7 @@ public interface DeviceDao extends BaseMapper<DeviceEntity> {
 
     DeviceEntity selectByDeviceCode(@Param("deviceCode") String deviceCode);
 
-    List<Map<String,Object>> getDeviceStatus();
+    List<Map<String,Object>> getDeviceStatus(@Param("startTime") String startTime, @Param("endTime") String endTime);
 
     List<Map<String,Object>> getDeviceExceptionTop(@Param("levelIds") ArrayList<Integer> levelIds, @Param("startTime") String startTime, @Param("endTime") String endTime);
 
