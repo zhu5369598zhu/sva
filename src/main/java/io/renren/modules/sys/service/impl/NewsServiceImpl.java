@@ -19,12 +19,21 @@ public class NewsServiceImpl extends ServiceImpl<NewsDao, NewsEntity> implements
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
-    	String user_id = params.get("user_id").toString(); 
+    	String user_id = (String)params.get("user_id"); 
+    	String type = (String)params.get("type"); 
+    	Integer [] typeArray =null;
+    	if(type.equals("1")) {// 交接日志
+    		typeArray = new Integer[]{1,2,13};              
+    	}else if(type.equals("2")) { // 工单
+    		typeArray = new Integer[]{3,4,5,6,7,8,9,11,12,14};              
+    	}
         Page<NewsEntity> page = this.selectPage(
                 new Query<NewsEntity>(params).getPage(),
                 new EntityWrapper<NewsEntity>()
                 .eq(StringUtils.isNotBlank(user_id),"user_id", user_id)
                 .notLike("news_type", "0")
+                .notLike("news_type", "13")
+                .in("news_type", typeArray)
         );
         for(NewsEntity newsEntity: page.getRecords()) {
         	if(newsEntity.getNewsType() ==1) { 

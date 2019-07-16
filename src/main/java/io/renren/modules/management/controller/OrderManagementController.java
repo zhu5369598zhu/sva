@@ -251,7 +251,7 @@ public class OrderManagementController {
 	@RequiresPermissions("management:ordermanagement:disagreelower")
     public R disagreelower(@RequestBody OrderManagementEntity orderManagement){
 		OrderDefectiveEntity defectiveEntity = orderDefectiveService.selectById(orderManagement.getDefectiveId());
-
+		String orderApplicantOpinion = orderManagement.getOrderApplicantOpinion();
 		// 0 填报工单，1缺陷工单,2 巡检缺陷工单
 		Integer orderType = orderManagement.getOrderType();
 		if(orderType == 1){ // 填报缺陷工单
@@ -264,11 +264,11 @@ public class OrderManagementController {
 			newsEntity.setUpdateTime(new Date());
 			newsService.update(newsEntity,new EntityWrapper<NewsEntity>()
 					.eq("news_number",orderManagement.getOrderNumber()));
-			// 修改 缺陷工单为 拟制中的状态
-			defectiveEntity.setOrderStatus(0);
+			// 修改 缺陷工单为 拒绝中的状态
+			defectiveEntity.setOrderStatus(3);// 被拒绝
 			defectiveEntity.setOrderConfirmer(null);
 			defectiveEntity.setOrderConfirmerId(null);
-			defectiveEntity.setOrderConfirmerOpinion(null);
+			defectiveEntity.setOrderConfirmerOpinion(orderManagement.getOrderApplicantOpinion());
 			defectiveEntity.setConfirmedTime(null);
 			defectiveEntity.setRequirementTime(null);
 			orderDefectiveService.updateAllColumnById(defectiveEntity);
@@ -284,11 +284,20 @@ public class OrderManagementController {
 			newsEntity.setUpdateTime(new Date());
 			newsService.update(newsEntity,new EntityWrapper<NewsEntity>()
 					.eq("news_number",orderManagement.getOrderNumber()));
+			
+			// 修改 缺陷工单为 拒绝中的状态
+			defectiveEntity.setOrderStatus(3);// 被拒绝
+			defectiveEntity.setOrderConfirmer(null);
+			defectiveEntity.setOrderConfirmerId(null);
+			defectiveEntity.setOrderConfirmerOpinion(orderManagement.getOrderApplicantOpinion());
+			defectiveEntity.setConfirmedTime(null);
+			defectiveEntity.setRequirementTime(null);
+			orderDefectiveService.updateAllColumnById(defectiveEntity);
 
 			Integer resultId = defectiveEntity.getResultId();
 			InspectionResultEntity inspectionResult = new InspectionResultEntity();
 			inspectionResult.setId(resultId);
-			inspectionResult.setStatus(0); // 被拒绝
+			inspectionResult.setStatus(3);// 被拒绝 
 			inspectionResultService.updateById(inspectionResult);
 		}
 		Integer defectiveId = orderManagement.getDefectiveId();

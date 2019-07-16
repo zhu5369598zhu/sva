@@ -1,28 +1,30 @@
 package io.renren.modules.group.service.impl;
 
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
-
-import io.renren.modules.group.dao.ClassGroupLogDao;
+import io.renren.modules.group.dao.ClassGroupLogAlreadyDao;
 import io.renren.modules.group.entity.ClassGroupLogEntity;
-import io.renren.modules.group.service.ClassGroupLogService;
+import io.renren.modules.group.service.ClassGroupLogAlreadyService;
 import io.renren.modules.setting.entity.BaseTurnEntity;
 import io.renren.modules.setting.service.BaseTurnService;
+import io.renren.modules.sys.entity.NewsEntity;
 import io.renren.modules.sys.entity.SysDeptEntity;
+import io.renren.modules.sys.service.NewsService;
 import io.renren.modules.sys.service.SysDeptService;
 
-
-@Service("classGroupLogService")
-public class ClassGroupLogServiceImpl extends ServiceImpl<ClassGroupLogDao, ClassGroupLogEntity> implements ClassGroupLogService {
+@Service("classGroupLogAlreadyService")
+public class ClassGroupLogAlreadyServiceImpl extends ServiceImpl<ClassGroupLogAlreadyDao, ClassGroupLogEntity> implements ClassGroupLogAlreadyService{
 
 	@Autowired
     private SysDeptService sysDeptService;
@@ -30,25 +32,18 @@ public class ClassGroupLogServiceImpl extends ServiceImpl<ClassGroupLogDao, Clas
 	@Autowired
     private BaseTurnService baseTurnService;
 	
+	@Autowired
+	private NewsService newsService;
 	
-    @Override
-    public PageUtils queryPage(Map<String, Object> params) {
-    	
-    	String logNumber = params.get("logNumber").toString();
-    	String deptId = params.get("deptId").toString();
-    	String classGroupName = params.get("classGroupName").toString();
-    	String baseTurnId = params.get("baseTurnId").toString();
-    	String logType = params.get("logType").toString();
-    	String logStatus = params.get("logStatus").toString();
-    	String [] LogStatusObj = new String[10];
-		if(logStatus.equals("4") ||logStatus.equals("2")){ // 待确认有驳回
-			LogStatusObj[0] = "2";
-			LogStatusObj[1] = "4";
-		}else if(logStatus.equals("1")) {
-			LogStatusObj[0] = "1";
-		}else if(logStatus.equals("3")) {
-			LogStatusObj[0] = "3";
-		}
+	@Override
+	public PageUtils queryPage(Map<String, Object> params) {
+		
+		String logNumber = (String)params.get("logNumber");
+    	String deptId = (String)params.get("deptId");
+    	String classGroupName = (String)params.get("classGroupName");
+    	String baseTurnId = (String)params.get("baseTurnId");
+    	String logStatus = (String)params.get("logStatus");
+    	String logUserStatus =(String)params.get("logUserStatus");
         Page<ClassGroupLogEntity> page = this.selectPage(
                 new Query<ClassGroupLogEntity>(params).getPage(),
                 new EntityWrapper<ClassGroupLogEntity>()
@@ -56,14 +51,13 @@ public class ClassGroupLogServiceImpl extends ServiceImpl<ClassGroupLogDao, Clas
                 .like(StringUtils.isNotBlank(deptId),"dept_id", deptId)
                 .like(StringUtils.isNotBlank(classGroupName),"class_group_name", classGroupName)
                 .like(StringUtils.isNotBlank(baseTurnId),"base_turn_id", baseTurnId)
-                .like(StringUtils.isNotBlank(logType),"log_type", logType)
-                .in(StringUtils.isNotBlank(logStatus),"log_status", LogStatusObj)
-				.orderBy("class_id",false)
-				
+                .eq(StringUtils.isNotBlank(logStatus),"log_status", logStatus)
+                .eq(StringUtils.isNotBlank(logUserStatus), "log_user_status",logUserStatus)
+                .orderBy("class_id", false)
         );
-        
-        for(ClassGroupLogEntity classGroupLogEntity: page.getRecords()) {
-        	// 获取日志名称
+        List<ClassGroupLogEntity> list = page.getRecords();
+     
+        for(ClassGroupLogEntity classGroupLogEntity :list) {
         	if(classGroupLogEntity.getLogType().equals("1")) { //班长日志
         		classGroupLogEntity.setLogTypeName("班长日志");
         	}else if(classGroupLogEntity.getLogType().equals("2")) {//班前日志
@@ -72,16 +66,15 @@ public class ClassGroupLogServiceImpl extends ServiceImpl<ClassGroupLogDao, Clas
         		classGroupLogEntity.setLogTypeName("班后会");
         	}
         	// 获取日志状态名称
-        	if(classGroupLogEntity.getLogStatus().equals("1")) {//拟制中
+        	if(classGroupLogEntity.getLogUserStatus().equals("1")) {//拟制中
         		classGroupLogEntity.setLogStatusName("拟制中");
-        	}else if(classGroupLogEntity.getLogStatus().equals("2")) {
+        	}else if(classGroupLogEntity.getLogUserStatus().equals("2")) {
         		classGroupLogEntity.setLogStatusName("待确认");
-        	}else if(classGroupLogEntity.getLogStatus().equals("3")) {
+        	}else if(classGroupLogEntity.getLogUserStatus().equals("3")) {
         		classGroupLogEntity.setLogStatusName("已确认");
+        	}else if(classGroupLogEntity.getLogUserStatus().equals("4")) {
+        		classGroupLogEntity.setLogStatusName("已驳回");
         	}
-			if(classGroupLogEntity.getLogStatus().equals("4")|| classGroupLogEntity.getLogUserStatus().equals("4")) {
-				classGroupLogEntity.setLogStatusName("!待确认");
-			}
         	
         	// 获取部门(车间工段) 名称
         	SysDeptEntity sysDeptEntity = sysDeptService.selectById(classGroupLogEntity.getDeptId());
@@ -90,24 +83,10 @@ public class ClassGroupLogServiceImpl extends ServiceImpl<ClassGroupLogDao, Clas
         	// 获取班次(轮次) 名称
         	BaseTurnEntity baseTurnEntity = baseTurnService.selectById(classGroupLogEntity.getBaseTurnId());
         	classGroupLogEntity.setBaseTurnName(baseTurnEntity.getName());
-        	
-        	
         }
         
         
-        
         return new PageUtils(page);
-    }
-    
-    @Override
-    public PageUtils querybanqianPage(Map<String, Object> params) {
-    	Page<ClassGroupLogEntity> page = this.selectPage(
-                new Query<ClassGroupLogEntity>(params).getPage(),
-                new EntityWrapper<ClassGroupLogEntity>()
-                .eq("log_type", "2")
-				.orderBy("class_id",false)
-				
-        );
-    	return new PageUtils(page);
-    }
+	}
+
 }

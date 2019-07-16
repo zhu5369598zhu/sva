@@ -119,13 +119,14 @@ public class ClassGroupLogConfirmedController {
         					.eq("news_number", classGroupLog.getLogNumber()));
         		}
 
-				NewsEntity newEntity = new NewsEntity();
+        		NewsEntity newEntity = new NewsEntity();
 				newEntity.setNewsType(0);
 				newEntity.setUpdateTime(new Date());
 				newsService.update(newEntity,
 						new EntityWrapper<NewsEntity>()
 								.eq("news_number", classGroupLog.getLogNumber())
 								.eq("user_id", classGroupLog.getSuccessorId()));
+
         	}
     	}else if(classGroupLog.getLogType().equals("2")) { // 班前日志
     		if(classGroupLog.getLogStatus().equals("3")) { // 已确认   都确认完的情况下 才能进行修改
@@ -160,15 +161,15 @@ public class ClassGroupLogConfirmedController {
         	}else if(classGroupLog.getLogStatus().equals("4")) { // 已驳回
         		
         		List<NewsEntity> list = newsService.selectList(new EntityWrapper<NewsEntity>().eq("news_number", classGroupLog.getLogNumber()).eq("news_type", "1"));
-    			if(list.size()>=1) { // 班组成员没有确认完，还是 待确认状态
+    			if(list.size()>1) { // 班组成员没有确认完，还是 待确认状态
     				classGroupLog.setLogStatus("2"); 
-    				
+    			}else {
+    				classGroupLog.setLogStatus("4"); 
     			}
         		// 通知 交底人 消息被 驳回  (存在就修改 ，不存在 就新增)
     			NewsEntity newsEntity = newsService.selectOne(new EntityWrapper<NewsEntity>()
-    					//.eq("news_type", 2)
-    					.eq("news_name", "您有一条被驳回的班前日志")
     					.eq("user_id", classGroupLog.getHandoverPersonId())
+    					.eq("news_name", "您有一条被驳回的班前日志")
     					.eq("news_number", classGroupLog.getLogNumber()));
     			if(newsEntity !=null) {
     				newsEntity.setNewsType(2); 
@@ -184,6 +185,14 @@ public class ClassGroupLogConfirmedController {
             		newEntity.setUpdateTime(new Date());
             		newsService.insert(newEntity);
     			}
+    			NewsEntity Entity = new NewsEntity();
+    			Entity.setNewsType(13);
+    			Entity.setUpdateTime(new Date());
+				newsService.update(Entity,
+						new EntityWrapper<NewsEntity>()
+						.eq("news_type", "1")
+						.eq("news_number", classGroupLog.getLogNumber())
+						.eq("user_id", classGroupLog.getSuccessorId()));
         		
         	}
     	}else if(classGroupLog.getLogType().equals("3")) { // 班后日志
@@ -213,16 +222,16 @@ public class ClassGroupLogConfirmedController {
     		}else if(classGroupLog.getLogStatus().equals("4")) { // 已驳回
     			
     			List<NewsEntity> list = newsService.selectList(new EntityWrapper<NewsEntity>().eq("news_number", classGroupLog.getLogNumber()).eq("news_type", 1));
-    			if(list.size()>=1) { // 班组成员没有确认完，还是 待确认状态
+    			if(list.size()>1) { // 班组成员没有确认完，还是 待确认状态
     				classGroupLog.setLogStatus("2"); 
-    				
+    			}else {
+    				classGroupLog.setLogStatus("4"); 
     			}
     			
     			// 通知 交班人 消息被 驳回  (存在就修改 ，不存在 就新增)
     			NewsEntity newsEntity = newsService.selectOne(new EntityWrapper<NewsEntity>()
-    					//.eq("news_type", "2")
-    					.eq("news_name", "您有一条被驳回的班后日志")
     					.eq("user_id", classGroupLog.getHandoverPersonId())
+    					.eq("news_name", "您有一条被驳回的班后日志")
     					.eq("news_number", classGroupLog.getLogNumber()));
     			if(newsEntity !=null) {
     				newsEntity.setNewsType(2); 
@@ -238,6 +247,16 @@ public class ClassGroupLogConfirmedController {
             		newEntity.setUpdateTime(new Date());
             		newsService.insert(newEntity);
     			}
+    			// 修改 之前的通知 为 无效状态
+    			NewsEntity Entity = new NewsEntity();
+    			Entity.setNewsType(13);
+    			Entity.setUpdateTime(new Date());
+				newsService.update(Entity,
+						new EntityWrapper<NewsEntity>()
+						.eq("news_type", "1")
+						.eq("news_number", classGroupLog.getLogNumber())
+						.eq("user_id", classGroupLog.getSuccessorId()));
+    			
         	}
     	}
     	classGroupLogConfirmedService.updateById(classGroupLog);

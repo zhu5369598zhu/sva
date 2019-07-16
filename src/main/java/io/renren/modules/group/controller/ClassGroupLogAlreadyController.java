@@ -1,57 +1,46 @@
 package io.renren.modules.group.controller;
 
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import io.renren.common.utils.OrderUtils;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-
+import io.renren.common.utils.OrderUtils;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.modules.group.entity.ClassGroupLogEntity;
-import io.renren.modules.group.service.ClassGroupLogRejectService;
+import io.renren.modules.group.service.ClassGroupLogAlreadyService;
 import io.renren.modules.sys.entity.NewsEntity;
 import io.renren.modules.sys.service.NewsService;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
- * 班组日志(待确认)
+ * 班组日志(已确认)
  *
  * @author qiaosixun
  * @email qiaosixun@handweb.com
  * @date 2019-05-05 16:24:44
  */
 @RestController
-@RequestMapping("group/classgrouplogreject")
-public class ClassGroupLogRejectController {
+@RequestMapping("group/classgrouplogalready")
+public class ClassGroupLogAlreadyController {
 
 	
 	@Autowired
 	private NewsService newsService; 
 	
 	@Autowired
-	private ClassGroupLogRejectService classGroupLogRejectService;
-	
+	private ClassGroupLogAlreadyService classGroupLogAlreadyService;
 	
     /**
      * 列表
      */
     @RequestMapping("/list")
-    @RequiresPermissions("group:classgrouplog:list")
+    @RequiresPermissions("group:classgrouplogalready:list")
     public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = classGroupLogRejectService.queryPage(params);
+        PageUtils page = classGroupLogAlreadyService.queryPage(params);
 
         return R.ok().put("page", page);
     }
@@ -61,9 +50,9 @@ public class ClassGroupLogRejectController {
      * 信息
      */
     @RequestMapping("/info/{classId}")
-    @RequiresPermissions("group:classgrouplog:info")
+    @RequiresPermissions("group:classgrouplogalready:info")
     public R info(@PathVariable("classId") Integer classId){
-			ClassGroupLogEntity classGroupLog = classGroupLogRejectService.selectById(classId);
+			ClassGroupLogEntity classGroupLog = classGroupLogAlreadyService.selectById(classId);
 
         return R.ok().put("classgrouplog", classGroupLog);
     }
@@ -72,9 +61,9 @@ public class ClassGroupLogRejectController {
      * 保存
      */
     @RequestMapping("/save")
-    @RequiresPermissions("group:classgrouplog:save")
+    @RequiresPermissions("group:classgrouplogalready:save")
     public R save(@RequestBody ClassGroupLogEntity classGroupLog){
-    	classGroupLogRejectService.insert(classGroupLog);
+    	classGroupLogAlreadyService.insert(classGroupLog);
     	
         return R.ok();
     }
@@ -83,9 +72,9 @@ public class ClassGroupLogRejectController {
      * 修改
      */
     @RequestMapping("/update")
-    @RequiresPermissions("group:classgrouplog:update")
+    @RequiresPermissions("group:classgrouplogalready:update")
     public R update(@RequestBody ClassGroupLogEntity classGroupLog){
-    	classGroupLogRejectService.updateById(classGroupLog);
+    	classGroupLogAlreadyService.updateById(classGroupLog);
     	if(classGroupLog.getLogType().equals("1")) {  // 班长日志 （可能改 接班人）
     		NewsEntity newsEntity = newsService.selectOne(new EntityWrapper<NewsEntity>().eq("news_number", classGroupLog.getLogNumber()).eq("news_type", 0));
 			// 更换 状态为 通知状态 可能更换 接班人
@@ -124,10 +113,11 @@ public class ClassGroupLogRejectController {
             		}
         		}
         		// 清空 之前的 未确认 班组成员
+        		NewsEntity entity = new NewsEntity();
+        		entity.setNewsType(0);
+        		entity.setUpdateTime(new Date()); 
+        		//newsService.update(entity, new EntityWrapper<NewsEntity>().eq("news_number", classGroupLog.getLogNumber()).eq("news_type", 1));
         		newsService.delete(new EntityWrapper<NewsEntity>().eq("news_number", classGroupLog.getLogNumber()).eq("news_type", 1));
-        		// 清空 之前的 驳回的 班组成员 
-        		newsService.delete(new EntityWrapper<NewsEntity>().eq("news_number", classGroupLog.getLogNumber()).eq("news_type", 13));
-        		
         		// 取值 前端设置的 班组 查看 是否有重复的 
         		for(String user_id: teamMembersIdList) {
         			Integer userId = Integer.parseInt(user_id);
@@ -151,12 +141,6 @@ public class ClassGroupLogRejectController {
         			}
         			
         		}
-    		}else {
-    			// 把之前驳回人员 变成 待确认状态
-    			NewsEntity entity = new NewsEntity();
-    			entity.setNewsType(1);
-    			entity.setUpdateTime(new Date());
-    			newsService.update(entity, new EntityWrapper<NewsEntity>().eq("news_number", classGroupLog.getLogNumber()).eq("news_type", 13));
     		}
     		
     	}else if(classGroupLog.getLogType().equals("3")) {  //班后日志 （可能 修改班组 成员的情况）
@@ -181,9 +165,11 @@ public class ClassGroupLogRejectController {
             		}
         		}
         		// 清空 之前的 未确认 班组成员
+        		NewsEntity entity = new NewsEntity();
+        		entity.setNewsType(0);
+        		entity.setUpdateTime(new Date()); 
+        		//newsService.update(entity, new EntityWrapper<NewsEntity>().eq("news_number", classGroupLog.getLogNumber()).eq("news_type", 1));
         		newsService.delete(new EntityWrapper<NewsEntity>().eq("news_number", classGroupLog.getLogNumber()).eq("news_type", 1));
-        		// 清空 之前的 驳回的 班组成员 
-        		newsService.delete(new EntityWrapper<NewsEntity>().eq("news_number", classGroupLog.getLogNumber()).eq("news_type", 13));
         		// 取值 前端设置的 班组 查看 是否有重复的 
         		for(String user_id: teamMembersIdList) {
         			Integer userId = Integer.parseInt(user_id);
@@ -206,12 +192,6 @@ public class ClassGroupLogRejectController {
         			}
         			
         		}
-    		}else {
-    			// 把之前驳回人员 变成 待确认状态
-    			NewsEntity entity = new NewsEntity();
-    			entity.setNewsType(1);
-    			entity.setUpdateTime(new Date());
-    			newsService.update(entity, new EntityWrapper<NewsEntity>().eq("news_number", classGroupLog.getLogNumber()).eq("news_type", 13));
     		}
     		
     	}
@@ -226,9 +206,9 @@ public class ClassGroupLogRejectController {
      * 删除
      */
     @RequestMapping("/delete")
-    @RequiresPermissions("group:classgrouplog:delete")
+    @RequiresPermissions("group:classgrouplogalready:delete")
     public R delete(@RequestBody Integer[] classIds){
-    	classGroupLogRejectService.deleteBatchIds(Arrays.asList(classIds));
+    	classGroupLogAlreadyService.deleteBatchIds(Arrays.asList(classIds));
 
         return R.ok();
     }
@@ -237,13 +217,13 @@ public class ClassGroupLogRejectController {
      * 日志编码
      */
     @RequestMapping("/logNumber")
-    @RequiresPermissions("group:classgrouplog:logNumber")
+    @RequiresPermissions("group:classgrouplogalready:logNumber")
     public R dataNumber() {
 
 		SimpleDateFormat sdf=new SimpleDateFormat("yyMMdd");
 		String newDate=sdf.format(new Date());
 
-		List<ClassGroupLogEntity> list = classGroupLogRejectService.selectList(new EntityWrapper<ClassGroupLogEntity>().like("log_number",newDate));
+		List<ClassGroupLogEntity> list = classGroupLogAlreadyService.selectList(new EntityWrapper<ClassGroupLogEntity>().like("log_number",newDate));
 
 		String logNumber = OrderUtils.orderNumber(list.size());
         
@@ -251,24 +231,7 @@ public class ClassGroupLogRejectController {
     }
     
     
-    /**
-     * 去确认 确定
-     */
-    @RequestMapping("/reject")
-    @RequiresPermissions("group:classgrouplogreject:reject")
-	public R conFirmed(@RequestParam Map<String, Object> params) {
-		
-    	String user_id = params.get("user_id").toString();
-    	String news_number = params.get("log_number").toString();
-    	 
-    	List<NewsEntity> selectList = newsService.selectList(
-    			new EntityWrapper<NewsEntity>()
-    			.eq("user_id", Integer.parseInt(user_id))
-    			.eq("news_number", news_number)
-    			.eq("news_type", 2));
-    	
-    	return R.ok().put("newsCounts", selectList.size()); 
-	}
+    
     
     
 	

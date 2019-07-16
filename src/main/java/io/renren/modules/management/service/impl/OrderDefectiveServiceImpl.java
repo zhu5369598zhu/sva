@@ -15,7 +15,9 @@ import io.renren.modules.management.dao.OrderDefectiveDao;
 import io.renren.modules.management.entity.OrderDefectiveEntity;
 import io.renren.modules.management.service.OrderDefectiveService;
 import io.renren.modules.setting.entity.ExceptionEntity;
+import io.renren.modules.setting.entity.OrderExceptionEntity;
 import io.renren.modules.setting.service.ExceptionService;
+import io.renren.modules.setting.service.OrderExceptionService;
 import io.renren.modules.sys.entity.SysDeptEntity;
 import io.renren.modules.sys.service.SysDeptService;
 
@@ -23,9 +25,8 @@ import io.renren.modules.sys.service.SysDeptService;
 @Service("orderDefectiveService")
 public class OrderDefectiveServiceImpl extends ServiceImpl<OrderDefectiveDao, OrderDefectiveEntity> implements OrderDefectiveService {
 
-	
 	@Autowired
-    private ExceptionService exceptionService;
+    private OrderExceptionService orderExceptionService;
 	
 	@Autowired
 	private SysDeptService sysDeptService;
@@ -78,17 +79,15 @@ public class OrderDefectiveServiceImpl extends ServiceImpl<OrderDefectiveDao, Or
         	}else if(defective.getOrderStatus() ==2) {
         		defective.setOrderStatusName("已转"); 
         	}else if(defective.getOrderStatus() ==3){
-        		defective.setOrderStatusName("被拒绝");
+        		defective.setOrderStatusName("转工单被拒绝");
 			}
         	
         	SysDeptEntity sysDeptEntity = sysDeptService.selectById(defective.getDeptId());
         	defective.setDeptName(sysDeptEntity.getName()); 
         	
-        	ExceptionEntity exception = exceptionService.selectById(defective.getExceptionId());
+        	OrderExceptionEntity exception = orderExceptionService.selectById(defective.getExceptionId());
         	defective.setExceptionName(exception.getName()); 
         }
-        
-        
         
         page.setRecords(orderDefective);
         

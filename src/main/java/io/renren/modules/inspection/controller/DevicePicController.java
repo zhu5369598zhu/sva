@@ -3,8 +3,6 @@ package io.renren.modules.inspection.controller;
 import java.io.*;
 import java.util.*;
 
-import net.dongliu.apk.parser.ApkFile;
-import net.dongliu.apk.parser.bean.ApkMeta;
 import org.apache.commons.io.IOUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;

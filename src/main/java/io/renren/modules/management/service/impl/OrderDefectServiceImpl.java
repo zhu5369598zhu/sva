@@ -108,6 +108,8 @@ public class OrderDefectServiceImpl extends ServiceImpl<OrderDefectDao, OrderDef
             	result.setOrderStatusName("已确认");
             }else if(result.getOrderStatus() ==2) {
             	result.setOrderStatusName("已挂起");
+            }else if(result.getOrderStatus() ==3) {
+            	result.setOrderStatusName("转工单被拒绝"); 
             }
                                                                                                                                                        
         }

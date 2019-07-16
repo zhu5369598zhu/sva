@@ -148,6 +148,7 @@ public class OrderDefectController {
 			orderDefective.setConfirmedTime(new Date());
 			orderDefective.setOrderStatus(2);
 			orderDefective.setRequirementTime(null);
+			orderDefective.setOrderConfirmerOpinion(null); 
 			orderDefectService.updateById(orderDefectiveEntity);
 		}
 

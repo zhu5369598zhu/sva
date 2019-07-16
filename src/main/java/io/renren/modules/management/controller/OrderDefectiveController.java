@@ -84,6 +84,8 @@ public class OrderDefectiveController {
 				orderDefective.setOrderStatusName("待确认");
 			}else if(orderDefective.getOrderStatus() ==2) {
 				orderDefective.setOrderStatusName("已转");
+			}else if(orderDefective.getOrderStatus() ==3){
+				orderDefective.setOrderStatusName("转工单被拒绝");
 			} 
 			
 			if(orderDefective.getDefectiveType() ==0) {
@@ -124,8 +126,7 @@ public class OrderDefectiveController {
     @RequestMapping("/update")
     @RequiresPermissions("management:orderdefective:update")
     public R update(@RequestBody OrderDefectiveEntity orderDefective){
-			orderDefectiveService.updateById(orderDefective);
-
+            orderDefectiveService.updateAllColumnById(orderDefective);
         return R.ok();
     }
     
@@ -182,20 +183,6 @@ public class OrderDefectiveController {
 		news.setUpdateTime(new Date());
 		newsService.update(news, new EntityWrapper<NewsEntity>()
 				.eq("news_number",orderDefective.getDefectiveNumber()));
-		//进行记录
-		/*OrderRecordEntity recordEntity = new OrderRecordEntity();
-		recordEntity.setOrderNumber(orderNumber);
-		recordEntity.setDefectiveId(orderDefective.getDefectiveId());
-		recordEntity.setDefectiveNumber(orderDefective.getDefectiveNumber());
-    	recordEntity.setOrderPeople(orderDefective.getOrderConfirmer());
-		recordEntity.setOrderOpinion("请"+orderDefective.getOrderAcceptor()+"尽快处理!");
-		recordEntity.setOrderPeopleId(1);
-		recordEntity.setOrderType(1);
-		recordEntity.setCreateTime(orderDefective.getCreateTime());
-		recordEntity.setRequirementTime(orderDefective.getRequirementTime());
-		recordEntity.setNowTime(new Date());
-		orderRecordService.insert(recordEntity);*/
-		
     	return R.ok();
     }
 

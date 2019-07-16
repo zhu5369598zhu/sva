@@ -174,7 +174,6 @@ public class OrderManagementReportedController {
     		record.setOrderType(orderManagement.getOrderType());
     		
     		orderRecordService.insert(record);
-    		orderManagement.setOrderStatus(3);// 上报
             NewsEntity newsEntity = new NewsEntity();
             newsEntity.setUserId(orderManagement.getOrderConfirmerId());
             newsEntity.setNewsName("您有一条已上报待审核的工单");

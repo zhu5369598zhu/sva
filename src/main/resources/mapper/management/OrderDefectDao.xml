@@ -55,7 +55,7 @@
 		left join `tb_device_level` l on l.id = d.device_level
     left join `tb_order_defective` defective on defective.result_id = r.id
 		where 1=1
-		and r.is_ok != 0
+		and r.is_ok = 0
 		<if test="deptIds!=null">
 			and d.device_dept in
 			<foreach item="item" index="index" collection="deptIds" open="("

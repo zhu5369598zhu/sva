@@ -63,9 +63,6 @@
 		<if test="orderName!=null">
 			and r.order_name like '%${orderName}%'
 		</if>
-		<if test="orderStatus!=null">
-			and r.order_status=#{orderStatus}
-		</if>
 		<if test="orderConfirmerId!=null">
 		    and r.order_confirmer_id =#{orderConfirmerId}
 		</if>
@@ -75,6 +72,11 @@
 		<if test="endTime!=null">
 			and r.create_time &lt;= CONCAT(#{endTime})
 		</if> 
+		and (
+		r.order_status = 3
+		or r.order_status =14
+		)
+		
 		order by r.order_id DESC 
 
 	</select>
