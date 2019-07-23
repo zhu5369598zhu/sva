@@ -113,7 +113,9 @@ public class OrderManagementController {
         		orderManagement.setOrderStatusName("已确认不结算"); 
         	}else if(orderManagement.getOrderStatus()==9){
 				orderManagement.setOrderStatusName("已转单待确认");
-			}
+			}else if(orderManagement.getOrderStatus()==14){
+            	orderManagement.setOrderStatusName("!已上报待审核"); 
+            }
 
 		SysDeptEntity sysDeptEntity1 = sysDeptService.selectById(orderManagement.getDeptId());
         orderManagement.setDeptName(sysDeptEntity.getName());

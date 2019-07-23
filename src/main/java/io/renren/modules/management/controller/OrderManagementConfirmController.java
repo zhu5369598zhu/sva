@@ -105,6 +105,8 @@ public class OrderManagementConfirmController {
                 orderManagement.setOrderStatusName("已确认不结算");
             }else if(orderManagement.getOrderStatus()==9){
                 orderManagement.setOrderStatusName("已转单待确认");
+            }else if(orderManagement.getOrderStatus()==14){
+            	orderManagement.setOrderStatusName("!已上报待审核"); 
             }
 			
         return R.ok().put("ordermanagement", orderManagement);
@@ -153,7 +155,7 @@ public class OrderManagementConfirmController {
     		OrderRecordEntity record = new OrderRecordEntity();
 			record.setNowTime(new Date()); // 当前时间
 			record.setOrderNumber(orderManagement.getOrderNumber());
-			record.setOrderOpinion(orderManagement.getOrderConfirmerOpinion()); // 工单主题当结论
+			record.setOrderOpinion("上报被拒绝，"+orderManagement.getOrderConfirmerOpinion()); // 工单主题当结论
 			record.setOrderPeople(orderManagement.getOrderConfirmer());
 			record.setOrderPeopleId(3);//确认人
 			record.setOrderType(orderManagement.getOrderType());
@@ -194,7 +196,7 @@ public class OrderManagementConfirmController {
     		OrderRecordEntity record = new OrderRecordEntity();
 			record.setNowTime(new Date()); // 当前时间
 			record.setOrderNumber(orderManagement.getOrderNumber());
-			record.setOrderOpinion(orderManagement.getOrderConfirmerOpinion()); // 工单主题当结论
+			record.setOrderOpinion("同意申请延期，"+orderManagement.getOrderConfirmerOpinion()); // 工单主题当结论
 			record.setOrderPeople(orderManagement.getOrderConfirmer());
 			record.setOrderPeopleId(3);//确认人
 			record.setOrderType(orderManagement.getOrderType());
@@ -214,7 +216,7 @@ public class OrderManagementConfirmController {
     		OrderRecordEntity record = new OrderRecordEntity();
 			record.setNowTime(new Date()); // 当前时间
 			record.setOrderNumber(orderManagement.getOrderNumber());
-			record.setOrderOpinion(orderManagement.getOrderConfirmerOpinion()); // 工单主题当结论
+			record.setOrderOpinion("不同意申请延期，"+orderManagement.getOrderConfirmerOpinion()); // 工单主题当结论
 			record.setOrderPeople(orderManagement.getOrderConfirmer());
 			record.setOrderPeopleId(3);//确认人
 			record.setOrderType(orderManagement.getOrderType());
