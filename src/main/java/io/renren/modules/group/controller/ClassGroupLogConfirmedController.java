@@ -141,18 +141,24 @@ public class ClassGroupLogConfirmedController {
     			if(list.size()>1) { // 没有确认完，还是 待确认状态
     				classGroupLog.setLogStatus("2");
     			}else {
-    				classGroupLog.setLogUserStatus("3");
-    				// 清理 已生成的 驳回通知
-    				NewsEntity newEntity = new NewsEntity();
-            		newEntity.setNewsNumber(classGroupLog.getLogNumber());
-            		newEntity.setNewsType(0);
-            		newEntity.setUpdateTime(new Date());
-            		newsService.update(newEntity, 
-            				new EntityWrapper<NewsEntity>()
-            				.eq("news_number", classGroupLog.getLogNumber())
-            				.eq("user_id", classGroupLog.getHandoverPersonId())
-            				.eq("news_type", "2")
-            				); 
+    				// 有驳回的情况出现
+        			List<NewsEntity> listSize = newsService.selectList(new EntityWrapper<NewsEntity>().eq("news_number", classGroupLog.getLogNumber()).eq("news_type", "13"));
+        			if(listSize.size() > 0) {
+        				classGroupLog.setLogStatus("2"); // 还是待确认状态
+        			}else {
+        				classGroupLog.setLogUserStatus("3");
+        				// 清理 已生成的 驳回通知
+        				NewsEntity newEntity = new NewsEntity();
+                		newEntity.setNewsNumber(classGroupLog.getLogNumber());
+                		newEntity.setNewsType(0);
+                		newEntity.setUpdateTime(new Date());
+                		newsService.update(newEntity, 
+                				new EntityWrapper<NewsEntity>()
+                				.eq("news_number", classGroupLog.getLogNumber())
+                				.eq("user_id", classGroupLog.getHandoverPersonId())
+                				.eq("news_type", "2")
+                				); 
+        			}
     			}
     			
         		NewsEntity newEntity = new NewsEntity();
@@ -208,18 +214,23 @@ public class ClassGroupLogConfirmedController {
     			if(list.size()>1) { // 没有确认完，还是 待确认状态
     				classGroupLog.setLogStatus("2");
     			}else {
-    				classGroupLog.setLogUserStatus("3");
-    				// 清理 已生成的 驳回通知
-    				NewsEntity newEntity = new NewsEntity();
-            		newEntity.setNewsNumber(classGroupLog.getLogNumber());
-            		newEntity.setNewsType(0);
-            		newEntity.setUpdateTime(new Date());
-            		newsService.update(newEntity, 
-            				new EntityWrapper<NewsEntity>()
-            				.eq("news_number", classGroupLog.getLogNumber())
-            				.eq("user_id", classGroupLog.getHandoverPersonId())
-            				.eq("news_type", "2")
-            				); 
+        			List<NewsEntity> listSize = newsService.selectList(new EntityWrapper<NewsEntity>().eq("news_number", classGroupLog.getLogNumber()).eq("news_type", "13"));
+                    if(listSize.size() > 0) { // 有其他人驳回的情况
+                    	classGroupLog.setLogStatus("2"); // 还是待确认状态
+                    }else {
+                    	classGroupLog.setLogUserStatus("3");
+        				// 清理 已生成的 驳回通知
+        				NewsEntity newEntity = new NewsEntity();
+                		newEntity.setNewsNumber(classGroupLog.getLogNumber());
+                		newEntity.setNewsType(0);
+                		newEntity.setUpdateTime(new Date());
+                		newsService.update(newEntity, 
+                				new EntityWrapper<NewsEntity>()
+                				.eq("news_number", classGroupLog.getLogNumber())
+                				.eq("user_id", classGroupLog.getHandoverPersonId())
+                				.eq("news_type", "2")
+                				); 
+                    }
     			}
     			NewsEntity newEntity = new NewsEntity();
     			newEntity.setNewsNumber(classGroupLog.getLogNumber());
