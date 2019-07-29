@@ -176,7 +176,7 @@ public class OrderManagementReportedController {
     		orderRecordService.insert(record);
             NewsEntity newsEntity = new NewsEntity();
             newsEntity.setUserId(orderManagement.getOrderConfirmerId());
-            newsEntity.setNewsName("您有一条已上报待审核的工单");
+            newsEntity.setNewsName("您有一条受理申请延期的工单待处理");
             newsEntity.setNewsType(6);
             newsEntity.setUpdateTime(new Date());
             newsService.update(newsEntity, new EntityWrapper<NewsEntity>()

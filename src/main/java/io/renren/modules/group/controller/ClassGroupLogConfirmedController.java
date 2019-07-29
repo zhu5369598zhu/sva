@@ -131,8 +131,9 @@ public class ClassGroupLogConfirmedController {
 				newEntity.setUpdateTime(new Date());
 				newsService.update(newEntity,
 						new EntityWrapper<NewsEntity>()
+						        .eq("news_type", 1)
 								.eq("news_number", classGroupLog.getLogNumber())
-								.eq("user_id", classGroupLog.getSuccessorId()));
+								.eq("user_id", classGroupLog.getSuccessorId())); 
 
         	}
     	}else if(classGroupLog.getLogType().equals("2")) { // 班前日志

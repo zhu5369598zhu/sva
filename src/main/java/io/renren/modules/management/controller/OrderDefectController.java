@@ -1,22 +1,16 @@
 package io.renren.modules.management.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import io.renren.common.utils.OrderUtils;
-import io.renren.common.utils.PageUtils;
-import io.renren.common.utils.R;
 import io.renren.modules.inspection.entity.InspectionResultEntity;
 import io.renren.modules.inspection.service.InspectionResultService;
-import io.renren.modules.management.entity.OrderDefectiveEntity;
-import io.renren.modules.management.entity.OrderManagementEntity;
-import io.renren.modules.management.service.OrderDefectService;
-import io.renren.modules.management.service.OrderManagementService;
-import io.renren.modules.management.service.OrderRecordService;
-import io.renren.modules.setting.entity.OrderExceptionEntity;
-import io.renren.modules.setting.service.OrderExceptionService;
 import io.renren.modules.sys.entity.NewsEntity;
 import io.renren.modules.sys.entity.SysDeptEntity;
-import io.renren.modules.sys.service.NewsService;
-import io.renren.modules.sys.service.SysDeptService;
+
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,10 +18,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import io.renren.common.utils.OrderUtils;
+import io.renren.common.utils.PageUtils;
+import io.renren.common.utils.R;
+import io.renren.modules.management.entity.OrderDefectiveEntity;
+import io.renren.modules.management.entity.OrderManagementEntity;
+import io.renren.modules.management.service.OrderDefectService;
+import io.renren.modules.management.service.OrderManagementService;
+import io.renren.modules.management.service.OrderRecordService;
+import io.renren.modules.setting.entity.ExceptionEntity;
+import io.renren.modules.setting.entity.OrderExceptionEntity;
+import io.renren.modules.setting.service.ExceptionService;
+import io.renren.modules.setting.service.OrderExceptionService;
+import io.renren.modules.sys.service.NewsService;
+import io.renren.modules.sys.service.SysDeptService;
 
 /**
  * 缺陷工单表
@@ -175,8 +179,9 @@ public class OrderDefectController {
     	managementEntity.setOrderContent(orderDefective.getOrderContent());
 		managementEntity.setOrderApplicant(orderDefective.getOrderConfirmer());// 工单填报人 = 缺陷确认人
     	managementEntity.setOrderApplicantId(orderDefective.getOrderConfirmerId());//工单填报人id = 缺陷确认人id
-		managementEntity.setOrderConfirmer(orderDefective.getOrderConfirmer());
-		managementEntity.setOrderConfirmerId(orderDefective.getOrderConfirmerId());
+    	managementEntity.setOrderApplicantOpinion(null);
+		// managementEntity.setOrderConfirmer(orderDefective.getOrderConfirmer());
+		// managementEntity.setOrderConfirmerId(orderDefective.getOrderConfirmerId());
     	// managementEntity.setOrderAcceptor(""); // 工单受理人
     	// managementEntity.setOrderAcceptorId(""); // 工单受理人id
     	// managementEntity.setOrderApplicantOpinion(orderDefective.getDefectiveNameOpinion());

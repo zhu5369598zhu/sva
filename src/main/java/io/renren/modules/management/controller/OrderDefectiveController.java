@@ -155,11 +155,11 @@ public class OrderDefectiveController {
     	managementEntity.setOrderContent(orderDefective.getOrderContent());
     	managementEntity.setOrderApplicant(orderDefective.getOrderConfirmer());// 工单填报人
     	managementEntity.setOrderApplicantId(orderDefective.getOrderConfirmerId());//工单填报人id
-		managementEntity.setOrderConfirmer(orderDefective.getOrderConfirmer());
-		managementEntity.setOrderConfirmerId(orderDefective.getOrderConfirmerId());
+    	managementEntity.setOrderApplicantOpinion(null);
+		// managementEntity.setOrderConfirmer(orderDefective.getOrderConfirmer());
+		// managementEntity.setOrderConfirmerId(orderDefective.getOrderConfirmerId());
 		// managementEntity.setOrderAcceptor(orderDefective.getOrderAcceptor()); // 工单受理人
     	// managementEntity.setOrderAcceptorId(orderDefective.getOrderAcceptorId()); // 工单受理人id
-    	// managementEntity.setOrderApplicantOpinion(orderDefective.getDefectiveNameOpinion());
     	managementEntity.setExceptionId(orderDefective.getExceptionId()); 
     	managementEntity.setCreateTime(new Date()); 
     	managementEntity.setRequirementTime(orderDefective.getRequirementTime());

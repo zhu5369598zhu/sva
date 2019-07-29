@@ -40,13 +40,20 @@ public class ClassGroupLogConfirmedServiceImpl extends ServiceImpl<ClassGroupLog
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
 		
-		String logNumber = params.get("logNumber").toString();
-    	String deptId = params.get("deptId").toString();
-    	String classGroupName = params.get("classGroupName").toString();
-    	String baseTurnId = params.get("baseTurnId").toString();
-    	String logType = params.get("logType").toString();
-    	String logStatus = params.get("logStatus").toString(); 
-    	
+		String logNumber = (String)params.get("logNumber");
+    	String deptId = (String)params.get("deptId");
+    	String classGroupName = (String)params.get("classGroupName");
+    	String baseTurnId = (String)params.get("baseTurnId");
+    	String logType = (String)params.get("logType");
+    	String logStatus = (String)params.get("logStatus"); 
+    	String[] LogStatusObj = new String[2];
+		if(logStatus.equals("4") ||logStatus.equals("2")){ // 待确认有驳回
+			LogStatusObj[0] = "2";
+			LogStatusObj[1] = "4";
+		}
+		String[] logTypeObj = new String[2];
+		logTypeObj[0] = "1";
+		logTypeObj[1] = "2";
     	
         Page<ClassGroupLogEntity> page = this.selectPage(
                 new Query<ClassGroupLogEntity>(params).getPage(),
@@ -56,7 +63,7 @@ public class ClassGroupLogConfirmedServiceImpl extends ServiceImpl<ClassGroupLog
                 .like(StringUtils.isNotBlank(classGroupName),"class_group_name", classGroupName)
                 .like(StringUtils.isNotBlank(baseTurnId),"base_turn_id", baseTurnId)
                 .like(StringUtils.isNotBlank(logType),"log_type", logType)
-                .like(StringUtils.isNotBlank(logStatus),"log_status", logStatus)
+                .in(StringUtils.isNotBlank(logStatus),"log_status", LogStatusObj)
                 .orderBy("class_id", false)
                 
         );
@@ -66,7 +73,7 @@ public class ClassGroupLogConfirmedServiceImpl extends ServiceImpl<ClassGroupLog
         for(int i=0;i<list.size();i++) {
         	ClassGroupLogEntity classGroupLogEntity = list.get(i); 
         	if(!params.get("user_id").toString().equals("")) { 
-        		List<NewsEntity> selectList = newsService.selectList(new EntityWrapper<NewsEntity>().eq("user_id", Integer.parseInt(params.get("user_id").toString())).eq("news_type", 1).eq("news_number", classGroupLogEntity.getLogNumber()));
+        		List<NewsEntity> selectList = newsService.selectList(new EntityWrapper<NewsEntity>().eq("user_id", Integer.parseInt(params.get("user_id").toString())).in("news_type", logTypeObj).eq("news_number", classGroupLogEntity.getLogNumber()));
             	if(selectList.size()==0) {
             		list.remove(i);
             	}
@@ -89,9 +96,11 @@ public class ClassGroupLogConfirmedServiceImpl extends ServiceImpl<ClassGroupLog
         	}else if(classGroupLogEntity.getLogStatus().equals("3")) {
         		classGroupLogEntity.setLogStatusName("已确认");
         	}else if(classGroupLogEntity.getLogStatus().equals("4")) {
-        		classGroupLogEntity.setLogStatusName("已驳回");
+        		classGroupLogEntity.setLogStatusName("!待确认");
         	}
-        	
+        	if(classGroupLogEntity.getLogUserStatus().equals("4")) {
+        		classGroupLogEntity.setLogStatusName("!待确认");
+        	}
         	// 获取部门(车间工段) 名称
         	SysDeptEntity sysDeptEntity = sysDeptService.selectById(classGroupLogEntity.getDeptId());
         	classGroupLogEntity.setDeptName(sysDeptEntity.getName());
@@ -108,6 +117,14 @@ public class ClassGroupLogConfirmedServiceImpl extends ServiceImpl<ClassGroupLog
 							.eq("news_number", news_number)
 							.eq("news_type", 1));
 			classGroupLogEntity.setNewsCounts(selectList.size());
+			
+			List<NewsEntity> rejectselectList = newsService.selectList(
+					new EntityWrapper<NewsEntity>()
+							.eq("user_id", Integer.parseInt(user_id))
+							.eq("news_number", news_number)
+							.eq("news_type", 2));
+			classGroupLogEntity.setRejectNewsCounts(rejectselectList.size()); 
+			
         }
         
         return new PageUtils(page);
