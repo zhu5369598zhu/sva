@@ -860,10 +860,10 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
         }
 
         Integer exceptionId = result.getExceptionId();
-        if(exceptionId > 1){
-            result.setIsOk(0);
-        }else if (exceptionId == 0){
+        if(exceptionId == 1){
             result.setIsOk(1);
+        }else {
+            result.setIsOk(0);
         }
         result.setGuid(UUID.randomUUID().toString());
         result.setCreateTime(new java.util.Date());
