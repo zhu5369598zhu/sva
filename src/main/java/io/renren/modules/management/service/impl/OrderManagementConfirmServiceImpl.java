@@ -90,7 +90,7 @@ public class OrderManagementConfirmServiceImpl extends ServiceImpl<OrderManageme
 			}else if(orderManagement.getOrderStatus()==9){
 				orderManagement.setOrderStatusName("已转单待确认");
 			}else if(orderManagement.getOrderStatus()==14) {
-				orderManagement.setOrderStatusName("!已上报待审核"); 
+				orderManagement.setOrderStatusName("!已受理待上报"); 
 			}
 			Integer orderType = orderManagement.getOrderType();
 			if(orderType == 0){

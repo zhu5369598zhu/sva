@@ -212,6 +212,11 @@ public class ClassGroupLogEntity implements Serializable {
 	 */
 	@TableField(exist = false)
 	private Integer newsCounts;
+	/**
+	 * 有驳回是否跟自己有关
+	 */
+	@TableField(exist = false)
+	private Integer rejectNewsCounts;
 	
 	/**
 	 * 驳回人
@@ -767,6 +772,18 @@ public class ClassGroupLogEntity implements Serializable {
 	 * 设置：是否跟自己有关
 	 */
 	public void setNewsCounts(Integer newsCounts){ this.newsCounts = newsCounts;}
+	/**
+	 * 获取：有驳回是否跟自己有关
+	 */
+	public Integer getRejectNewsCounts() {
+		return rejectNewsCounts;
+	}
+	/**
+	 * 设置：有驳回是否跟自己有关
+	 */
+	public void setRejectNewsCounts(Integer rejectNewsCounts) {
+		this.rejectNewsCounts = rejectNewsCounts;
+	}
 	/**
 	 * 设置：驳回人
 	 */
