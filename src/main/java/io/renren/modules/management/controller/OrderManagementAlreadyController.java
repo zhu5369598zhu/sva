@@ -1,31 +1,28 @@
 package io.renren.modules.management.controller;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import io.renren.modules.setting.entity.OrderExceptionEntity;
-import io.renren.modules.setting.service.OrderExceptionService;
-import io.renren.modules.sys.entity.SysDeptEntity;
-import io.renren.modules.sys.service.SysDeptService;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-
+import io.renren.common.utils.OrderUtils;
+import io.renren.common.utils.PageUtils;
+import io.renren.common.utils.R;
 import io.renren.modules.management.entity.OrderManagementEntity;
 import io.renren.modules.management.entity.OrderRecordEntity;
 import io.renren.modules.management.service.OrderManagementAlreadyService;
 import io.renren.modules.management.service.OrderRecordService;
+import io.renren.modules.setting.entity.OrderExceptionEntity;
+import io.renren.modules.setting.service.OrderExceptionService;
 import io.renren.modules.sys.entity.NewsEntity;
+import io.renren.modules.sys.entity.SysDeptEntity;
 import io.renren.modules.sys.service.NewsService;
-import io.renren.common.utils.OrderUtils;
-import io.renren.common.utils.PageUtils;
-import io.renren.common.utils.R;
+import io.renren.modules.sys.service.SysDeptService;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 
 
@@ -151,7 +148,7 @@ public class OrderManagementAlreadyController {
     	if(orderStatus ==6) { //拒绝受理 通知 填报人
     		NewsEntity newsEntity = new NewsEntity();
     		newsEntity.setUserId(orderManagement.getOrderApplicantId());
-    		newsEntity.setNewsName("您有一条确认派单的工单被驳回");
+    		newsEntity.setNewsName("您有一条已下发待受理的工单被拒绝");
     		newsEntity.setNewsNumber(orderManagement.getOrderNumber());
     		newsEntity.setNewsType(4); // 已下发被被驳回
     		newsEntity.setUpdateTime(new Date()); 
