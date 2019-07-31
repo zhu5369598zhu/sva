@@ -170,6 +170,7 @@ public class ClassGroupLogConfirmedController {
         		newEntity.setUpdateTime(new Date());
         		newsService.update(newEntity, 
         				new EntityWrapper<NewsEntity>()
+        				.eq("news_type", "1")
         				.eq("news_number", classGroupLog.getLogNumber())
         				.eq("user_id", classGroupLog.getSuccessorId())); 
         	}else if(classGroupLog.getLogStatus().equals("4")) { // 已驳回
@@ -237,7 +238,10 @@ public class ClassGroupLogConfirmedController {
     			newEntity.setNewsNumber(classGroupLog.getLogNumber());
         		newEntity.setNewsType(0);
         		newEntity.setUpdateTime(new Date());
-        		newsService.update(newEntity, new EntityWrapper<NewsEntity>().eq("news_number", classGroupLog.getLogNumber()).eq("user_id", classGroupLog.getSuccessorId()));
+        		newsService.update(newEntity, new EntityWrapper<NewsEntity>()
+        				.eq("news_type", "1")
+        				.eq("news_number", classGroupLog.getLogNumber())
+        				.eq("user_id", classGroupLog.getSuccessorId()));
     		}else if(classGroupLog.getLogStatus().equals("4")) { // 已驳回
     			
     			List<NewsEntity> list = newsService.selectList(new EntityWrapper<NewsEntity>().eq("news_number", classGroupLog.getLogNumber()).eq("news_type", 1));
