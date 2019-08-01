@@ -25,10 +25,7 @@ import io.renren.modules.management.entity.OrderDefectiveEntity;
 import io.renren.modules.management.entity.OrderManagementEntity;
 import io.renren.modules.management.service.OrderDefectService;
 import io.renren.modules.management.service.OrderManagementService;
-import io.renren.modules.management.service.OrderRecordService;
-import io.renren.modules.setting.entity.ExceptionEntity;
 import io.renren.modules.setting.entity.OrderExceptionEntity;
-import io.renren.modules.setting.service.ExceptionService;
 import io.renren.modules.setting.service.OrderExceptionService;
 import io.renren.modules.sys.service.NewsService;
 import io.renren.modules.sys.service.SysDeptService;
@@ -56,9 +53,6 @@ public class OrderDefectController {
 	@Autowired
 	private NewsService newsService;
 	
-	@Autowired
-	private OrderRecordService orderRecordService;
-
 	@Autowired
 	private InspectionResultService inspectionResultService;
 	

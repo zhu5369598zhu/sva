@@ -164,7 +164,8 @@ public class OrderManagementConfirmController {
 			record.setOrderType(orderManagement.getOrderType());
 			
 			orderRecordService.insert(record);
-
+			orderManagement.setOrderConfirmerId(0);
+            orderManagement.setOrderConfirmer(null); 
             //orderManagement.setDelayTime(new Date()); // 申请时间 改为 null
     	}else if(orderManagement.getOrderStatus() ==5) { // 已完结
     		orderManagement.setConfirmedTime(new Date()); // 确认时间
@@ -178,8 +179,8 @@ public class OrderManagementConfirmController {
             OrderRecordEntity record = new OrderRecordEntity();
             record.setNowTime(new Date()); // 当前时间
             record.setOrderNumber(orderManagement.getOrderNumber());
-            record.setOrderOpinion("已消除，同意完结"); // 工单主题当结论
-            record.setOrderPeople(orderManagement.getOrderConfirmerOpinion());
+            record.setOrderOpinion("同意完结"+orderManagement.getOrderConfirmerOpinion()); // 工单主题当结论
+            record.setOrderPeople(orderManagement.getOrderConfirmer());
             record.setOrderPeopleId(3);//确认人
             record.setOrderType(orderManagement.getOrderType());
 			
@@ -200,8 +201,8 @@ public class OrderManagementConfirmController {
 			record.setNowTime(new Date()); // 当前时间
 			record.setOrderNumber(orderManagement.getOrderNumber());
 			record.setOrderOpinion("同意申请延期，"+orderManagement.getOrderConfirmerOpinion()); // 工单主题当结论
-			record.setOrderPeople(orderManagement.getOrderConfirmer());
-			record.setOrderPeopleId(3);//确认人
+			record.setOrderPeople(orderManagement.getOrderApplicant());
+			record.setOrderPeopleId(1);//确认人
 			record.setOrderType(orderManagement.getOrderType());
 			
 			orderRecordService.insert(record);
@@ -220,8 +221,8 @@ public class OrderManagementConfirmController {
 			record.setNowTime(new Date()); // 当前时间
 			record.setOrderNumber(orderManagement.getOrderNumber());
 			record.setOrderOpinion("不同意申请延期，"+orderManagement.getOrderConfirmerOpinion()); // 工单主题当结论
-			record.setOrderPeople(orderManagement.getOrderConfirmer());
-			record.setOrderPeopleId(3);//确认人
+			record.setOrderPeople(orderManagement.getOrderApplicant());
+			record.setOrderPeopleId(1);//确认人
 			record.setOrderType(orderManagement.getOrderType());
 			
 			orderRecordService.insert(record);

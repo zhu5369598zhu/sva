@@ -95,6 +95,11 @@ public class ClassGroupLogEntity implements Serializable {
 	 */
 	private Integer successorId;
 	/**
+	 * 接班人前台名称
+	 */
+	@TableField(exist = false)
+	private String successorName;
+	/**
 	 * 交接完成时间
 	 */
 	private Date createTime;
@@ -379,6 +384,18 @@ public class ClassGroupLogEntity implements Serializable {
 	 */
 	public void setSuccessorId(Integer successorId) {
 		this.successorId = successorId;
+	}
+	/**
+	 * 获取：接班人前台显示名称
+	 */
+	public String getSuccessorName() {
+		return successorName;
+	}
+	/**
+	 * 设置：接班人 前台显示名称
+	 */
+	public void setSuccessorName(String successorName) {
+		this.successorName = successorName;
 	}
 	/**
 	 * 设置：交接完成时间
