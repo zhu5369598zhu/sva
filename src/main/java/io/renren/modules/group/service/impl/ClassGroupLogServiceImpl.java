@@ -1,17 +1,10 @@
 package io.renren.modules.group.service.impl;
 
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.Map;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
-
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
-
 import io.renren.modules.group.dao.ClassGroupLogDao;
 import io.renren.modules.group.entity.ClassGroupLogEntity;
 import io.renren.modules.group.service.ClassGroupLogService;
@@ -19,6 +12,11 @@ import io.renren.modules.setting.entity.BaseTurnEntity;
 import io.renren.modules.setting.service.BaseTurnService;
 import io.renren.modules.sys.entity.SysDeptEntity;
 import io.renren.modules.sys.service.SysDeptService;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 
 @Service("classGroupLogService")
@@ -91,6 +89,13 @@ public class ClassGroupLogServiceImpl extends ServiceImpl<ClassGroupLogDao, Clas
         	BaseTurnEntity baseTurnEntity = baseTurnService.selectById(classGroupLogEntity.getBaseTurnId());
         	classGroupLogEntity.setBaseTurnName(baseTurnEntity.getName());
         	
+        	String successor = classGroupLogEntity.getSuccessor();
+        	String[] split = successor.split(",");
+        	if(split.length>1) {
+        		classGroupLogEntity.setSuccessorName(split[0]+"...");
+        	}else {
+        		classGroupLogEntity.setSuccessorName(successor); 
+        	}
         	
         }
         
