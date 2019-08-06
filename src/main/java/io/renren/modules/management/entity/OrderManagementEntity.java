@@ -162,6 +162,10 @@ public class OrderManagementEntity implements Serializable {
 	 */
 	@TableField(exist = false)
 	private String defectiveDevice;
+	/**
+	 * 工单操作人是否显示 0 不显示 1 显示
+	 */
+	private Integer disPlay;
 
 	/**
 	 * 设置：管理工单主键id
@@ -572,7 +576,18 @@ public class OrderManagementEntity implements Serializable {
 	public String getDefectiveDevice() {
 		return defectiveDevice;
 	}
-	
+	/**
+	 * 设置：工单操作人是否显示 0 不显示 1 显示
+	 */
+	public void setDisPlay(Integer disPlay) {
+		this.disPlay = disPlay;
+	}
+	/**
+	 * 获取：工单操作人是否显示 0不显示 1 显示
+	 */
+	public Integer getDisPlay() {
+		return disPlay;
+	}
 	
 	
 	

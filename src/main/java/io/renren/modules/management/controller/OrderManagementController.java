@@ -171,9 +171,9 @@ public class OrderManagementController {
     @RequiresPermissions("management:ordermanagement:orderupdate")
     public R orderupdate(@RequestBody OrderManagementEntity orderManagement){
     	    orderManagement.setCreateTime(new Date()); 
-    	    //orderManagement.setDefectiveName(orderManagement.getOrderApplicant()); 待定
-			orderManagementService.updateById(orderManagement);
-			
+    	    orderManagement.setOrderAcceptorOpinion(null);
+			// orderManagementService.updateById(orderManagement);
+			orderManagementService.updateAllColumnById(orderManagement);
 			NewsEntity entity =  newsService.selectOne(new EntityWrapper<NewsEntity>().eq("news_number", orderManagement.getOrderNumber()));
 			
 			if(entity !=null) {

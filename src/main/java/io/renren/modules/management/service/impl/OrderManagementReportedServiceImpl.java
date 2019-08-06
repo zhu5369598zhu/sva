@@ -83,6 +83,8 @@ public class OrderManagementReportedServiceImpl extends ServiceImpl<OrderManagem
 				orderManagement.setOrderStatusName("已确认不结算");
 			}else if(orderManagement.getOrderStatus()==9){
 				orderManagement.setOrderStatusName("已转单待确认");
+			}else if(orderManagement.getOrderStatus()==14) {
+				orderManagement.setOrderStatusName("!已受理待上报"); 
 			}
 			Integer orderType = orderManagement.getOrderType();
 			if(orderType == 0){
