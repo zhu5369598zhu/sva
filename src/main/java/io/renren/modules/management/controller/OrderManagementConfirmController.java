@@ -166,7 +166,7 @@ public class OrderManagementConfirmController {
 			orderRecordService.insert(record);
 			orderManagement.setOrderConfirmerId(0);
             orderManagement.setOrderConfirmer(null); 
-            //orderManagement.setDelayTime(new Date()); // 申请时间 改为 null
+            orderManagement.setProcessingResult(null);
     	}else if(orderManagement.getOrderStatus() ==5) { // 已完结
     		orderManagement.setConfirmedTime(new Date()); // 确认时间
     		orderManagement.setActualTime(new Date()); // 点击上报就是 实际完成时间
@@ -185,7 +185,7 @@ public class OrderManagementConfirmController {
             record.setOrderType(orderManagement.getOrderType());
 			
 			orderRecordService.insert(record);
-    		
+			
     	}else if(orderManagement.getOrderStatus()== 14) { // 同意申请延期
     		orderManagement.setOrderStatus(2); // 待上报
     		NewsEntity newsEntity = new NewsEntity();
@@ -195,17 +195,22 @@ public class OrderManagementConfirmController {
     		newsEntity.setUpdateTime(new Date()); 
     		newsService.update(newsEntity, new EntityWrapper<NewsEntity>()
     				.eq("news_number", orderManagement.getOrderNumber())
-    				.eq("news_type", 6)
+    				.eq("news_type", 14)
     				);
     		OrderRecordEntity record = new OrderRecordEntity();
 			record.setNowTime(new Date()); // 当前时间
 			record.setOrderNumber(orderManagement.getOrderNumber());
-			record.setOrderOpinion("同意申请延期，"+orderManagement.getOrderConfirmerOpinion()); // 工单主题当结论
+			record.setOrderOpinion("同意申请延期，"+orderManagement.getOrderApplicantOpinion()); // 工单主题当结论
 			record.setOrderPeople(orderManagement.getOrderApplicant());
 			record.setOrderPeopleId(1);//确认人
 			record.setOrderType(orderManagement.getOrderType());
 			
 			orderRecordService.insert(record);
+			orderManagement.setProcessingResult(null);
+	    	orderManagement.setDelayTime(null);
+	    	orderManagement.setOrderConfirmer(null);
+	    	orderManagement.setOrderConfirmerId(0);
+	    	orderManagement.setDisPlay(1); 
     	}else if(orderManagement.getOrderStatus()== 15) {// 不同意申请延期
     		orderManagement.setOrderStatus(2); // 待上报
     		NewsEntity newsEntity = new NewsEntity();
@@ -215,17 +220,22 @@ public class OrderManagementConfirmController {
     		newsEntity.setUpdateTime(new Date()); 
     		newsService.update(newsEntity, new EntityWrapper<NewsEntity>()
     				.eq("news_number", orderManagement.getOrderNumber())
-    				.eq("news_type", 6)
+    				.eq("news_type", 14)
     				);
     		OrderRecordEntity record = new OrderRecordEntity();
 			record.setNowTime(new Date()); // 当前时间
 			record.setOrderNumber(orderManagement.getOrderNumber());
-			record.setOrderOpinion("不同意申请延期，"+orderManagement.getOrderConfirmerOpinion()); // 工单主题当结论
+			record.setOrderOpinion("不同意申请延期，"+orderManagement.getOrderApplicantOpinion()); // 工单主题当结论
 			record.setOrderPeople(orderManagement.getOrderApplicant());
 			record.setOrderPeopleId(1);//确认人
 			record.setOrderType(orderManagement.getOrderType());
 			
 			orderRecordService.insert(record);
+			orderManagement.setProcessingResult(null);
+	    	orderManagement.setDelayTime(null);
+	    	orderManagement.setOrderConfirmer(null);
+	    	orderManagement.setOrderConfirmerId(0);
+	    	orderManagement.setDisPlay(1); 
     	}
     	
     	orderManagementConfirmService.updateAllColumnById(orderManagement);

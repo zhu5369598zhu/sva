@@ -110,6 +110,8 @@ public class OrderManagementReportedController {
             orderManagement.setOrderStatusName("已确认不结算");
         }else if(orderManagement.getOrderStatus()==9){
             orderManagement.setOrderStatusName("已转单待确认");
+        }else if(orderManagement.getOrderStatus()==14){
+        	orderManagement.setOrderStatusName("!已受理待上报"); 
         }
 
 			
@@ -168,21 +170,24 @@ public class OrderManagementReportedController {
     		OrderRecordEntity record = new OrderRecordEntity();
     		record.setNowTime(new Date()); // 当前时间
     		record.setOrderNumber(orderManagement.getOrderNumber());
-    		record.setOrderOpinion("进行延时"); // 工单主题当结论
+    		record.setOrderOpinion("申请延期"); // 工单主题当结论
     		record.setOrderPeople(orderManagement.getOrderAcceptor());
     		record.setOrderPeopleId(2);//受理人
     		record.setOrderType(orderManagement.getOrderType());
     		
     		orderRecordService.insert(record);
             NewsEntity newsEntity = new NewsEntity();
-            newsEntity.setUserId(orderManagement.getOrderConfirmerId());
+            newsEntity.setUserId(orderManagement.getOrderApplicantId());
             newsEntity.setNewsName("您有一条受理申请延期的工单待处理");
-            newsEntity.setNewsType(6);
+            newsEntity.setNewsType(14);
+            newsEntity.setCreateTime(new Date()); 
             newsEntity.setUpdateTime(new Date());
             newsService.update(newsEntity, new EntityWrapper<NewsEntity>()
                     .eq("news_number", orderManagement.getOrderNumber())
             );
     	}
+    	orderManagement.setDisPlay(0); 
+    	orderManagement.setOrderConfirmerOpinion(null); 
         orderManagementReportedService.updateAllColumnById(orderManagement);
         return R.ok();
     }
