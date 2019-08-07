@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.management.dao.OrderDefectiveListDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.management.entity.OrderDefectiveEntity" id="orderDefectiveMap">
+        <result property="defectiveId" column="defective_id"/>
+        <result property="defectiveNumber" column="defective_number"/>
+        <result property="defectiveTheme" column="defective_theme"/>
+        <result property="defectiveType" column="defective_type"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="exceptionId" column="exception_id"/>
+        <result property="orderContent" column="order_content"/>
+        <result property="defectiveName" column="defective_name"/>
+        <result property="defectiveNameId" column="defective_name_id"/>
+        <result property="defectiveNameOpinion" column="defective_name_opinion"/>
+        <result property="createTime" column="create_time"/>
+        <result property="orderStatus" column="order_status"/>
+        <result property="orderConfirmer" column="order_confirmer"/>
+        <result property="orderConfirmerId" column="order_confirmer_id"/>
+        <result property="confirmedTime" column="confirmed_time"/>
+        <result property="orderConfirmerOpinion" column="order_confirmer_opinion"/>
+        <result property="orderAcceptor" column="order_acceptor"></result>
+        <result property="orderAcceptorId" column="order_acceptor_id"></result>
+        <result property="requirementTime" column="requirement_time"></result>
+        <result property="defectiveDevice" column="defective_device"/>
+        <result property="resultId" column="result_id"/>
+    </resultMap>
+
+
+	<select id="selectOrderDefectiveList" parameterType="java.util.HashMap" 
+		resultType="io.renren.modules.management.entity.OrderDefectiveEntity">
+		select r.defective_id, r.defective_number, r.defective_theme, r.defective_type, r.dept_id,
+		r.exception_id ,r.order_content ,r.defective_name ,r.defective_name_id ,r.defective_name_opinion ,
+		r.create_time ,r.order_status ,r.order_confirmer ,r.order_confirmer_id, r.confirmed_time,
+		r.order_confirmer_opinion ,r.order_acceptor ,r.order_acceptor_id ,r.requirement_time ,r.defective_device
+		from tb_order_defective r
+		where 1=1
+		<if test="deptIds!=null">
+			and r.dept_id in
+			<foreach item="item" index="index" collection="deptIds" open="("
+				separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="defectiveNumber!=null">
+			and r.defective_number like '%${defectiveNumber}%'
+		</if>
+		<if test="exceptionId !=null">
+		    and r.exception_id = #{exceptionId}
+		</if>
+		<if test="defectiveTheme!=null">
+			and r.defective_theme like '%${defectiveTheme}%'
+		</if>
+		order by r.defective_id DESC 
+		
+
+		
+	</select>
+
+</mapper>
