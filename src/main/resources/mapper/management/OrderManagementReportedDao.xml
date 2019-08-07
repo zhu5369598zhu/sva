@@ -33,6 +33,7 @@
         <result property="orderType" column="order_type"/>
         <result property="levelId" column="level_id"/>
         <result property="orderDevice" column="order_device"/>
+        <result property="disPlay" column="dis_play"/>
     </resultMap>
 	
 	
@@ -44,7 +45,7 @@
 		 r.defective_name, r.order_content, r.order_applicant, r.order_applicant_id, r.order_applicant_opinion,
 		 r.order_acceptor,  r.order_acceptor_id, r.order_applicant_opinion, r.order_confirmer, r.order_confirmer_id,
 		 r.order_confirmer_opinion, r.create_time, r.confirmed_time, r.actual_time, r.delay_time, r.processing_result,
-		 r.order_status, r.order_type, r.level_id, r.order_device
+		 r.order_status, r.order_type, r.level_id, r.order_device, r.dis_play
 		
 		 from 
 		`tb_order_management` r
@@ -64,7 +65,13 @@
 			and r.order_name like '%${orderName}%'
 		</if>
 		<if test="orderAcceptorId!=null">
-		    and r.order_acceptor_id = #{orderAcceptorId}
+		    and (
+		    r.order_acceptor_id = #{orderAcceptorId} and (
+															r.order_status = 2
+															or r.order_status =7
+														)
+		    or r.order_applicant_id = #{orderAcceptorId} and r.order_status =14
+		    )
 		</if>
 		 <if test="startTime!=null">
 			and r.create_time &gt;= CONCAT(#{startTime})
@@ -72,10 +79,7 @@
 		<if test="endTime!=null">
 			and r.create_time &lt;= CONCAT(#{endTime})
 		</if>
-		and (
-		r.order_status = 2
-		or r.order_status =7
-		)
+	
 		order by r.order_id DESC
 
 	</select>

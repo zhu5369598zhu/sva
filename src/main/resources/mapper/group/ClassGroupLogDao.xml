@@ -45,6 +45,7 @@
         <result property="workSummary" column="work_summary"/>
         <result property="personCharge" column="person_charge"/>
         <result property="rejectReason" column="reject_reason"/>
+        <result property="rejectPeople" column="reject_people" />
     </resultMap>
 
 

@@ -32,7 +32,7 @@
 	<select id="selectResultList"
 		resultType="io.renren.modules.inspection.entity.InspectionResultEntity"
 		parameterType="io.renren.modules.inspection.entity.InspectionResultEntity">
-		select r.id,d.device_name as device_name,r.item_id,i.name as
+		select distinct r.id,d.device_name as device_name,r.item_id,i.name as
 		item_name,defective.defective_number as defectiveNumber,r.hang_up as hangUp, t.name as inspection_type,i.unit,r.is_ok,r.exception_id
 		,i.up_limit,i.upup_limit,i.down_limit,i.downdown_limit
 		,e.name as
