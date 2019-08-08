@@ -33,6 +33,7 @@
         <result property="orderType" column="order_type"/>
         <result property="levelId" column="level_id"/>
         <result property="orderDevice" column="order_device"/>
+        <result property="disPlay" column="dis_play"/>
     </resultMap>
 	
 	
