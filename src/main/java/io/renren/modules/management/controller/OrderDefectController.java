@@ -142,8 +142,17 @@ public class OrderDefectController {
         if(orderDefectiveEntity ==null){ // 新增
 			SimpleDateFormat sdf=new SimpleDateFormat("yyMMdd");
 			String newDate=sdf.format(new Date());
-        	List<OrderDefectiveEntity> list = orderDefectService.selectList(new EntityWrapper<OrderDefectiveEntity>().like("defective_number",newDate));
-			String defectiveNumber = OrderUtils.orderDefectNumber(list.size());
+        	List<OrderDefectiveEntity> list = orderDefectService.selectList(new EntityWrapper<OrderDefectiveEntity>().like("defective_number",newDate).orderBy("defective_id", false));
+        	String defectiveNumber = null;
+    		if(list.size()>0) {
+    			defectiveNumber = list.get(0).getDefectiveNumber();
+    			String numStr = defectiveNumber.substring(defectiveNumber.length()-3,defectiveNumber.length());
+    	        String newStr = numStr.replaceAll("^(0+)", "");
+    	        Integer num = Integer.parseInt(newStr);
+    	        defectiveNumber =  OrderUtils.orderDefectNumber(num);
+    		}else {
+    			defectiveNumber = OrderUtils.orderDefectNumber(list.size());
+    		}
 			orderDefective.setDefectiveNumber(defectiveNumber);
 			orderDefective.setCreateTime(new Date());
 			orderDefective.setConfirmedTime(new Date());
@@ -159,8 +168,17 @@ public class OrderDefectController {
     	//orderDefectService.updateById(orderDefective);
 		SimpleDateFormat sdf=new SimpleDateFormat("yyMMdd");
 		String newDate=sdf.format(new Date());
-		List<OrderManagementEntity> managementlist = orderManagementService.selectList(new EntityWrapper<OrderManagementEntity>().like("order_number",newDate));
-    	String orderNumber = OrderUtils.orderManagementNumber(managementlist.size()); // 工单编号
+		List<OrderManagementEntity> managementlist = orderManagementService.selectList(new EntityWrapper<OrderManagementEntity>().like("order_number",newDate).orderBy("order_id", false));
+		String orderNumber = null;
+		if(managementlist.size()>0) {
+			String order_number = managementlist.get(0).getOrderNumber();
+	        String numStr = order_number.substring(order_number.length()-3,order_number.length());
+	        String newStr = numStr.replaceAll("^(0+)", "");
+	        Integer num = Integer.parseInt(newStr);
+			orderNumber = OrderUtils.orderManagementNumber(num);
+		} else {
+			orderNumber = OrderUtils.orderManagementNumber(managementlist.size());
+		}
     	// 填报缺陷工单 转到 工单管理  orderApplicant
     	OrderManagementEntity managementEntity = new OrderManagementEntity();
     	managementEntity.setOrderNumber(orderNumber);

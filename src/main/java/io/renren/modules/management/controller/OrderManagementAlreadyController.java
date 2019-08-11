@@ -209,18 +209,7 @@ public class OrderManagementAlreadyController {
         return R.ok();
     }
     
-    /**
-     * 工单编号
-     */
-    @RequestMapping("/managementNumber")
-    @RequiresPermissions("management:ordermanagementalready:managementNumber")
-    public R managementNumber() {
-        SimpleDateFormat sdf=new SimpleDateFormat("yyMMdd");
-        String newDate=sdf.format(new Date());
-        List<OrderManagementEntity> list = orderManagementAlreadyService.selectList(new EntityWrapper<OrderManagementEntity>().like("order_number",newDate));
-        String orderNubmer = OrderUtils.orderManagementNumber(list.size());
-    	return R.ok().put("managementNumber", orderNubmer);
-    }
+    
     
     
     

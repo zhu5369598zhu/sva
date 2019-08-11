@@ -1,30 +1,26 @@
 package io.renren.modules.group.controller;
 
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import io.renren.modules.sys.entity.SysDeptEntity;
-import io.renren.modules.sys.service.SysDeptService;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import io.renren.common.utils.OrderUtils;
+import io.renren.common.utils.PageUtils;
+import io.renren.common.utils.R;
 import io.renren.modules.group.entity.ClassGroupLogEntity;
 import io.renren.modules.group.service.ClassGroupLogService;
 import io.renren.modules.setting.entity.BaseTurnEntity;
 import io.renren.modules.setting.service.BaseTurnService;
 import io.renren.modules.sys.entity.NewsEntity;
+import io.renren.modules.sys.entity.SysDeptEntity;
 import io.renren.modules.sys.service.NewsService;
-import io.renren.common.utils.OrderUtils;
-import io.renren.common.utils.PageUtils;
-import io.renren.common.utils.R;
+import io.renren.modules.sys.service.SysDeptService;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 
 
@@ -76,8 +72,6 @@ public class ClassGroupLogController {
 
 		BaseTurnEntity baseTurn = baseTurnService.selectById(classGroupLog.getBaseTurnId());
 		classGroupLog.setBaseTurnName(baseTurn.getName()); 
-
-
         return R.ok().put("classgrouplog", classGroupLog);
     }
 
@@ -87,8 +81,13 @@ public class ClassGroupLogController {
     @RequestMapping("/save")
     @RequiresPermissions("group:classgrouplog:save")
     public R save(@RequestBody ClassGroupLogEntity classGroupLog){
-			classGroupLogService.insert(classGroupLog);
-			
+    	String logNumber = classGroupLog.getLogNumber();
+    	List<ClassGroupLogEntity> list = classGroupLogService.selectList(new EntityWrapper<ClassGroupLogEntity>().eq("log_number", logNumber));
+    	if(list.size()>0) { // 不能出现两个 相同的 班组编号
+    		logNumber = this.dataNumber().get("logNumber").toString();
+            classGroupLog.setLogNumber(logNumber); 
+    	}
+    	classGroupLogService.insert(classGroupLog);
 		if(classGroupLog.getLogType().equals("1") && classGroupLog.getLogStatus().equals("2")) { //班长日志
     		NewsEntity newEntity = new NewsEntity();
     		newEntity.setNewsName("您有一条待确认班长日志");
@@ -213,9 +212,17 @@ public class ClassGroupLogController {
 		SimpleDateFormat sdf=new SimpleDateFormat("yyMMdd");
 		String newDate=sdf.format(new Date());
 
-		List<ClassGroupLogEntity> list = classGroupLogService.selectList(new EntityWrapper<ClassGroupLogEntity>().like("log_number",newDate));
-        String logNumber = OrderUtils.orderNumber(list.size());
-        
+		List<ClassGroupLogEntity> list = classGroupLogService.selectList(new EntityWrapper<ClassGroupLogEntity>().like("log_number",newDate).orderBy("log_number", false));
+        String logNumber =null;
+		if(list.size()>0) {
+			logNumber = list.get(0).getLogNumber();
+			String numStr = logNumber.substring(logNumber.length()-3,logNumber.length());
+	        String newStr = numStr.replaceAll("^(0+)", "");
+	        Integer num = Integer.parseInt(newStr);
+	        logNumber = OrderUtils.orderNumber(num);
+        }else {
+        	logNumber = OrderUtils.orderNumber(list.size());
+        }
     	return R.ok().put("logNumber", logNumber);
     }
     

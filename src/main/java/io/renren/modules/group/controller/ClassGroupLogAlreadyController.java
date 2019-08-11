@@ -222,9 +222,7 @@ public class ClassGroupLogAlreadyController {
 
 		SimpleDateFormat sdf=new SimpleDateFormat("yyMMdd");
 		String newDate=sdf.format(new Date());
-
 		List<ClassGroupLogEntity> list = classGroupLogAlreadyService.selectList(new EntityWrapper<ClassGroupLogEntity>().like("log_number",newDate));
-
 		String logNumber = OrderUtils.orderNumber(list.size());
         
     	return R.ok().put("logNumber", logNumber);

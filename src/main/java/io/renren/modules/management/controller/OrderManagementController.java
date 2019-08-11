@@ -144,8 +144,17 @@ public class OrderManagementController {
     public R save(@RequestBody OrderManagementEntity orderManagement){
 		SimpleDateFormat sdf=new SimpleDateFormat("yyMMdd");
 		String newDate=sdf.format(new Date());
-		List<OrderManagementEntity> list = orderManagementService.selectList(new EntityWrapper<OrderManagementEntity>().like("order_number",newDate));
-		String orderNumber = OrderUtils.orderManagementNumber(list.size());
+		List<OrderManagementEntity> list = orderManagementService.selectList(new EntityWrapper<OrderManagementEntity>().like("order_number",newDate).orderBy("order_id", false)); 
+		String orderNumber = null;
+		if(list.size()>0) {
+			String order_number = list.get(0).getOrderNumber();
+	        String numStr = order_number.substring(order_number.length()-3,order_number.length());
+	        String newStr = numStr.replaceAll("^(0+)", "");
+	        Integer num = Integer.parseInt(newStr);
+			orderNumber = OrderUtils.orderManagementNumber(num);
+		} else {
+			orderNumber = OrderUtils.orderManagementNumber(list.size());
+		}
     	orderManagement.setOrderNumber(orderNumber);
 		orderManagement.setCreateTime(new Date());
 		orderManagementService.insert(orderManagement);
@@ -231,21 +240,6 @@ public class OrderManagementController {
         return R.ok();
     }
     
-    /**
-     * 工单编号
-     */
-    @RequestMapping("/managementNumber")
-    @RequiresPermissions("management:ordermanagement:managementNumber")
-    public R managementNumber() {
-
-		SimpleDateFormat sdf=new SimpleDateFormat("yyMMdd");
-		String newDate=sdf.format(new Date());
-		List<OrderManagementEntity> list = orderManagementService.selectList(new EntityWrapper<OrderManagementEntity>().like("order_number",newDate));
-		String orderNumber = OrderUtils.orderManagementNumber(list.size());
-        
-    	return R.ok().put("managementNumber", orderNumber);
-    }
-
 	/**
 	 * 拒绝转单
 	 */

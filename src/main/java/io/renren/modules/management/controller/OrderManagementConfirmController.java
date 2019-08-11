@@ -255,19 +255,7 @@ public class OrderManagementConfirmController {
         return R.ok();
     }
     
-    /**
-     * 工单编号
-     */
-    @RequestMapping("/managementNumber")
-    @RequiresPermissions("management:ordermanagementconfirm:managementNumber")
-    public R managementNumber() {
-
-        SimpleDateFormat sdf=new SimpleDateFormat("yyMMdd");
-        String newDate=sdf.format(new Date());
-        List<OrderManagementEntity> list = orderManagementConfirmService.selectList(new EntityWrapper<OrderManagementEntity>().like("order_number",newDate));
-        String orderNubmer = OrderUtils.orderManagementNumber(list.size());
-    	return R.ok().put("managementNumber", orderNubmer);
-    }
+    
     
     
     
