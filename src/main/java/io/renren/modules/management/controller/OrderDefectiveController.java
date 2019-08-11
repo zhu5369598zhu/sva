@@ -105,9 +105,18 @@ public class OrderDefectiveController {
     public R save(@RequestBody OrderDefectiveEntity orderDefective){
 		SimpleDateFormat sdf=new SimpleDateFormat("yyMMdd");
 		String newDate=sdf.format(new Date());
-		List<OrderDefectiveEntity> list = orderDefectiveService.selectList(new EntityWrapper<OrderDefectiveEntity>().like("defective_number", newDate));
-		String orderNumber = OrderUtils.orderDefectNumber(list.size());
-		orderDefective.setDefectiveNumber(orderNumber);
+		List<OrderDefectiveEntity> list = orderDefectiveService.selectList(new EntityWrapper<OrderDefectiveEntity>().like("defective_number", newDate).orderBy("defective_id", false));
+		String defectiveNumber = null;
+		if(list.size()>0) {
+			defectiveNumber = list.get(0).getDefectiveNumber();
+			String numStr = defectiveNumber.substring(defectiveNumber.length()-3,defectiveNumber.length());
+	        String newStr = numStr.replaceAll("^(0+)", "");
+	        Integer num = Integer.parseInt(newStr);
+	        defectiveNumber =  OrderUtils.orderDefectNumber(num);
+		}else {
+			defectiveNumber = OrderUtils.orderDefectNumber(list.size());
+		}
+		orderDefective.setDefectiveNumber(defectiveNumber);
     	orderDefective.setCreateTime(new Date());
 		orderDefectiveService.insert(orderDefective);
 
@@ -135,9 +144,17 @@ public class OrderDefectiveController {
     	orderDefectiveService.updateById(orderDefective);
 		SimpleDateFormat sdf=new SimpleDateFormat("yyMMdd");
 		String newDate=sdf.format(new Date());
-		List<OrderManagementEntity> list = orderManagementService.selectList(new EntityWrapper<OrderManagementEntity>().like("order_number",newDate));
-
-		String orderNumber = OrderUtils.orderManagementNumber(list.size()); // 工单编号
+		List<OrderManagementEntity> list = orderManagementService.selectList(new EntityWrapper<OrderManagementEntity>().like("order_number",newDate).orderBy("order_id", false));
+		String orderNumber = null;
+		if(list.size()>0) {
+			String order_number = list.get(0).getOrderNumber();
+	        String numStr = order_number.substring(order_number.length()-3,order_number.length());
+	        String newStr = numStr.replaceAll("^(0+)", "");
+	        Integer num = Integer.parseInt(newStr);
+			orderNumber = OrderUtils.orderManagementNumber(num);
+		} else {
+			orderNumber = OrderUtils.orderManagementNumber(list.size());
+		}
     	// 填报缺陷工单 转到 工单管理  
     	OrderManagementEntity managementEntity = new OrderManagementEntity();
     	managementEntity.setOrderNumber(orderNumber);
@@ -192,19 +209,6 @@ public class OrderDefectiveController {
         return R.ok();
     }
     
-    /**
-     * 缺陷单编号
-     */
-    @RequestMapping("/managementNumber")
-    @RequiresPermissions("management:orderdefective:managementNumber")
-    public R managementNumber() {
-		SimpleDateFormat sdf=new SimpleDateFormat("yyMMdd");
-		String newDate=sdf.format(new Date());
-		List<OrderDefectiveEntity> list = orderDefectiveService.selectList(new EntityWrapper<OrderDefectiveEntity>().like("defective_number",newDate));
-		String orderNumber = OrderUtils.orderDefectNumber(list.size());
-        
-    	return R.ok().put("managementNumber", orderNumber);
-    }
     
     
     

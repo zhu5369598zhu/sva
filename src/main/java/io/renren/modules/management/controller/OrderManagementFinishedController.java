@@ -147,18 +147,7 @@ public class OrderManagementFinishedController {
         return R.ok();
     }
     
-    /**
-     * 工单编号
-     */
-    @RequestMapping("/managementNumber")
-    @RequiresPermissions("management:ordermanagementfinished:managementNumber")
-    public R managementNumber() {
-        SimpleDateFormat sdf=new SimpleDateFormat("yyMMdd");
-        String newDate=sdf.format(new Date());
-        List<OrderManagementEntity> list = orderManagementFinishedService.selectList(new EntityWrapper<OrderManagementEntity>().like("order_number",newDate));
-        String orderNumber = OrderUtils.orderManagementNumber(list.size());
-    	return R.ok().put("managementNumber", orderNumber);
-    }
+    
     
     
     

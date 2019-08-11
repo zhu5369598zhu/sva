@@ -1,33 +1,25 @@
 package io.renren.modules.management.controller;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import io.renren.modules.setting.entity.OrderExceptionEntity;
-import io.renren.modules.setting.service.OrderExceptionService;
-import io.renren.modules.sys.entity.SysDeptEntity;
-import io.renren.modules.sys.service.SysDeptService;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-
+import io.renren.common.utils.PageUtils;
+import io.renren.common.utils.R;
 import io.renren.modules.management.entity.OrderManagementEntity;
 import io.renren.modules.management.entity.OrderRecordEntity;
 import io.renren.modules.management.service.OrderManagementReportedService;
 import io.renren.modules.management.service.OrderRecordService;
-import io.renren.modules.setting.entity.ExceptionEntity;
-import io.renren.modules.setting.service.ExceptionService;
+import io.renren.modules.setting.entity.OrderExceptionEntity;
+import io.renren.modules.setting.service.OrderExceptionService;
 import io.renren.modules.sys.entity.NewsEntity;
+import io.renren.modules.sys.entity.SysDeptEntity;
 import io.renren.modules.sys.service.NewsService;
-import io.renren.common.utils.OrderUtils;
-import io.renren.common.utils.PageUtils;
-import io.renren.common.utils.R;
+import io.renren.modules.sys.service.SysDeptService;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Map;
 
 
 
@@ -204,19 +196,7 @@ public class OrderManagementReportedController {
         return R.ok();
     }
     
-    /**
-     * 工单编号
-     */
-    @RequestMapping("/managementNumber")
-    @RequiresPermissions("management:ordermanagementreported:managementNumber")
-    public R managementNumber() {
-        SimpleDateFormat sdf=new SimpleDateFormat("yyMMdd");
-        String newDate=sdf.format(new Date());
-        List<OrderManagementEntity> list = orderManagementReportedService.selectList(new EntityWrapper<OrderManagementEntity>().like("order_number",newDate));
-        String orderNumber = OrderUtils.orderManagementNumber(list.size());
-        
-    	return R.ok().put("managementNumber", orderNumber);
-    }
+    
     
     
     
