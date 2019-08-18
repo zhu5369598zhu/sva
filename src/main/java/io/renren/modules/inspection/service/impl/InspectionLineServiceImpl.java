@@ -61,7 +61,9 @@ public class InspectionLineServiceImpl extends ServiceImpl<InspectionLineDao, In
             }
 
             SysDeptEntity sysDeptEntity = sysDeptService.selectById(inspectionLineEntity.getDeptId());
-            inspectionLineEntity.setDeptName(sysDeptEntity.getName());
+            if(sysDeptEntity !=null){
+                inspectionLineEntity.setDeptName(sysDeptEntity.getName());
+            }
 
             Integer publishCount = publishService.selectCount(
                     new EntityWrapper<InspectionLinePublishEntity>()

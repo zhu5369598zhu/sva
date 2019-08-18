@@ -10,8 +10,10 @@ import io.renren.common.validator.group.UpdateGroup;
 import io.renren.modules.inspection.entity.ClassGroupEntity;
 import io.renren.modules.inspection.entity.ClassWorkerEntity;
 import io.renren.modules.inspection.entity.DeviceEntity;
+import io.renren.modules.inspection.entity.InspectionLineEntity;
 import io.renren.modules.inspection.service.ClassGroupService;
 import io.renren.modules.inspection.service.ClassWorkerService;
+import io.renren.modules.inspection.service.InspectionLineService;
 import io.renren.modules.sys.entity.SysDeptEntity;
 import io.renren.modules.sys.entity.SysUserEntity;
 import io.renren.modules.sys.form.PasswordForm;
@@ -50,6 +52,8 @@ public class SysUserController extends AbstractController {
 	private ClassGroupService classGroupService;
 	@Autowired
 	private ClassWorkerService workerService;
+	@Autowired
+	private InspectionLineService lineService;
 
 
 	@PostMapping("/upload")
@@ -269,7 +273,10 @@ public class SysUserController extends AbstractController {
 			for (ClassWorkerEntity classWorkerEntity:classWorkerEntities){
 				ClassGroupEntity classGroupEntity = classGroupService.selectById(classWorkerEntity.getClassGroupId());
 				if(classGroupEntity != null){
-					return R.error(400,"该用户已添加到班组[" + classGroupEntity.getName() + "]中，不能删除");
+					InspectionLineEntity lineEntity = lineService.selectById(classGroupEntity.getInspectionLineId());
+					if(lineEntity != null && lineEntity.getIsDelete() != 1){
+						return R.error(400,"该用户已添加到班组[" + classGroupEntity.getName() + "]中，不能删除");
+					}
 				}
 			}
 		}

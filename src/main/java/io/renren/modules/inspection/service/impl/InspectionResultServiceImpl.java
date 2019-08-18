@@ -212,11 +212,13 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
         String[] series = new String[resultList.size()];
 
         HashMap<String, Object> json = new HashMap<>();
-        for(Integer i = 0; i < resultList.size(); i++){
+        Integer k = 0;
+        for(Integer i = resultList.size() -1; i >= 0; i--){
             InspectionResultEntity result = (InspectionResultEntity)resultList.get(i);
-            ids[i] = result.getId().toString();
-            category[i] = result.getStartTime().toString();
-            series[i] = result.getResult();
+            ids[k] = result.getId().toString();
+            category[k] = result.getStartTime().toString();
+            series[k] = result.getResult();
+            k = k + 1;
         }
 
         json.put("ids", ids);

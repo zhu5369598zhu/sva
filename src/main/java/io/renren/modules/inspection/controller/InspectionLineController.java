@@ -131,7 +131,9 @@ public class InspectionLineController {
                 List<TurnClassGroupEntity> turnClassGroupEntities = turnClassGroupService.selectByMap(turnClassParams);
                 if (turnClassGroupEntities.size() == 0 ){
                     TurnEntity turnEntity = turnService.selectById(periodTurnEntity.getTurnId());
-                    return R.error(400, "轮次\"" + turnEntity.getName() + "\"没有设置班组。" );
+                    if(turnEntity !=null){
+                        return R.error(400, "轮次\"" + turnEntity.getName() + "\"没有设置班组。" );
+                    }
                 }
 
                 for (TurnClassGroupEntity turnClassGroupEntity:turnClassGroupEntities){

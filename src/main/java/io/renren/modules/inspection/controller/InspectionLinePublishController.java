@@ -92,9 +92,15 @@ public class InspectionLinePublishController {
             linePublishEntities.add(linePublish);
         }
 
-        Integer result = inspectionLinePublishService.insertPublishBatch(linePublishEntities);
+        if(linePublishEntities.size() > 0){
+            Integer result = inspectionLinePublishService.insertPublishBatch(linePublishEntities);
 
-        return R.ok().put("bind", result);
+            return R.ok().put("bind", result);
+        }
+        else {
+           return R.error(400,"没有PDA数据");
+        }
+
     }
 
     /**

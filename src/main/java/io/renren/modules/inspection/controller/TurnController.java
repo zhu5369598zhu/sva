@@ -4,6 +4,10 @@ import java.util.*;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import io.renren.common.annotation.SysLog;
+import io.renren.modules.inspection.entity.InspectionPeriodEntity;
+import io.renren.modules.inspection.entity.PeriodTurnEntity;
+import io.renren.modules.inspection.service.InspectionPeriodService;
+import io.renren.modules.inspection.service.PeriodTurnService;
 import io.renren.modules.inspection.service.TurnClassGroupService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +38,10 @@ public class TurnController {
     private TurnClassGroupService turnClassGroupService;
     @Autowired
     private TurnService turnService;
+    @Autowired
+    private PeriodTurnService periodTurnService;
+    @Autowired
+    private InspectionPeriodService periodService;
 
     /**
      * 列表
@@ -110,7 +118,21 @@ public class TurnController {
     @RequestMapping("/delete")
     @RequiresPermissions("inspection:turn:delete")
     public R delete(@RequestBody Long[] ids){
-			turnService.deleteBatch(ids);
+        for(Long turnId:ids){
+            HashMap<String, Object> params = new HashMap<String, Object>();
+            params.put("turn_id",turnId);
+            List<PeriodTurnEntity> periodTurnList = periodTurnService.selectByMap(params);
+            if(periodTurnList.size() > 0) {
+                for(PeriodTurnEntity periodTurn:periodTurnList){
+                    InspectionPeriodEntity period = periodService.selectById(periodTurn.getTurnId());
+                    if(period != null){
+                        return R.error(400,"该轮次已被周期[" + period.getName() + "]绑定使用，请先在该周期将期删除.");
+                    }
+                }
+            }
+        }
+
+        turnService.deleteBatch(ids);
 
         return R.ok();
     }
