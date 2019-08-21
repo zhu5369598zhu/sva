@@ -1,27 +1,36 @@
 package io.renren.modules.app.controller;
 
-import io.renren.common.annotation.SysLog;
 import io.renren.common.exception.RRException;
 import io.renren.common.utils.R;
+import io.renren.common.utils.SendSms;
 import io.renren.modules.app.annotation.Login;
 import io.renren.modules.app.annotation.LoginUser;
 import io.renren.modules.app.service.InspectionService;
+import io.renren.modules.inspection.entity.DeviceEntity;
 import io.renren.modules.inspection.entity.InspectionItemEntity;
 import io.renren.modules.inspection.entity.InspectionResultEntity;
 import io.renren.modules.inspection.entity.InspectionResultMediaEntity;
 import io.renren.modules.inspection.entity.PdaEntity;
+import io.renren.modules.inspection.service.DeviceService;
 import io.renren.modules.inspection.service.InspectionItemService;
 import io.renren.modules.inspection.service.InspectionResultMediaService;
 import io.renren.modules.inspection.service.InspectionResultService;
 import io.renren.modules.inspection.service.PdaService;
+import io.renren.modules.setting.entity.ExceptionEntity;
+import io.renren.modules.setting.service.ExceptionService;
 import io.renren.modules.sys.entity.AppUpgradeEntity;
+import io.renren.modules.sys.entity.DeviceExceptionEntity;
 import io.renren.modules.sys.entity.SysUserEntity;
 import io.renren.modules.sys.service.AppUpgradeService;
+import io.renren.modules.sys.service.DeviceExceptionService;
+import io.renren.modules.sys.service.SysUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.alibaba.fastjson.JSONObject;
 
 import java.util.*;
 
@@ -48,6 +57,15 @@ public class AppInspectionController {
     private PdaService pdaService;
     @Autowired
     private AppUpgradeService upgradeService;
+    @Autowired
+    private DeviceService deviceService;
+    @Autowired
+    private DeviceExceptionService deviceExceptionService;
+    @Autowired
+	private SysUserService sysUserService; 
+    @Autowired
+    private ExceptionService exceptionService;
+    
 
     @GetMapping("upgrade")
     @ApiOperation("获取升级信息")
@@ -125,6 +143,104 @@ public class AppInspectionController {
         }
         if(inspectionResult.getEndTime() == null){
             return R.error(400, "endTime不能为空");
+        }
+        InspectionItemEntity inspctionItem = itemService.selectByGuid(itemGuid);
+        Integer deviceId = inspctionItem.getDeviceId();
+        DeviceEntity device = deviceService.selectById(deviceId);
+        Map<String,Object> hashMap = new HashMap<String,Object>();
+        hashMap.put("deviceId", deviceId);
+        DeviceExceptionEntity deviceException = deviceExceptionService.findDeviceExceptionBydeviceId(hashMap);
+        if(deviceException ==null) {
+        	hashMap.put("deptId",device.getDeviceDept());
+        	hashMap.put("deviceLevel",device.getDeviceLevel());
+        	DeviceExceptionEntity deviceExceptionEntity = deviceExceptionService.findDeviceExceptionByDeptidDeviceLevel(hashMap);
+        	if(deviceExceptionEntity!=null) {
+        		String exceptionIds = deviceExceptionEntity.getExceptionIds();
+            	String[] split = exceptionIds.split(",");
+            	for(String s: split) {
+            		if(s.equals(inspectionResult.getExceptionId().toString())) {
+            			String smsUserIds = deviceExceptionEntity.getSmsUserIds();
+            			if(!"".equals(smsUserIds)) { 
+            				String[] userIds = smsUserIds.split(",");
+                			for(String userId: userIds) {
+                				SysUserEntity userEntity = sysUserService.selectById(Integer.parseInt(userId));
+                				String mobile = userEntity.getMobile();
+                				String deviceName = device.getDeviceName(); // 设备名称
+                				String itemName = inspctionItem.getName(); // 巡检项名称
+                				ExceptionEntity exceptionEntity = exceptionService.selectById(s);
+                				String exceptionName = exceptionEntity.getName(); // 异常等级名称
+                				JSONObject returnJson = new JSONObject(new LinkedHashMap()); 
+                				returnJson.put("deviceName", "["+deviceName+"]");
+                				returnJson.put("itemName", "["+itemName+"]");
+                				returnJson.put("exceptionName", "["+exceptionName+"]");
+                				System.out.println("手机号"+ mobile);
+                				System.out.println("数据"+ returnJson.toJSONString());
+                				String isOk = SendSms.deviceSend(mobile, returnJson);
+                				System.out.println("是否成功"+ isOk);
+                				HashMap<String,Object> map = new HashMap<String,Object>();
+                				if(isOk.equals("ok")) { // 发送短信成功
+                    				map.put("isOk", 1);
+                    				map.put("phone", mobile);
+                    				map.put("content", "尊敬的用户，您的设备"+deviceName+"巡检"+itemName+"出现异常等级为"+exceptionName+",请您及时关注哦。");
+                    				map.put("type", 1);
+                    				map.put("createTiem", new Date());
+                    				deviceExceptionService.insertSms(map); // 发送短信记录
+                				}else { // 发送短信失败 
+                    				map.put("isOk", 0);
+                    				map.put("phone", mobile);
+                    				map.put("content", "尊敬的用户，您的设备"+deviceName+"巡检"+itemName+"出现异常等级为"+exceptionName+",请您及时关注哦。");
+                    				map.put("type", 1);
+                    				map.put("createTiem", new Date());
+                    				deviceExceptionService.insertSms(map); // 发送短信记录
+                				}
+                			}
+            			}
+            		}
+            	}
+        	}
+        }else {
+        	String exceptionIds = deviceException.getExceptionIds();
+        	String[] split = exceptionIds.split(",");
+        	for(String s: split) {
+        		if(s.equals(inspectionResult.getExceptionId().toString())) {
+        			String smsUserIds = deviceException.getSmsUserIds();
+        			if(!"".equals(smsUserIds)) { 
+        				String[] userIds = smsUserIds.split(",");
+            			for(String userId: userIds) {
+            				SysUserEntity userEntity = sysUserService.selectById(Integer.parseInt(userId));
+            				String mobile = userEntity.getMobile();
+            				String deviceName = device.getDeviceName(); // 设备名称
+            				String itemName = inspctionItem.getName(); // 巡检项名称
+            				ExceptionEntity exceptionEntity = exceptionService.selectById(s);
+            				String exceptionName = exceptionEntity.getName(); // 异常等级名称
+            				JSONObject returnJson = new JSONObject(new LinkedHashMap());
+            				returnJson.put("deviceName", "["+deviceName+"]");
+            				returnJson.put("itemName", "["+itemName+"]");
+            				returnJson.put("exceptionName", "["+exceptionName+"]");
+            				System.out.println("数据"+ returnJson.toJSONString());
+            				String isOk = SendSms.deviceSend(mobile, returnJson);
+            				System.out.println("是否发送成功"+ isOk);
+            				if(isOk.equals("ok")) { // 发送短信成功
+            					HashMap<String,Object> map = new HashMap<String,Object>();
+                				map.put("isOk", 1);
+                				map.put("phone", mobile);
+                				map.put("content", "尊敬的用户，您的设备"+deviceName+"巡检"+itemName+"出现异常等级为"+exceptionName+",请您及时关注哦。");
+                				map.put("type", 1);
+                				map.put("createTiem", new Date());
+                				deviceExceptionService.insertSms(map); // 发送短信记录
+            				}else { // 发送短信失败 
+            					HashMap<String,Object> map = new HashMap<String,Object>();
+                				map.put("isOk", 0);
+                				map.put("phone", mobile);
+                				map.put("content", "尊敬的用户，您的设备"+deviceName+"巡检"+itemName+"出现异常等级为"+exceptionName+",请您及时关注哦。");
+                				map.put("type", 1);
+                				map.put("createTiem", new Date());
+                				deviceExceptionService.insertSms(map); // 发送短信记录
+            				}
+            			}
+        			}
+        		}
+        	}
         }
         resultService.deleteByAppResultGuid(appResultGuid);
         String guid = resultService.insertResult(inspectionResult);

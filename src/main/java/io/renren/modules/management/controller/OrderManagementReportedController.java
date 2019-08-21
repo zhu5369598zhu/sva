@@ -1,25 +1,39 @@
 package io.renren.modules.management.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import io.renren.modules.setting.entity.OrderExceptionEntity;
+import io.renren.modules.setting.service.OrderExceptionService;
+import io.renren.modules.sys.entity.SysDeptEntity;
+import io.renren.modules.sys.entity.SysUserEntity;
+import io.renren.modules.sys.service.SysDeptService;
+import io.renren.modules.sys.service.SysUserService;
+
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import io.renren.common.utils.PageUtils;
-import io.renren.common.utils.R;
+
 import io.renren.modules.management.entity.OrderManagementEntity;
 import io.renren.modules.management.entity.OrderRecordEntity;
 import io.renren.modules.management.service.OrderManagementReportedService;
 import io.renren.modules.management.service.OrderRecordService;
-import io.renren.modules.setting.entity.OrderExceptionEntity;
-import io.renren.modules.setting.service.OrderExceptionService;
+import io.renren.modules.setting.entity.ExceptionEntity;
+import io.renren.modules.setting.service.ExceptionService;
 import io.renren.modules.sys.entity.NewsEntity;
-import io.renren.modules.sys.entity.SysDeptEntity;
+import io.renren.modules.sys.service.DeviceExceptionService;
 import io.renren.modules.sys.service.NewsService;
-import io.renren.modules.sys.service.SysDeptService;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Map;
+import io.renren.common.utils.OrderUtils;
+import io.renren.common.utils.PageUtils;
+import io.renren.common.utils.R;
+import io.renren.common.utils.SendSms;
 
 
 
@@ -48,6 +62,12 @@ public class OrderManagementReportedController {
 
     @Autowired
     private SysDeptService sysDeptService;
+    
+    @Autowired
+	private SysUserService sysUserService;
+	
+	@Autowired
+    private DeviceExceptionService deviceExceptionService;
     /**
      * 列表
      */
@@ -158,6 +178,35 @@ public class OrderManagementReportedController {
 			record.setOrderType(orderManagement.getOrderType());
 			
 			orderRecordService.insert(record);
+			
+			SysUserEntity userEntity = sysUserService.selectById(orderManagement.getOrderConfirmerId());
+			if(!"".equals(userEntity.getMobile())) {
+				JSONObject returnJson = new JSONObject();
+				returnJson.put("news_name", "您有一条已上报待审核的工单");
+				returnJson.put("news_number", orderManagement.getOrderNumber());
+				
+				String isOk = SendSms.ordersend(userEntity.getMobile(), returnJson);
+				if(isOk.equals("ok")) { //发生成功
+					HashMap<String,Object> map = new HashMap<String,Object>(); 
+					map.put("isOk", 1);
+					map.put("phone", userEntity.getMobile());
+					map.put("content", "您有一条已上报待审核的工单");
+					map.put("type", 2);
+					map.put("createTiem", new Date());
+					deviceExceptionService.insertSms(map); // 发送短信记录
+				}else {
+					HashMap<String,Object> map = new HashMap<String,Object>(); 
+					map.put("isOk", 0);
+					map.put("phone", userEntity.getMobile());
+					map.put("content", "您有一条已上报待审核的工单");
+					map.put("type", 2);
+					map.put("createTiem", new Date());
+					deviceExceptionService.insertSms(map); // 发送短信记录
+				}
+			}
+				
+				
+			
     	}else {
     		OrderRecordEntity record = new OrderRecordEntity();
     		record.setNowTime(new Date()); // 当前时间
@@ -177,6 +226,33 @@ public class OrderManagementReportedController {
             newsService.update(newsEntity, new EntityWrapper<NewsEntity>()
                     .eq("news_number", orderManagement.getOrderNumber())
             );
+            
+            SysUserEntity userEntity = sysUserService.selectById(orderManagement.getOrderApplicantId());
+			if(!"".equals(userEntity.getMobile())) {
+				JSONObject returnJson = new JSONObject();
+				returnJson.put("news_name", "您有一条受理申请延期的工单待处理");
+				returnJson.put("news_number", orderManagement.getOrderNumber());
+				
+				String isOk = SendSms.ordersend(userEntity.getMobile(), returnJson);
+				if(isOk.equals("ok")) { //发生成功
+					HashMap<String,Object> map = new HashMap<String,Object>(); 
+					map.put("isOk", 1);
+					map.put("phone", userEntity.getMobile());
+					map.put("content", "您有一条受理申请延期的工单待处理");
+					map.put("type", 2);
+					map.put("createTiem", new Date());
+					deviceExceptionService.insertSms(map); // 发送短信记录
+				}else {
+					HashMap<String,Object> map = new HashMap<String,Object>(); 
+					map.put("isOk", 0);
+					map.put("phone", userEntity.getMobile());
+					map.put("content", "您有一条受理申请延期的工单待处理");
+					map.put("type", 2);
+					map.put("createTiem", new Date());
+					deviceExceptionService.insertSms(map); // 发送短信记录
+				}
+			}
+            
     	}
     	orderManagement.setDisPlay(0); 
     	orderManagement.setOrderConfirmerOpinion(null); 

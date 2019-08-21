@@ -4,7 +4,10 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import io.renren.modules.sys.entity.SysDeptEntity;
+import io.renren.modules.sys.entity.SysUserEntity;
 import io.renren.modules.sys.service.SysDeptService;
+import io.renren.modules.sys.service.SysUserService;
+
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,19 +16,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 
+import io.renren.modules.management.entity.OrderDefectiveEntity;
 import io.renren.modules.management.entity.OrderManagementEntity;
 import io.renren.modules.management.entity.OrderRecordEntity;
+import io.renren.modules.management.service.OrderDefectiveListService;
 import io.renren.modules.management.service.OrderManagementConfirmService;
 import io.renren.modules.management.service.OrderRecordService;
 import io.renren.modules.setting.entity.OrderExceptionEntity;
 import io.renren.modules.setting.service.OrderExceptionService;
 import io.renren.modules.sys.entity.NewsEntity;
+import io.renren.modules.sys.service.DeviceExceptionService;
 import io.renren.modules.sys.service.NewsService;
 import io.renren.common.utils.OrderUtils;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
+import io.renren.common.utils.SendSms;
 
 
 
@@ -54,6 +62,14 @@ public class OrderManagementConfirmController {
 
     @Autowired
     private SysDeptService sysDeptService;
+    @Autowired
+	private SysUserService sysUserService;
+	
+	@Autowired
+    private DeviceExceptionService deviceExceptionService;
+	
+	@Autowired
+    private OrderDefectiveListService orderDefectiveListService;
     /**
      * 列表
      */
@@ -164,6 +180,36 @@ public class OrderManagementConfirmController {
 			record.setOrderType(orderManagement.getOrderType());
 			
 			orderRecordService.insert(record);
+			
+			SysUserEntity userEntity = sysUserService.selectById(orderManagement.getOrderAcceptorId());
+			if(!"".equals(userEntity.getMobile())) {
+				
+				JSONObject returnJson = new JSONObject();
+				returnJson.put("news_name", "您有一条已上报待审核的工单被拒绝");
+				returnJson.put("news_number", orderManagement.getOrderNumber());
+				
+				String isOk = SendSms.ordersend(userEntity.getMobile(), returnJson);
+				if(isOk.equals("ok")) { // 发送成功
+					HashMap<String,Object> map = new HashMap<String,Object>(); 
+					map.put("isOk", 1);
+					map.put("phone", userEntity.getMobile());
+					map.put("content", "您有一条已上报待审核的工单被拒绝");
+					map.put("type", 2);
+					map.put("createTiem", new Date());
+					deviceExceptionService.insertSms(map); // 发送短信记录
+				}else {
+					HashMap<String,Object> map = new HashMap<String,Object>(); 
+					map.put("isOk", 0);
+					map.put("phone", userEntity.getMobile());
+					map.put("content", "您有一条已上报待审核的工单被拒绝");
+					map.put("type", 2);
+					map.put("createTiem", new Date());
+					deviceExceptionService.insertSms(map); // 发送短信记录
+				}
+				
+			}
+			
+			
 			orderManagement.setOrderConfirmerId(0);
             orderManagement.setOrderConfirmer(null); 
             orderManagement.setProcessingResult(null);
@@ -186,6 +232,113 @@ public class OrderManagementConfirmController {
 			
 			orderRecordService.insert(record);
 			
+			Integer defectiveId = orderManagement.getDefectiveId();
+			if(defectiveId != 0) { // 属于缺陷工单转成 工单
+				OrderDefectiveEntity orderDefectiveEntity = orderDefectiveListService.selectById(defectiveId);
+				Integer defectiveNameId = orderDefectiveEntity.getDefectiveNameId();
+				String defectiveNumber = orderDefectiveEntity.getDefectiveNumber();
+				
+				SysUserEntity userEntity = sysUserService.selectById(defectiveNameId);
+				if(!"".equals(userEntity.getMobile())) {
+					
+					JSONObject returnJson = new JSONObject();
+					returnJson.put("news_name", "您有一条已完结的缺陷单");
+					returnJson.put("news_number", defectiveNumber);
+					
+					String isOk = SendSms.ordersend(userEntity.getMobile(), returnJson);
+					if(isOk.equals("ok")) { // 发送成功
+						HashMap<String,Object> map = new HashMap<String,Object>(); 
+						map.put("isOk", 1);
+						map.put("phone", userEntity.getMobile());
+						map.put("content", "您有一条已完结的缺陷单");
+						map.put("type", 2);
+						map.put("createTiem", new Date());
+						deviceExceptionService.insertSms(map); // 发送短信记录
+					}else {
+						HashMap<String,Object> map = new HashMap<String,Object>(); 
+						map.put("isOk", 0);
+						map.put("phone", userEntity.getMobile());
+						map.put("content", "您有一条已完结的缺陷单");
+						map.put("type", 2);
+						map.put("createTiem", new Date());
+						deviceExceptionService.insertSms(map); // 发送短信记录
+					}
+					
+				}
+				Integer orderApplicantId = orderManagement.getOrderApplicantId();
+				Integer orderAcceptorId = orderManagement.getOrderAcceptorId();
+				Integer orderConfirmerId = orderManagement.getOrderConfirmerId();
+				HashMap<Integer,Object> map = new HashMap<Integer, Object>();
+				map.put(orderApplicantId, orderApplicantId);
+				map.put(orderAcceptorId, orderAcceptorId);
+				map.put(orderConfirmerId, orderConfirmerId);
+				for(Integer userId :map.keySet()) {
+					SysUserEntity user = sysUserService.selectById(userId);
+					if(!"".equals(user.getMobile())) {
+						JSONObject returnJson = new JSONObject();
+						returnJson.put("news_name", "您有一条已完结的工单");
+						returnJson.put("news_number", orderManagement.getOrderNumber());
+						
+						String isOk = SendSms.ordersend(user.getMobile(), returnJson);
+						if(isOk.equals("ok")) { // 发送成功
+							HashMap<String,Object> hashMap = new HashMap<String,Object>(); 
+							hashMap.put("isOk", 1);
+							hashMap.put("phone", user.getMobile());
+							hashMap.put("content", "您有一条已完结的工单");
+							hashMap.put("type", 2);
+							hashMap.put("createTiem", new Date());
+							deviceExceptionService.insertSms(hashMap); // 发送短信记录
+						}else {
+							HashMap<String,Object> hashMap = new HashMap<String,Object>(); 
+							hashMap.put("isOk", 0);
+							hashMap.put("phone", user.getMobile());
+							hashMap.put("content", "您有一条已完结的工单");
+							hashMap.put("type", 2);
+							hashMap.put("createTiem", new Date());
+							deviceExceptionService.insertSms(hashMap); // 发送短信记录
+						}
+					}
+				}
+				
+			}else {
+				
+				Integer orderApplicantId = orderManagement.getOrderApplicantId();
+				Integer orderAcceptorId = orderManagement.getOrderAcceptorId();
+				Integer orderConfirmerId = orderManagement.getOrderConfirmerId();
+				HashMap<Integer,Object> map = new HashMap<Integer, Object>();
+				map.put(orderApplicantId, orderApplicantId);
+				map.put(orderAcceptorId, orderAcceptorId);
+				map.put(orderConfirmerId, orderConfirmerId);
+				for(Integer userId :map.keySet()) {
+					SysUserEntity user = sysUserService.selectById(userId);
+					if(!"".equals(user.getMobile())) {
+						JSONObject returnJson = new JSONObject();
+						returnJson.put("news_name", "您有一条已完结的工单");
+						returnJson.put("news_number", orderManagement.getOrderNumber());
+						
+						String isOk = SendSms.ordersend(user.getMobile(), returnJson);
+						if(isOk.equals("ok")) { // 发送成功
+							HashMap<String,Object> hashMap = new HashMap<String,Object>(); 
+							hashMap.put("isOk", 1);
+							hashMap.put("phone", user.getMobile());
+							hashMap.put("content", "您有一条已完结的工单");
+							hashMap.put("type", 2);
+							hashMap.put("createTiem", new Date());
+							deviceExceptionService.insertSms(hashMap); // 发送短信记录
+						}else {
+							HashMap<String,Object> hashMap = new HashMap<String,Object>(); 
+							hashMap.put("isOk", 0);
+							hashMap.put("phone", user.getMobile());
+							hashMap.put("content", "您有一条已完结的工单");
+							hashMap.put("type", 2);
+							hashMap.put("createTiem", new Date());
+							deviceExceptionService.insertSms(hashMap); // 发送短信记录
+						}
+					}
+				}
+			}
+			
+			
     	}else if(orderManagement.getOrderStatus()== 14) { // 同意申请延期
     		orderManagement.setOrderStatus(2); // 待上报
     		NewsEntity newsEntity = new NewsEntity();
@@ -206,6 +359,34 @@ public class OrderManagementConfirmController {
 			record.setOrderType(orderManagement.getOrderType());
 			
 			orderRecordService.insert(record);
+			SysUserEntity userEntity = sysUserService.selectById(orderManagement.getOrderAcceptorId());
+			if(!"".equals(userEntity.getMobile())) {
+				
+				JSONObject returnJson = new JSONObject();
+				returnJson.put("news_name", "您有一条申请延期通过的工单待处理");
+				returnJson.put("news_number", orderManagement.getOrderNumber());
+				
+				String isOk = SendSms.ordersend(userEntity.getMobile(), returnJson);
+				if(isOk.equals("ok")) { // 发送成功
+					HashMap<String,Object> map = new HashMap<String,Object>(); 
+					map.put("isOk", 1);
+					map.put("phone", userEntity.getMobile());
+					map.put("content", "您有一条申请延期通过的工单待处理");
+					map.put("type", 2);
+					map.put("createTiem", new Date());
+					deviceExceptionService.insertSms(map); // 发送短信记录
+				}else {
+					HashMap<String,Object> map = new HashMap<String,Object>(); 
+					map.put("isOk", 0);
+					map.put("phone", userEntity.getMobile());
+					map.put("content", "您有一条申请延期通过的工单待处理");
+					map.put("type", 2);
+					map.put("createTiem", new Date());
+					deviceExceptionService.insertSms(map); // 发送短信记录
+				}
+				
+			}
+			
 			orderManagement.setProcessingResult(null);
 	    	orderManagement.setDelayTime(null);
 	    	orderManagement.setOrderConfirmer(null);
@@ -231,6 +412,34 @@ public class OrderManagementConfirmController {
 			record.setOrderType(orderManagement.getOrderType());
 			
 			orderRecordService.insert(record);
+			SysUserEntity userEntity = sysUserService.selectById(orderManagement.getOrderAcceptorId());
+			if(!"".equals(userEntity.getMobile())) {
+				
+				JSONObject returnJson = new JSONObject();
+				returnJson.put("news_name", "您有一条申请延期未通过的工单待处理");
+				returnJson.put("news_number", orderManagement.getOrderNumber());
+				
+				String isOk = SendSms.ordersend(userEntity.getMobile(), returnJson);
+				if(isOk.equals("ok")) { // 发送成功
+					HashMap<String,Object> map = new HashMap<String,Object>(); 
+					map.put("isOk", 1);
+					map.put("phone", userEntity.getMobile());
+					map.put("content", "您有一条申请延期未通过的工单待处理");
+					map.put("type", 2);
+					map.put("createTiem", new Date());
+					deviceExceptionService.insertSms(map); // 发送短信记录
+				}else {
+					HashMap<String,Object> map = new HashMap<String,Object>(); 
+					map.put("isOk", 0);
+					map.put("phone", userEntity.getMobile());
+					map.put("content", "您有一条申请延期未通过的工单待处理");
+					map.put("type", 2);
+					map.put("createTiem", new Date());
+					deviceExceptionService.insertSms(map); // 发送短信记录
+				}
+				
+			}
+			
 			orderManagement.setProcessingResult(null);
 	    	orderManagement.setDelayTime(null);
 	    	orderManagement.setOrderConfirmer(null);

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 
 import io.renren.modules.management.entity.OrderDefectiveEntity;
@@ -25,11 +26,15 @@ import io.renren.modules.management.service.OrderManagementService;
 import io.renren.modules.management.service.OrderRecordService;
 import io.renren.modules.sys.entity.NewsEntity;
 import io.renren.modules.sys.entity.SysDeptEntity;
+import io.renren.modules.sys.entity.SysUserEntity;
+import io.renren.modules.sys.service.DeviceExceptionService;
 import io.renren.modules.sys.service.NewsService;
 import io.renren.modules.sys.service.SysDeptService;
+import io.renren.modules.sys.service.SysUserService;
 import io.renren.common.utils.OrderUtils;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
+import io.renren.common.utils.SendSms;
 
 
 
@@ -63,6 +68,12 @@ public class OrderManagementController {
 
 	@Autowired
 	private InspectionResultService inspectionResultService;
+	
+	@Autowired
+	private SysUserService sysUserService;
+	
+	@Autowired
+    private DeviceExceptionService deviceExceptionService;
     /**
      * 列表
      */
@@ -89,9 +100,9 @@ public class OrderManagementController {
         	if(orderManagement.getOrderType() ==0) {
         		orderManagement.setOrderTypeName("填报工单");
         	}else if(orderManagement.getOrderType() ==1) {
-        		orderManagement.setOrderTypeName("缺陷工单");
+        		orderManagement.setOrderTypeName("缺陷填报工单");
         	}else if(orderManagement.getOrderType() ==2) {
-        		orderManagement.setOrderTypeName("巡检缺陷工单");
+        		orderManagement.setOrderTypeName("巡检异常工单");
         	}
         	if(orderManagement.getOrderStatus() ==0) {
         		orderManagement.setOrderStatusName("拟制中");
@@ -207,7 +218,35 @@ public class OrderManagementController {
 
 
 			}
-
+			Integer orderAcceptorId = orderManagement.getOrderAcceptorId();
+			SysUserEntity userEntity = sysUserService.selectById(orderAcceptorId);
+			if(!"".equals(userEntity.getMobile())) {
+				
+				JSONObject returnJson = new JSONObject();
+				returnJson.put("news_name", "您有一条已下发待受理的工单");
+				returnJson.put("news_number", orderManagement.getOrderNumber());
+				
+				String isOk = SendSms.ordersend(userEntity.getMobile(), returnJson);
+				if(isOk.equals("ok")) { //发生成功
+					HashMap<String,Object> map = new HashMap<String,Object>(); 
+					map.put("isOk", 1);
+					map.put("phone", userEntity.getMobile());
+					map.put("content", "您有一条已下发待受理的工单");
+					map.put("type", 2);
+					map.put("createTiem", new Date());
+					deviceExceptionService.insertSms(map); // 发送短信记录
+				}else {
+					HashMap<String,Object> map = new HashMap<String,Object>(); 
+					map.put("isOk", 0);
+					map.put("phone", userEntity.getMobile());
+					map.put("content", "您有一条已下发待受理的工单");
+					map.put("type", 2);
+					map.put("createTiem", new Date());
+					deviceExceptionService.insertSms(map); // 发送短信记录
+				}
+				
+			}
+			
 			OrderRecordEntity record = new OrderRecordEntity();
 			record.setNowTime(new Date()); // 当前时间
 			record.setOrderNumber(orderManagement.getOrderNumber());
@@ -268,7 +307,35 @@ public class OrderManagementController {
 			defectiveEntity.setConfirmedTime(null);
 			defectiveEntity.setRequirementTime(null);
 			orderDefectiveService.updateAllColumnById(defectiveEntity);
-
+			
+			SysUserEntity userEntity = sysUserService.selectById(defectiveEntity.getDefectiveNameId());
+			if(!"".equals(userEntity.getMobile())) {
+				
+				JSONObject returnJson = new JSONObject();
+				returnJson.put("news_name", "您有一条转工单被拒绝的填报缺陷");
+				returnJson.put("news_number", orderManagement.getOrderNumber());
+				
+				String isOk = SendSms.ordersend(userEntity.getMobile(), returnJson);
+				if(isOk.equals("ok")) { //发生成功
+					HashMap<String,Object> map = new HashMap<String,Object>(); 
+					map.put("isOk", 1);
+					map.put("phone", userEntity.getMobile());
+					map.put("content", "您有一条转工单被拒绝的填报缺陷");
+					map.put("type", 2);
+					map.put("createTiem", new Date());
+					deviceExceptionService.insertSms(map); // 发送短信记录
+				}else {
+					HashMap<String,Object> map = new HashMap<String,Object>(); 
+					map.put("isOk", 0);
+					map.put("phone", userEntity.getMobile());
+					map.put("content", "您有一条转工单被拒绝的填报缺陷");
+					map.put("type", 2);
+					map.put("createTiem", new Date());
+					deviceExceptionService.insertSms(map); // 发送短信记录
+				}
+				
+			}
+			
 
 		}else if(orderType ==2){// 巡检缺陷工单
 			// 修改通知
@@ -295,6 +362,34 @@ public class OrderManagementController {
 			inspectionResult.setId(resultId);
 			inspectionResult.setStatus(3);// 被拒绝 
 			inspectionResultService.updateById(inspectionResult);
+			
+			SysUserEntity userEntity = sysUserService.selectById(defectiveEntity.getDefectiveNameId());
+			if(!"".equals(userEntity.getMobile())) {
+				
+				JSONObject returnJson = new JSONObject();
+				returnJson.put("news_name", "您有一条转工单被拒绝的巡检异常缺陷");
+				returnJson.put("news_number", orderManagement.getOrderNumber());
+				
+				String isOk = SendSms.ordersend(userEntity.getMobile(), returnJson);
+				if(isOk.equals("ok")) { //发生成功
+					HashMap<String,Object> map = new HashMap<String,Object>(); 
+					map.put("isOk", 1);
+					map.put("phone", userEntity.getMobile());
+					map.put("content", "您有一条转工单被拒绝的巡检异常缺陷");
+					map.put("type", 2);
+					map.put("createTiem", new Date());
+					deviceExceptionService.insertSms(map); // 发送短信记录
+				}else {
+					HashMap<String,Object> map = new HashMap<String,Object>(); 
+					map.put("isOk", 0);
+					map.put("phone", userEntity.getMobile());
+					map.put("content", "您有一条转工单被拒绝的巡检异常缺陷");
+					map.put("type", 2);
+					map.put("createTiem", new Date());
+					deviceExceptionService.insertSms(map); // 发送短信记录
+				}
+				
+			}
 		}
 		Integer defectiveId = orderManagement.getDefectiveId();
 

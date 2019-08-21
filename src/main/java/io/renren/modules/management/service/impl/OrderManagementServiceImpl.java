@@ -87,7 +87,7 @@ public class OrderManagementServiceImpl extends ServiceImpl<OrderManagementDao, 
 			}
 			Integer orderType = orderManagement.getOrderType();
 			if(orderType == 0){
-        		orderManagement.setOrderTypeName("工单");
+        		orderManagement.setOrderTypeName("填报工单");
 			}else if(orderType ==1){
         		orderManagement.setOrderTypeName("缺陷填报工单");
 			}else if(orderType ==2){

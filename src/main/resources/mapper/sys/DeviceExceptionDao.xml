@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.sys.dao.DeviceExceptionDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.sys.entity.DeviceExceptionEntity" id="deviceExceptionMap">
+        <result property="id" column="id"/>
+        <result property="deviceLevel" column="device_level"/>
+        <result property="deviceLevelName" column="device_level_name"/>
+        <result property="deviceId" column="device_id"/>
+        <result property="deviceName" column="device_name"/>
+        <result property="exceptionIds" column="exception_ids"/>
+        <result property="deviceDept" column="device_dept"/>
+        <result property="deviceSmsType" column="device_sms_type"/>
+        <result property="smsRoleId" column="sms_role_id"/>
+        <result property="smsUserIds" column="sms_user_ids"/>
+        <result property="isOk" column="is_ok"/>
+        <result property="type" column="type"/>
+    </resultMap>
+
+	<select id="findLevelDevice" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+		select
+			d.device_id as id,
+			d.device_name as lable,
+			d.device_code as CODE,
+			'device' as type,
+			d.device_level as levelId,
+		  	e.`name` as levelName,
+			d.device_dept AS deptId
+		from
+			tb_device d
+		  LEFT JOIN tb_device_level e on d.device_level = e.id
+		where
+		d.is_delete = 0 and device_level =#{levelId} and device_dept=#{deptId}
+	</select>
+
+	<select id="findDeviceLeveList" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+		 select distinct 
+			b.device_level as id,
+		  	e.`name` as label,
+		  	b.device_code as code,
+		  	b.device_dept as deptId,
+		  	'level' as type 
+		from 
+		tb_device_level e
+		LEFT JOIN tb_device b on b.device_level = e.id where b.is_delete =0  and b.device_dept = #{deptId}
+		<if test="deviceName !=null">
+            and (b.device_name like '%${deviceName}%' or b.device_code like '%${deviceName}%')
+        </if>
+        GROUP BY b.device_level
+        order by id 
+       
+	</select>
+
+	<select id="findDeviceList" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+        select device_id as id, device_name as lable, device_code as code, 'device' as type from tb_device where is_delete=0 and is_inspect=1 and device_dept = #{deptId}
+        <if test="deviceName !=null">
+            and (device_name like '%${deviceName}%' or device_code like '%${deviceName}%')
+        </if>
+        order by device_id
+    </select>
+	
+	<select id="findDevice" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+		select device_id as id, device_name as lable, device_code as code, 'device' as type from tb_device where is_delete = 0 and device_id =#{deviceId} order by device_id
+	</select>
+	
+	<select id="findDeptUserList" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+	    select user_id as id, username as lable, user_code as code, 'user' as type from sys_user where dept_id = #{deptId} order by user_id
+	</select>
+	
+	<select id="selectByDeptIdLevelId" resultType="io.renren.modules.sys.entity.DeviceExceptionEntity" parameterType="java.util.HashMap">
+		SELECT
+			id,
+			device_level AS deviceLevel,
+			device_level_name AS deviceLevelName,
+		  	device_id AS deviceId,
+		  	device_name AS deviceName,
+		  	exception_ids AS exceptionIds,
+		  	device_dept AS deviceDept,
+		  	device_sms_type AS deviceSmsType,
+		  	sms_role_id AS smsRoleId,
+			sms_user_ids AS smsUserIds,
+		  	is_ok AS isOk,
+		  	type
+		FROM
+			tb_device_exception where device_level = #{levelId} and device_dept = #{deptId} and type='level'
+	</select>
+	
+	<select id="selectByDeptIdLevelIdDeviceId" resultType="io.renren.modules.sys.entity.DeviceExceptionEntity" parameterType="java.util.HashMap">
+		SELECT
+			id,
+			device_level AS deviceLevel,
+			device_level_name AS deviceLevelName,
+		  	device_id AS deviceId,
+		  	device_name AS deviceName,
+		  	exception_ids AS exceptionIds,
+		  	device_dept AS deviceDept,
+		  	device_sms_type AS deviceSmsType,
+		  	sms_role_id AS smsRoleId,
+			sms_user_ids AS smsUserIds,
+		  	is_ok AS isOk,
+		  	type
+		FROM
+			tb_device_exception where device_level = #{levelId} and device_dept = #{deptId} and device_id = #{deviceId} and type='device'
+	</select>
+	
+	<select id="findDeptRoleList" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+	    SELECT r.role_id as roleId,r.role_name as lable, 'code' as code ,'role' as type
+		 FROM sys_user u
+		 LEFT JOIN sys_user_role o on u.user_id = o.user_id
+		 LEFT JOIN sys_role r  on r.role_id = o.role_id
+		 LEFT JOIN sys_dept d on u.dept_id = d.dept_id where u.dept_id = #{deptId} GROUP BY r.role_id order by r.role_id
+	</select>
+	
+	<select id="queryListParentId" resultType="java.util.HashMap" parameterType="java.lang.Long">
+		select dept_id as deptId, name as lable, dept_code as code, 'dept' as type from sys_dept where parent_id = #{parentId} order by order_num asc
+	</select>
+	
+	<select id="findDeptRoleUserList" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+		SELECT
+		  u.user_id AS id,
+		  u.username AS lable,
+		  u.user_code AS CODE,
+		  'user' AS type
+		FROM
+			sys_user u
+		LEFT JOIN sys_user_role o ON u.user_id = o.user_id
+		LEFT JOIN sys_role r ON r.role_id = o.role_id
+		LEFT JOIN sys_dept d ON u.dept_id = d.dept_id
+		WHERE
+			u.dept_id = #{deptId} and r.role_id =#{roleId}  order by r.role_id
+	</select>
+	
+	<select id="changSmsType" resultType="io.renren.modules.sys.entity.DeviceExceptionEntity" parameterType="java.util.HashMap">
+		select * from tb_device_exception where id = #{id} and device_sms_type = #{deviceSmsType}
+	</select>
+	
+	<select id="findDeviceExceptionBydeviceId" resultType="io.renren.modules.sys.entity.DeviceExceptionEntity" parameterType="java.util.HashMap">
+	    select * from tb_device_exception where device_id = #{deviceId} and is_ok = 1
+	</select>
+	
+	<select id="findDeviceExceptionByDeptidDeviceLevel" resultType="io.renren.modules.sys.entity.DeviceExceptionEntity" parameterType="java.util.HashMap">
+		select * from tb_device_exception where device_level = #{deviceLevel} and device_dept = #{deptId} and is_ok = 1
+	</select>
+	
+	<insert id="insertSms" parameterType="java.util.HashMap">
+	    insert into tb_sms(phone, content, is_ok, type, create_time) value(#{phone}, #{content}, #{isOk}, #{type}, #{createTiem} )
+	</insert>
+	
+</mapper>
