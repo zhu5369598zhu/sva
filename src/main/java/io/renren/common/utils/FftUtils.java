@@ -137,7 +137,7 @@ public class FftUtils {
         if(type.equals("acc")){
 
         } else if(type.equals("speed")){
-            k = calculate(k, out.getFs());
+            k = calculate(k, out.getFs()/1000);
         }else if(type.equals("distance")){
             k = calculate(k, out.getFs());
             k = calculate(k, out.getFs()/1000/1000);

@@ -46,7 +46,9 @@ public class LoginUserHandlerMethodArgumentResolver implements HandlerMethodArgu
         SysUserEntity user = userService.selectById((Long)object);
         SysDeptEntity dept = deptService.selectById(user.getDeptId());
 
-        user.setDeptName(dept.getName());
+        if(dept !=null){
+            user.setDeptName(dept.getName());
+        }
 
         return user;
     }

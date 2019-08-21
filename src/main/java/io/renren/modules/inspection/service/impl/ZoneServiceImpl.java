@@ -40,7 +40,9 @@ public class ZoneServiceImpl extends ServiceImpl<ZoneDao, ZoneEntity> implements
 
         for(ZoneEntity zoneEntity : page.getRecords()){
             SysDeptEntity sysDeptEntity = sysDeptService.selectById(zoneEntity.getDeptId());
-            zoneEntity.setDeptName(sysDeptEntity.getName());
+            if(sysDeptEntity !=null){
+                zoneEntity.setDeptName(sysDeptEntity.getName());
+            }
         }
 
         return new PageUtils(page);

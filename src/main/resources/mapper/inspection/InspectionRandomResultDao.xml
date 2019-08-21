@@ -25,7 +25,7 @@
 
     <select id="selectResultList" resultType="io.renren.modules.inspection.entity.InspectionRandomResultEntity" parameterType="io.renren.modules.inspection.entity.InspectionRandomResultEntity">
         select r.id, r.factory, r.dept, r.workshop, r.device_name, r.device_code, r.name, t.id as inspection_type_id, t.name as inspection_type,
-        r.result, t.unit, u.username, r.start_time, r.end_time, r.remark, r.create_time
+        r.result, t.unit, u.username, DATE_FORMAT(r.start_time,'%Y-%m-%d %H:%i:%S')as start_time, DATE_FORMAT(r.end_time,'%Y-%m-%d %H:%i:%S')as end_time, r.remark, r.create_time
         from
         `tb_inspection_random_result` r
         left join `sys_user` u on u.user_id = r.user_id
@@ -58,6 +58,7 @@
         <if test="endTime!=null">
             and r.end_time &lt;= CONCAT(#{endTime},' 23:59:59')
         </if>
+         order by r.create_time desc
     </select>
 
     <select id="selectByGuid" resultType="io.renren.modules.inspection.entity.InspectionRandomResultEntity">

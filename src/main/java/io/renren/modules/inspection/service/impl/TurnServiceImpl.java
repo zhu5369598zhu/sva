@@ -1,18 +1,16 @@
 package io.renren.modules.inspection.service.impl;
 
 import io.renren.common.utils.MapUtils;
+import io.renren.common.utils.R;
 import io.renren.modules.inspection.entity.ClassGroupEntity;
 import io.renren.modules.inspection.entity.InspectionLineEntity;
-import io.renren.modules.inspection.service.ClassGroupService;
-import io.renren.modules.inspection.service.InspectionLineService;
-import io.renren.modules.inspection.service.TurnClassGroupService;
+import io.renren.modules.inspection.entity.PeriodTurnEntity;
+import io.renren.modules.inspection.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
@@ -21,7 +19,6 @@ import io.renren.common.utils.Query;
 
 import io.renren.modules.inspection.dao.TurnDao;
 import io.renren.modules.inspection.entity.TurnEntity;
-import io.renren.modules.inspection.service.TurnService;
 import org.springframework.transaction.annotation.Transactional;
 
 
@@ -33,6 +30,7 @@ public class TurnServiceImpl extends ServiceImpl<TurnDao, TurnEntity> implements
     private ClassGroupService classGroupService;
     @Autowired
     private TurnClassGroupService turnClassGroupService;
+
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {

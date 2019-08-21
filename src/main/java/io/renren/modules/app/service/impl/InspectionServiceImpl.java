@@ -174,13 +174,17 @@ public class InspectionServiceImpl extends ServiceImpl<InspectionLineDao, Inspec
                             itemJson.put("emissivity", itemEntity.getEmissivity());
                             if(itemEntity.getFrequency() != null){
                                 SamplingFrequencyEntity frequencyEntity = frequencyService.selectById(itemEntity.getFrequency());
-                                itemJson.put("frequency", frequencyEntity.getName());
+                                if(frequencyEntity != null){
+                                    itemJson.put("frequency", frequencyEntity.getName());
+                                }
                             }else{
                                 itemJson.put("frequency", itemEntity.getFrequency());
                             }
-                            if(itemEntity.getFrequency() != null){
+                            if(itemEntity.getPrecision() != null){
                                 SamplingPrecisionEntity precisionEntity = precisionService.selectById(itemEntity.getPrecision());
-                                itemJson.put("precision", precisionEntity.getName());
+                                if(precisionEntity !=null){
+                                    itemJson.put("precision", precisionEntity.getName());
+                                }
                             }else{
                                 itemJson.put("precision", itemEntity.getPrecision());
                             }
@@ -196,7 +200,7 @@ public class InspectionServiceImpl extends ServiceImpl<InspectionLineDao, Inspec
                             itemJson.put("down_limit", itemEntity.getDownLimit());
                             itemJson.put("down_used",itemEntity.getDownUsed());
                             itemJson.put("downdown_limit", itemEntity.getDowndownLimit());
-                            itemJson.put("downdown_used",itemEntity.getDownUsed());
+                            itemJson.put("downdown_used",itemEntity.getDowndownUsed());
                             itemJson.put("device_guid", deviceEntity.getGuid());
 
                             //抄表的单位特殊处理
@@ -264,10 +268,12 @@ public class InspectionServiceImpl extends ServiceImpl<InspectionLineDao, Inspec
                 List<PeriodTurnEntity> periodTurnEntities = periodTurnService.selectByMap(periodTurnParams);
                 for(PeriodTurnEntity periodTurnEntity: periodTurnEntities){
                     TurnEntity turnEntity = turnService.selectById(periodTurnEntity.getTurnId());
-                    Map<String,Object> periodTurnJson = new HashMap<>();
-                    periodTurnJson.put("turn_guid",turnEntity.getGuid());
-                    periodTurnJson.put("period_guid", periodEntity.getGuid());
-                    periodTurnList.add(periodTurnJson);
+                    if(turnEntity !=null){
+                        Map<String,Object> periodTurnJson = new HashMap<>();
+                        periodTurnJson.put("turn_guid",turnEntity.getGuid());
+                        periodTurnJson.put("period_guid", periodEntity.getGuid());
+                        periodTurnList.add(periodTurnJson);
+                    }
                 }
             }
 
