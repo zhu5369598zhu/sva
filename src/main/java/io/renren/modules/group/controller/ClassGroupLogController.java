@@ -1,26 +1,38 @@
 package io.renren.modules.group.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import io.renren.modules.sys.entity.SysDeptEntity;
+import io.renren.modules.sys.entity.SysUserEntity;
+import io.renren.modules.sys.service.SysDeptService;
+import io.renren.modules.sys.service.SysUserService;
+
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import io.renren.common.utils.OrderUtils;
-import io.renren.common.utils.PageUtils;
-import io.renren.common.utils.R;
 import io.renren.modules.group.entity.ClassGroupLogEntity;
 import io.renren.modules.group.service.ClassGroupLogService;
 import io.renren.modules.setting.entity.BaseTurnEntity;
 import io.renren.modules.setting.service.BaseTurnService;
 import io.renren.modules.sys.entity.NewsEntity;
-import io.renren.modules.sys.entity.SysDeptEntity;
+import io.renren.modules.sys.service.DeviceExceptionService;
 import io.renren.modules.sys.service.NewsService;
-import io.renren.modules.sys.service.SysDeptService;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import io.renren.common.utils.OrderUtils;
+import io.renren.common.utils.PageUtils;
+import io.renren.common.utils.R;
+import io.renren.common.utils.SendSms;
 
 
 
@@ -43,9 +55,14 @@ public class ClassGroupLogController {
     @Autowired
     private SysDeptService sysDeptService;
 
-    
     @Autowired
     private BaseTurnService baseTurnService;
+    
+    @Autowired
+	private SysUserService sysUserService;
+	
+	@Autowired
+    private DeviceExceptionService deviceExceptionService;
 
     /**
      * 列表
@@ -97,6 +114,36 @@ public class ClassGroupLogController {
     		newEntity.setUpdateTime(new Date());
     		newEntity.setCreateTime(new Date());
     		newsService.insert(newEntity);
+    		
+    		SysUserEntity userEntity = sysUserService.selectById(classGroupLog.getSuccessorId());
+    		if(!"".equals(userEntity.getMobile())) {
+    			
+    			JSONObject returnJson = new JSONObject();
+    			returnJson.put("news_name", "您有一条待确认班长日志");
+    			returnJson.put("news_number", classGroupLog.getLogNumber());
+    			
+    			String isOk = SendSms.ordersend(userEntity.getMobile(), returnJson);
+    			if(isOk.equals("ok")) { //发生成功
+    				HashMap<String,Object> map = new HashMap<String,Object>(); 
+    				map.put("isOk", 1);
+    				map.put("phone", userEntity.getMobile());
+    				map.put("content", "您有一条待确认班长日志");
+    				map.put("type", 3);
+    				map.put("createTiem", new Date());
+    				deviceExceptionService.insertSms(map); // 发送短信记录
+    			}else {
+    				HashMap<String,Object> map = new HashMap<String,Object>(); 
+    				map.put("isOk", 0);
+    				map.put("phone", userEntity.getMobile());
+    				map.put("content", "您有一条待确认班长日志");
+    				map.put("type", 3);
+    				map.put("createTiem", new Date());
+    				deviceExceptionService.insertSms(map); // 发送短信记录
+    			}
+    			
+    		}
+    		
+    		
     	}	
 		if(classGroupLog.getLogType().equals("2") && classGroupLog.getLogStatus().equals("2")) { // 班前日志
 			String teamMembersIds = classGroupLog.getTeamMembersIds();
@@ -110,6 +157,34 @@ public class ClassGroupLogController {
 	    		newEntity.setUpdateTime(new Date());
 	    		newEntity.setCreateTime(new Date());
 	    		newsService.insert(newEntity);
+	    		
+	    		SysUserEntity userEntity = sysUserService.selectById(Integer.parseInt(user_id));
+	    		if(!"".equals(userEntity.getMobile())) {
+	    			
+	    			JSONObject returnJson = new JSONObject();
+	    			returnJson.put("news_name", "您有一条待确认班前日志");
+	    			returnJson.put("news_number", classGroupLog.getLogNumber());
+	    			
+	    			String isOk = SendSms.ordersend(userEntity.getMobile(), returnJson);
+	    			if(isOk.equals("ok")) { //发生成功
+	    				HashMap<String,Object> map = new HashMap<String,Object>(); 
+	    				map.put("isOk", 1);
+	    				map.put("phone", userEntity.getMobile());
+	    				map.put("content", "您有一条待确认班前日志");
+	    				map.put("type", 3);
+	    				map.put("createTiem", new Date());
+	    				deviceExceptionService.insertSms(map); // 发送短信记录
+	    			}else {
+	    				HashMap<String,Object> map = new HashMap<String,Object>(); 
+	    				map.put("isOk", 0);
+	    				map.put("phone", userEntity.getMobile());
+	    				map.put("content", "您有一条待确认班前日志");
+	    				map.put("type", 3);
+	    				map.put("createTiem", new Date());
+	    				deviceExceptionService.insertSms(map); // 发送短信记录
+	    			}
+	    			
+	    		}
 			}
 		} 
 		if(classGroupLog.getLogType().equals("3") && classGroupLog.getLogStatus().equals("2")) {  // 班后日志
@@ -124,6 +199,34 @@ public class ClassGroupLogController {
 	    		newEntity.setUpdateTime(new Date());
 	    		newEntity.setCreateTime(new Date());
 	    		newsService.insert(newEntity);
+	    		
+	    		SysUserEntity userEntity = sysUserService.selectById(Integer.parseInt(user_id));
+	    		if(!"".equals(userEntity.getMobile())) {
+	    			
+	    			JSONObject returnJson = new JSONObject();
+	    			returnJson.put("news_name", "您有一条待确认班后日志");
+	    			returnJson.put("news_number", classGroupLog.getLogNumber());
+	    			
+	    			String isOk = SendSms.ordersend(userEntity.getMobile(), returnJson);
+	    			if(isOk.equals("ok")) { //发生成功
+	    				HashMap<String,Object> map = new HashMap<String,Object>(); 
+	    				map.put("isOk", 1);
+	    				map.put("phone", userEntity.getMobile());
+	    				map.put("content", "您有一条待确认班后日志");
+	    				map.put("type", 3);
+	    				map.put("createTiem", new Date());
+	    				deviceExceptionService.insertSms(map); // 发送短信记录
+	    			}else {
+	    				HashMap<String,Object> map = new HashMap<String,Object>(); 
+	    				map.put("isOk", 0);
+	    				map.put("phone", userEntity.getMobile());
+	    				map.put("content", "您有一条待确认班后日志");
+	    				map.put("type", 3);
+	    				map.put("createTiem", new Date());
+	    				deviceExceptionService.insertSms(map); // 发送短信记录
+	    			}
+	    			
+	    		}
 			}
 		}
 		
@@ -151,6 +254,35 @@ public class ClassGroupLogController {
 				newEntity.setUpdateTime(new Date());
 				newEntity.setCreateTime(new Date());
 				newsService.insert(newEntity);
+				
+				SysUserEntity userEntity = sysUserService.selectById(classGroupLog.getSuccessorId());
+	    		if(!"".equals(userEntity.getMobile())) {
+	    			
+	    			JSONObject returnJson = new JSONObject();
+	    			returnJson.put("news_name", "您有一条待确认班长日志");
+	    			returnJson.put("news_number", classGroupLog.getLogNumber());
+	    			
+	    			String isOk = SendSms.ordersend(userEntity.getMobile(), returnJson);
+	    			if(isOk.equals("ok")) { //发生成功
+	    				HashMap<String,Object> map = new HashMap<String,Object>(); 
+	    				map.put("isOk", 1);
+	    				map.put("phone", userEntity.getMobile());
+	    				map.put("content", "您有一条待确认班长日志");
+	    				map.put("type", 3);
+	    				map.put("createTiem", new Date());
+	    				deviceExceptionService.insertSms(map); // 发送短信记录
+	    			}else {
+	    				HashMap<String,Object> map = new HashMap<String,Object>(); 
+	    				map.put("isOk", 0);
+	    				map.put("phone", userEntity.getMobile());
+	    				map.put("content", "您有一条待确认班长日志");
+	    				map.put("type", 3);
+	    				map.put("createTiem", new Date());
+	    				deviceExceptionService.insertSms(map); // 发送短信记录
+	    			}
+	    			
+	    		}
+				
 			}
 		}else if(classGroupLog.getLogType().equals("2")&& classGroupLog.getLogStatus().equals("2")) { // 班前日志
 			// 之前没有通知记录，处于 拟制状态 改为 待处理状态
@@ -168,6 +300,34 @@ public class ClassGroupLogController {
 					newEntity.setUpdateTime(new Date());
 					newEntity.setCreateTime(new Date());
 					newsService.insert(newEntity);
+					
+					SysUserEntity userEntity = sysUserService.selectById(Integer.parseInt(user_id));
+		    		if(!"".equals(userEntity.getMobile())) {
+		    			
+		    			JSONObject returnJson = new JSONObject();
+		    			returnJson.put("news_name", "您有一条待确认班前日志");
+		    			returnJson.put("news_number", classGroupLog.getLogNumber());
+		    			
+		    			String isOk = SendSms.ordersend(userEntity.getMobile(), returnJson);
+		    			if(isOk.equals("ok")) { //发生成功
+		    				HashMap<String,Object> map = new HashMap<String,Object>(); 
+		    				map.put("isOk", 1);
+		    				map.put("phone", userEntity.getMobile());
+		    				map.put("content", "您有一条待确认班前日志");
+		    				map.put("type", 3);
+		    				map.put("createTiem", new Date());
+		    				deviceExceptionService.insertSms(map); // 发送短信记录
+		    			}else {
+		    				HashMap<String,Object> map = new HashMap<String,Object>(); 
+		    				map.put("isOk", 0);
+		    				map.put("phone", userEntity.getMobile());
+		    				map.put("content", "您有一条待确认班前日志");
+		    				map.put("type", 3);
+		    				map.put("createTiem", new Date());
+		    				deviceExceptionService.insertSms(map); // 发送短信记录
+		    			}
+		    			
+		    		}
 				}
 			}
     	}else if(classGroupLog.getLogType().equals("3")&& classGroupLog.getLogStatus().equals("2")) {// 班后日志
@@ -185,6 +345,34 @@ public class ClassGroupLogController {
 					newEntity.setUpdateTime(new Date());
 					newEntity.setCreateTime(new Date());
 					newsService.insert(newEntity);
+					
+					SysUserEntity userEntity = sysUserService.selectById(Integer.parseInt(user_id));
+		    		if(!"".equals(userEntity.getMobile())) {
+		    			
+		    			JSONObject returnJson = new JSONObject();
+		    			returnJson.put("news_name", "您有一条待确认班后日志");
+		    			returnJson.put("news_number", classGroupLog.getLogNumber());
+		    			
+		    			String isOk = SendSms.ordersend(userEntity.getMobile(), returnJson);
+		    			if(isOk.equals("ok")) { //发生成功
+		    				HashMap<String,Object> map = new HashMap<String,Object>(); 
+		    				map.put("isOk", 1);
+		    				map.put("phone", userEntity.getMobile());
+		    				map.put("content", "您有一条待确认班后日志");
+		    				map.put("type", 3);
+		    				map.put("createTiem", new Date());
+		    				deviceExceptionService.insertSms(map); // 发送短信记录
+		    			}else {
+		    				HashMap<String,Object> map = new HashMap<String,Object>(); 
+		    				map.put("isOk", 0);
+		    				map.put("phone", userEntity.getMobile());
+		    				map.put("content", "您有一条待确认班后日志");
+		    				map.put("type", 3);
+		    				map.put("createTiem", new Date());
+		    				deviceExceptionService.insertSms(map); // 发送短信记录
+		    			}
+		    			
+		    		}
 				}
 			}
     	}	

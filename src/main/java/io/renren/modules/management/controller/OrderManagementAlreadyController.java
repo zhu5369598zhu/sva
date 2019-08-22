@@ -6,7 +6,10 @@ import java.util.*;
 import io.renren.modules.setting.entity.OrderExceptionEntity;
 import io.renren.modules.setting.service.OrderExceptionService;
 import io.renren.modules.sys.entity.SysDeptEntity;
+import io.renren.modules.sys.entity.SysUserEntity;
 import io.renren.modules.sys.service.SysDeptService;
+import io.renren.modules.sys.service.SysUserService;
+
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 
 import io.renren.modules.management.entity.OrderManagementEntity;
@@ -22,10 +26,12 @@ import io.renren.modules.management.entity.OrderRecordEntity;
 import io.renren.modules.management.service.OrderManagementAlreadyService;
 import io.renren.modules.management.service.OrderRecordService;
 import io.renren.modules.sys.entity.NewsEntity;
+import io.renren.modules.sys.service.DeviceExceptionService;
 import io.renren.modules.sys.service.NewsService;
 import io.renren.common.utils.OrderUtils;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
+import io.renren.common.utils.SendSms;
 
 
 
@@ -54,6 +60,12 @@ public class OrderManagementAlreadyController {
 
     @Autowired
     private SysDeptService sysDeptService;
+    
+    @Autowired
+	private SysUserService sysUserService;
+	
+	@Autowired
+    private DeviceExceptionService deviceExceptionService;
 
     /**
      * 列表
@@ -170,6 +182,33 @@ public class OrderManagementAlreadyController {
 			record.setOrderPeopleId(2);// 受理人
 			record.setOrderType(orderManagement.getOrderType());
 			orderRecordService.insert(record);
+			SysUserEntity userEntity = sysUserService.selectById(orderManagement.getOrderApplicantId());
+			if(!"".equals(userEntity.getMobile())) {
+				
+				JSONObject returnJson = new JSONObject();
+				returnJson.put("news_name", "您有一条已下发待受理的工单被拒绝");
+				returnJson.put("news_number", orderManagement.getOrderNumber());
+				
+				String isOk = SendSms.ordersend(userEntity.getMobile(), returnJson);
+				if(isOk.equals("ok")) { // 发送成功
+					HashMap<String,Object> map = new HashMap<String,Object>(); 
+					map.put("isOk", 1);
+					map.put("phone", userEntity.getMobile());
+					map.put("content", "您有一条已下发待受理的工单被拒绝");
+					map.put("type", 2);
+					map.put("createTiem", new Date());
+					deviceExceptionService.insertSms(map); // 发送短信记录
+				}else {
+					HashMap<String,Object> map = new HashMap<String,Object>(); 
+					map.put("isOk", 0);
+					map.put("phone", userEntity.getMobile());
+					map.put("content", "您有一条已下发待受理的工单被拒绝");
+					map.put("type", 2);
+					map.put("createTiem", new Date());
+					deviceExceptionService.insertSms(map); // 发送短信记录
+				}
+				
+			}
     		
     		
     	}else if(orderStatus ==2) { // 同意
@@ -190,6 +229,32 @@ public class OrderManagementAlreadyController {
 			record.setOrderPeopleId(2);// 受理人
 			record.setOrderType(orderManagement.getOrderType());
 			orderRecordService.insert(record);
+			SysUserEntity userEntity = sysUserService.selectById(orderManagement.getOrderAcceptorId());
+			if(!"".equals(userEntity.getMobile())) {
+				
+				JSONObject returnJson = new JSONObject();
+				returnJson.put("news_name", "您有一条已受理待上报的工单");
+				returnJson.put("news_number", orderManagement.getOrderNumber());
+				
+				String isOk = SendSms.ordersend(userEntity.getMobile(), returnJson);
+				if(isOk.equals("ok")) { // 发送成功
+					HashMap<String,Object> map = new HashMap<String,Object>(); 
+					map.put("isOk", 1);
+					map.put("phone", userEntity.getMobile());
+					map.put("content", "您有一条已受理待上报的工单");
+					map.put("type", 2);
+					map.put("createTiem", new Date());
+					deviceExceptionService.insertSms(map); // 发送短信记录
+				}else {
+					HashMap<String,Object> map = new HashMap<String,Object>(); 
+					map.put("isOk", 0);
+					map.put("phone", userEntity.getMobile());
+					map.put("content", "您有一条已受理待上报的工单");
+					map.put("type", 2);
+					map.put("createTiem", new Date());
+					deviceExceptionService.insertSms(map); // 发送短信记录
+				}
+			}
     	}
     	
     	
