@@ -33,6 +33,7 @@ import io.renren.common.utils.OrderUtils;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.common.utils.SendSms;
+import io.renren.common.utils.TestMessage;
 
 
 
@@ -142,7 +143,10 @@ public class ClassGroupLogController {
     			}
     			
     		}
-    		
+    		String wechat = userEntity.getWechat();
+    		if(!"".equals(wechat)) { 
+    			TestMessage.ordersend(wechat, "您有一条待确认班长日志", classGroupLog.getLogNumber()); 
+    		}
     		
     	}	
 		if(classGroupLog.getLogType().equals("2") && classGroupLog.getLogStatus().equals("2")) { // 班前日志
@@ -185,6 +189,10 @@ public class ClassGroupLogController {
 	    			}
 	    			
 	    		}
+	    		String wechat = userEntity.getWechat();
+	    		if(!"".equals(wechat)) { 
+	    			TestMessage.ordersend(wechat, "您有一条待确认班前日志", classGroupLog.getLogNumber()); 
+	    		}
 			}
 		} 
 		if(classGroupLog.getLogType().equals("3") && classGroupLog.getLogStatus().equals("2")) {  // 班后日志
@@ -226,6 +234,10 @@ public class ClassGroupLogController {
 	    				deviceExceptionService.insertSms(map); // 发送短信记录
 	    			}
 	    			
+	    		}
+	    		String wechat = userEntity.getWechat();
+	    		if(!"".equals(wechat)) { 
+	    			TestMessage.ordersend(wechat, "您有一条待确认班后日志", classGroupLog.getLogNumber()); 
 	    		}
 			}
 		}
@@ -282,6 +294,10 @@ public class ClassGroupLogController {
 	    			}
 	    			
 	    		}
+	    		String wechat = userEntity.getWechat();
+	    		if(!"".equals(wechat)) { 
+	    			TestMessage.ordersend(wechat, "您有一条待确认班长日志", classGroupLog.getLogNumber()); 
+	    		}
 				
 			}
 		}else if(classGroupLog.getLogType().equals("2")&& classGroupLog.getLogStatus().equals("2")) { // 班前日志
@@ -328,6 +344,11 @@ public class ClassGroupLogController {
 		    			}
 		    			
 		    		}
+		    		String wechat = userEntity.getWechat();
+		    		if(!"".equals(wechat)) { 
+		    			TestMessage.ordersend(wechat, "您有一条待确认班前日志", classGroupLog.getLogNumber()); 
+		    		}
+		    		
 				}
 			}
     	}else if(classGroupLog.getLogType().equals("3")&& classGroupLog.getLogStatus().equals("2")) {// 班后日志
@@ -372,6 +393,10 @@ public class ClassGroupLogController {
 		    				deviceExceptionService.insertSms(map); // 发送短信记录
 		    			}
 		    			
+		    		}
+		    		String wechat = userEntity.getWechat();
+		    		if(!"".equals(wechat)) { 
+		    			TestMessage.ordersend(wechat, "您有一条待确认班后日志", classGroupLog.getLogNumber()); 
 		    		}
 				}
 			}

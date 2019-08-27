@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.common.utils.SendSms;
+import io.renren.common.utils.TestMessage;
 import io.renren.modules.group.entity.ClassGroupLogEntity;
 import io.renren.modules.group.service.ClassGroupLogRejectService;
 import io.renren.modules.sys.entity.NewsEntity;
@@ -137,6 +138,10 @@ public class ClassGroupLogRejectController {
     			}
     			
     		}
+    		String wechat = userEntity.getWechat();
+    		if(!"".equals(wechat)) { 
+    			TestMessage.ordersend(wechat, "您有一条待确认班长日志", classGroupLog.getLogNumber()); 
+    		}
     		
     	}else if(classGroupLog.getLogType().equals("2")) { // 班前日志 （ 可能 修改 班组成员的情况）
     		
@@ -213,6 +218,10 @@ public class ClassGroupLogRejectController {
         	    			}
         	    			
         	    		}
+        	    		String wechat = userEntity.getWechat();
+        	    		if(!"".equals(wechat)) { 
+        	    			TestMessage.ordersend(wechat, "您有一条待确认班前日志", classGroupLog.getLogNumber()); 
+        	    		}
         			}
         			
         		}
@@ -251,6 +260,10 @@ public class ClassGroupLogRejectController {
     	    				deviceExceptionService.insertSms(hashmap); // 发送短信记录
     	    			}
     	    			
+    	    		}
+    	    		String wechat = userEntity.getWechat();
+    	    		if(!"".equals(wechat)) { 
+    	    			TestMessage.ordersend(wechat, "您有一条待确认班前日志", classGroupLog.getLogNumber()); 
     	    		}
     			}
     		}
@@ -327,6 +340,10 @@ public class ClassGroupLogRejectController {
         	    			}
         	    			
         	    		}
+        	    		String wechat = userEntity.getWechat();
+        	    		if(!"".equals(wechat)) { 
+        	    			TestMessage.ordersend(wechat, "您有一条待确认班后日志", classGroupLog.getLogNumber()); 
+        	    		}
         			}
         			
         		}
@@ -365,6 +382,10 @@ public class ClassGroupLogRejectController {
     	    				deviceExceptionService.insertSms(hashmap); // 发送短信记录
     	    			}
     	    			
+    	    		}
+    	    		String wechat = userEntity.getWechat();
+    	    		if(!"".equals(wechat)) { 
+    	    			TestMessage.ordersend(wechat, "您有一条待确认班后日志", classGroupLog.getLogNumber()); 
     	    		}
     			}
     		}

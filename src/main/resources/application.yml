@@ -4,7 +4,7 @@ server:
     uri-encoding: UTF-8
     max-threads: 1000
     min-spare-threads: 30
-  port: 9000
+  port: 8080
   connection-timeout: 5000ms
   servlet:
     context-path: /sva
@@ -13,7 +13,7 @@ server:
 spring:
   # 环境 dev|test|prod
   profiles:
-    active: prod
+    active: dev
   # jackson时间格式化
   jackson:
     time-zone: GMT+8
@@ -87,3 +87,14 @@ renren:
 
 company:
   userName: "WQ"
+  accessKeySecret: 2uLQpuedE2BZPKR2kuB3kf0SDTjDsV
+  accessKeyId: LTAI1jFQEmsk61wR
+  SignName: 北京国能华控科技有限公司
+  TemplateDeviceCode: SMS_172603667
+  TemplateOrderCode: SMS_172603704
+  corpId: "ww4a9ff8a5d1318da2"
+  corpsecret: "KuZk4I5HT5dCxHvqm1FkHJwQjfkCyRbh_X6S2Ny5ZZQ"
+  agentid: "1000005"
+  
+  
+  

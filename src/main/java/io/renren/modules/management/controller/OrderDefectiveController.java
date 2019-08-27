@@ -35,6 +35,7 @@ import io.renren.common.utils.OrderUtils;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.common.utils.SendSms;
+import io.renren.common.utils.TestMessage;
 
 
 
@@ -238,7 +239,10 @@ public class OrderDefectiveController {
 			}
 			
 		}
-		
+		String wechat = userEntity.getWechat();
+		if(!"".equals(wechat)) { 
+			TestMessage.ordersend(wechat, "您有一条已转单待确认的工单", orderNumber); 
+		}
 		
     	return R.ok();
     }

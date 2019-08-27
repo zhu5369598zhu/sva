@@ -34,6 +34,7 @@ import io.renren.common.utils.OrderUtils;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.common.utils.SendSms;
+import io.renren.common.utils.TestMessage;
 
 
 
@@ -204,7 +205,10 @@ public class OrderManagementReportedController {
 					deviceExceptionService.insertSms(map); // 发送短信记录
 				}
 			}
-				
+			String wechat = userEntity.getWechat();
+			if(!"".equals(wechat)) { 
+				TestMessage.ordersend(wechat, "您有一条已上报待审核的工单", orderManagement.getOrderNumber()); 
+			}	
 				
 			
     	}else {
@@ -251,6 +255,10 @@ public class OrderManagementReportedController {
 					map.put("createTiem", new Date());
 					deviceExceptionService.insertSms(map); // 发送短信记录
 				}
+			}
+			String wechat = userEntity.getWechat();
+			if(!"".equals(wechat)) { 
+				TestMessage.ordersend(wechat, "您有一条受理申请延期的工单待处理", orderManagement.getOrderNumber()); 
 			}
             
     	}
