@@ -3,6 +3,12 @@ package io.renren.modules.inspection.dao;
 import io.renren.modules.inspection.entity.InspectionTaskEntity;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -13,5 +19,6 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface InspectionTaskDao extends BaseMapper<InspectionTaskEntity> {
+    List<Map<String,Object>> selectByDate(@Param("inspectDate") String inspectionDate);
 	
 }

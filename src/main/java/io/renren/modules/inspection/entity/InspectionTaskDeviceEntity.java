@@ -25,11 +25,11 @@ public class InspectionTaskDeviceEntity implements Serializable {
 	/**
 	 * 线路id
 	 */
-	private Integer lineId;
+	private Long lineId;
 	/**
 	 * 轮次id
 	 */
-	private Integer turnId;
+	private Long turnId;
 	/**
 	 * 设备id
 	 */
@@ -45,7 +45,12 @@ public class InspectionTaskDeviceEntity implements Serializable {
 	/**
 	 * 巡检日期
 	 */
-	private Integer inspectionDate;
+	private Date inspectionDate;
+	/**
+	 * 是否更新
+	 */
+	private Integer isUpdate;
+
 
 	/**
 	 * 设置：自增id
@@ -62,25 +67,25 @@ public class InspectionTaskDeviceEntity implements Serializable {
 	/**
 	 * 设置：线路id
 	 */
-	public void setLineId(Integer lineId) {
+	public void setLineId(Long lineId) {
 		this.lineId = lineId;
 	}
 	/**
 	 * 获取：线路id
 	 */
-	public Integer getLineId() {
+	public Long getLineId() {
 		return lineId;
 	}
 	/**
 	 * 设置：轮次id
 	 */
-	public void setTurnId(Integer turnId) {
+	public void setTurnId(Long turnId) {
 		this.turnId = turnId;
 	}
 	/**
 	 * 获取：轮次id
 	 */
-	public Integer getTurnId() {
+	public Long getTurnId() {
 		return turnId;
 	}
 	/**
@@ -122,13 +127,25 @@ public class InspectionTaskDeviceEntity implements Serializable {
 	/**
 	 * 设置：巡检日期
 	 */
-	public void setInspectionDate(Integer inspectionDate) {
+	public void setInspectionDate(Date inspectionDate) {
 		this.inspectionDate = inspectionDate;
 	}
 	/**
 	 * 获取：巡检日期
 	 */
-	public Integer getInspectionDate() {
+	public Date getInspectionDate() {
 		return inspectionDate;
+	}
+	/**
+	 * 设置：是否更新
+	 */
+	public void setIsUpdate(Integer isUpdate) {
+		this.isUpdate = isUpdate;
+	}
+	/**
+	 * 获取：是否更新
+	 */
+	public Integer getIsUpdate() {
+		return isUpdate;
 	}
 }

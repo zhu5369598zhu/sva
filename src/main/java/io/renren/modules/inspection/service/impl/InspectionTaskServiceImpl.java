@@ -1,6 +1,9 @@
 package io.renren.modules.inspection.service.impl;
 
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
@@ -24,6 +27,11 @@ public class InspectionTaskServiceImpl extends ServiceImpl<InspectionTaskDao, In
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public List<Map<String,Object>> selectByDate(String inspectionDate){
+        return baseMapper.selectByDate(inspectionDate);
     }
 
 }
