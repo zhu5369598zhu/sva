@@ -1,6 +1,12 @@
 package io.renren.modules.inspection.service.impl;
 
-import io.renren.modules.inspection.entity.InspectionLineEntity;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.plugins.Page;
+import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import io.renren.common.utils.PageUtils;
+import io.renren.common.utils.Query;
+import io.renren.modules.inspection.dao.DeviceDao;
+import io.renren.modules.inspection.entity.DeviceEntity;
 import io.renren.modules.inspection.entity.ZoneDeviceEntity;
 import io.renren.modules.inspection.entity.ZoneEntity;
 import io.renren.modules.inspection.service.*;
@@ -14,17 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.Serializable;
 import java.util.*;
-
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.plugins.Page;
-import com.baomidou.mybatisplus.service.impl.ServiceImpl;
-import io.renren.common.utils.PageUtils;
-import io.renren.common.utils.Query;
-
-import io.renren.modules.inspection.dao.DeviceDao;
-import io.renren.modules.inspection.entity.DeviceEntity;
 
 
 @Service("deviceService")
@@ -58,13 +54,20 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DeviceEntity> impl
         if (filterkey.equals("deviceCode")) {
             filterfield = "device_code";
         }
+        Integer[] array = null;
+        if(!deptId.equals("")){
+            List<Integer> deptIds = deptService.queryRecursiveChildByParentId(Long.parseLong(deptId));
+            Integer[] deptIdsIn = new Integer[deptIds.size()];
+            array = deptIds.toArray(deptIdsIn);
+        }
         String key = (String)params.get("key");
 
         Page<DeviceEntity> page = this.selectPage(
                 new Query<DeviceEntity>(params).getPage(),
                 new EntityWrapper<DeviceEntity>()
                         .like(StringUtils.isNotBlank(key),filterfield, key)
-                        .eq( deptId != null , "device_dept", deptId)
+                        // .eq( deptId != null , "device_dept", deptId)
+                        .in(array !=null,"device_dept",array)
                         .eq("is_delete",0)
         );
 
