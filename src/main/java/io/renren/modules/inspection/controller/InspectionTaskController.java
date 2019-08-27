@@ -1,6 +1,9 @@
 package io.renren.modules.inspection.controller;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -42,6 +45,15 @@ public class InspectionTaskController {
         return R.ok().put("page", page);
     }
 
+    /**
+     * 获取完成率
+     */
+    @RequestMapping("/getStatus")
+    public R getstatus(String date){
+        List<Map<String,Object>> statusList = inspectionTaskService.selectByDate(date);
+
+        return R.ok().put("status", statusList);
+    }
 
     /**
      * 信息

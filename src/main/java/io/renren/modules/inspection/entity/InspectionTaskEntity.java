@@ -29,7 +29,7 @@ public class InspectionTaskEntity implements Serializable {
 	/**
 	 * 轮次id
 	 */
-	private Integer turnId;
+	private Long turnId;
 	/**
 	 * 应检设备数
 	 */
@@ -51,9 +51,9 @@ public class InspectionTaskEntity implements Serializable {
 	 */
 	private Integer isInspected;
 	/**
-	 * 巡检跨度开始时间
+	 * 是否跨度
 	 */
-	private Date inspectionSpanStartDate;
+	private Integer isSpan;
 	/**
 	 * 巡检跨度结束时间
 	 */
@@ -85,13 +85,13 @@ public class InspectionTaskEntity implements Serializable {
 	/**
 	 * 设置：轮次id
 	 */
-	public void setTurnId(Integer turnId) {
+	public void setTurnId(Long turnId) {
 		this.turnId = turnId;
 	}
 	/**
 	 * 获取：轮次id
 	 */
-	public Integer getTurnId() {
+	public Long getTurnId() {
 		return turnId;
 	}
 	/**
@@ -155,16 +155,16 @@ public class InspectionTaskEntity implements Serializable {
 		return isInspected;
 	}
 	/**
-	 * 设置：巡检跨度开始时间
+	 * 设置：是否跨度
 	 */
-	public void setInspectionSpanStartDate(Date inspectionSpanStartDate) {
-		this.inspectionSpanStartDate = inspectionSpanStartDate;
+	public void setIsSpan(Integer isSpan) {
+		this.isSpan = isSpan;
 	}
 	/**
-	 * 获取：巡检跨度开始时间
+	 * 获取：是否跨度
 	 */
-	public Date getInspectionSpanStartDate() {
-		return inspectionSpanStartDate;
+	public Integer getIsSpan() {
+		return isSpan;
 	}
 	/**
 	 * 设置：巡检跨度结束时间

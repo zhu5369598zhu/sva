@@ -1,19 +1,17 @@
 package io.renren.modules.job.task;
 
-import io.renren.modules.inspection.entity.InspectionLineEntity;
-import io.renren.modules.inspection.entity.InspectionPeriodEntity;
-import io.renren.modules.inspection.entity.InspectionTaskEntity;
+import com.qiniu.common.Zone;
+import io.renren.modules.inspection.entity.*;
 import io.renren.modules.inspection.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
-@Component("lineScanTask")
+@Component("lineTask")
 public class lineScanTask {
     private Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
@@ -32,30 +30,221 @@ public class lineScanTask {
     LineZoneService lineZoneService;
     @Autowired
     ZoneDeviceService zoneDeviceService;
+    @Autowired
+    InspectionItemService itemService;
 
     public void test() {
+        logger.info("test方法，正在被执行");
+    }
+
+    public void writeInspectionTask(String params) throws java.text.ParseException{
+        Date dt = null;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        if(params.isEmpty()){
+            dt = new Date();
+        }else{
+            try{
+                dt = simpleDateFormat.parse(params);
+            }catch (Exception e){
+                dt = new Date();
+            }
+        }
+
+        taskGen(dt);
+    }
+
+    public void writeInspectionTask() throws java.text.ParseException{
+        Date dt = new Date();
+        taskGen(dt);
+    }
+
+    private void taskGen(Date dt) throws java.text.ParseException {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar cal = Calendar.getInstance();
         HashMap lineParams = new HashMap();
         lineParams.put("is_publish", 1);
         List<InspectionLineEntity> lines = lineService.selectByMap(lineParams);
+        HashSet<Integer> deviceList = new HashSet<>();
         for (InspectionLineEntity line:lines) {
+            Integer deviceCount = 0;
+            Integer itemCount = 0;
+            HashMap lineZoneParams = new HashMap();
+            lineZoneParams.put("line_id",line.getId());
+            List<LineZoneEntity> lineZoneList = lineZoneService.selectByMap(lineZoneParams);
+            for(LineZoneEntity lineZone:lineZoneList){
+                HashMap zoneDeviceParams = new HashMap();
+                zoneDeviceParams.put("zone_id",lineZone.getZoneId());
+                List<ZoneDeviceEntity> zoneDeviceList = zoneDeviceService.selectByMap(zoneDeviceParams);
+                zoneDeviceList.size();
+                for(ZoneDeviceEntity zoneDevice:zoneDeviceList){
+                    deviceList.add(zoneDevice.getDeviceId());
+                }
+            }
             HashMap periodParams = new HashMap();
             periodParams.put("line_id", line.getId());
             List<InspectionPeriodEntity> periods = periodService.selectByMap(periodParams);
             for (InspectionPeriodEntity period:periods) {
-                if(period.getFrequency() == 1){
-                    InspectionTaskEntity taskEntity = new InspectionTaskEntity();
-                    //taskEntity.setInspectDeviceCount();
-                    taskEntity.setIsInspected(0);
-                    taskEntity.setInspectionSpanStartDate(new Date());
-                    taskEntity.setInspectionSpanEndDate(new Date());
-                }
-                if(period.getFrequency() == 7){
+                InspectionTaskEntity taskEntity = new InspectionTaskEntity();
+                taskEntity.setLineId(line.getId());
+                taskEntity.setIsSpan(0);
+                taskEntity.setIsInspected(0);
+                taskEntity.setInspectedDeviceCount(0);
+                taskEntity.setInspectedItemCount(0);
+                HashMap periodTurnParams = new HashMap();
+                periodTurnParams.put("period_id",period.getId());
+                List<PeriodTurnEntity> periodTurnList = periodTurnService.selectByMap(periodTurnParams);
+                for(PeriodTurnEntity periodTurn:periodTurnList){
+                    itemCount = 0;
+                    Date basePoint = simpleDateFormat.parse(period.getBasePoint());
+                    TurnEntity turn = turnService.selectById(periodTurn.getTurnId());
+                    if(turn !=null){
+                        taskEntity.setTurnId(turn.getId());
 
-                }
-                if(period.getFrequency() == 31){
+                        if(period.getFrequency() == 1){
+                            deviceCount = deviceList.size();
+                            for(Integer deviceId:deviceList){
+                                HashMap deviceParams = new HashMap();
+                                deviceParams.put("device_id",deviceId);
+                                List<InspectionItemEntity> itemList = itemService.selectByMap(deviceParams);
+                                itemCount += itemList.size();
+                                InspectionTaskDeviceEntity taskDeviceEntity = new InspectionTaskDeviceEntity();
+                                taskDeviceEntity.setDeviceId(deviceId);
+                                taskDeviceEntity.setLineId(line.getId().longValue());
+                                taskDeviceEntity.setTurnId(turn.getId());
+                                taskDeviceEntity.setInsepctItemCount(itemList.size());
+                                taskDeviceEntity.setInspectionDate(dt);
+                                writeTaskDevice(line.getId(),turn.getId().intValue(),deviceId,simpleDateFormat.format(dt),taskDeviceEntity);
+                            }
+                            taskEntity.setIsSpan(0);
+                            taskEntity.setInspectDeviceCount(deviceCount);
+                            taskEntity.setInspectItemCount(itemCount);
+                            taskEntity.setInspectionSpanEndDate(dt);
+                            writeTask(line.getId(),turn.getId().intValue(),simpleDateFormat.format(dt),taskEntity);
+                        } else if(period.getFrequency() == 7) {
+                            if (basePoint.getTime() < dt.getTime()) {
+                                cal.setTime(dt);
+                                Integer week = cal.get(Calendar.DAY_OF_WEEK) - 1;
+                                if (period.getSpan() == 1) {
+                                    if (period.getStartPoint() == week) {
+                                        deviceCount = deviceList.size();
+                                        for(Integer deviceId:deviceList){
+                                            HashMap deviceParams = new HashMap();
+                                            deviceParams.put("device_id",deviceId);
+                                            List<InspectionItemEntity> itemList = itemService.selectByMap(deviceParams);
+                                            itemCount += itemList.size();
+                                            InspectionTaskDeviceEntity taskDeviceEntity = new InspectionTaskDeviceEntity();
+                                            taskDeviceEntity.setDeviceId(deviceId);
+                                            taskDeviceEntity.setLineId(line.getId().longValue());
+                                            taskDeviceEntity.setTurnId(turn.getId());
+                                            taskDeviceEntity.setInsepctItemCount(itemList.size());
+                                            taskDeviceEntity.setInspectionDate(dt);
+                                            writeTaskDevice(line.getId(),turn.getId().intValue(),deviceId,simpleDateFormat.format(dt),taskDeviceEntity);
+                                        }
+                                        taskEntity.setIsSpan(0);
+                                        taskEntity.setInspectDeviceCount(deviceCount);
+                                        taskEntity.setInspectItemCount(itemCount);
+                                        taskEntity.setInspectionSpanEndDate(dt);
 
+                                        writeTask(line.getId(),turn.getId().intValue(),simpleDateFormat.format(dt),taskEntity);
+                                    }
+                                } else {
+                                    if (period.getStartPoint() + period.getSpan() == week) {
+                                        deviceCount = deviceList.size();
+                                        for(Integer deviceId:deviceList){
+                                            HashMap deviceParams = new HashMap();
+                                            deviceParams.put("device_id",deviceId);
+                                            List<InspectionItemEntity> itemList = itemService.selectByMap(deviceParams);
+                                            itemCount += itemList.size();
+                                            InspectionTaskDeviceEntity taskDeviceEntity = new InspectionTaskDeviceEntity();
+                                            taskDeviceEntity.setDeviceId(deviceId);
+                                            taskDeviceEntity.setLineId(line.getId().longValue());
+                                            taskDeviceEntity.setTurnId(turn.getId());
+                                            taskDeviceEntity.setInsepctItemCount(itemList.size());
+                                            taskDeviceEntity.setInspectionDate(dt);
+                                            writeTaskDevice(line.getId(),turn.getId().intValue(),deviceId,simpleDateFormat.format(dt),taskDeviceEntity);
+                                        }
+                                        taskEntity.setIsSpan(1);
+                                        taskEntity.setInspectDeviceCount(deviceCount);
+                                        taskEntity.setInspectItemCount(itemCount);
+                                        taskEntity.setInspectionSpanEndDate(dt);
+
+                                        writeTask(line.getId(),turn.getId().intValue(),simpleDateFormat.format(dt),taskEntity);
+                                    }
+                                }
+                            }
+                        } else if(period.getFrequency() == 31){
+                            cal.setTime(dt);
+                            Integer day = cal.get(Calendar.DATE);
+                            if(basePoint.getTime()< dt.getTime()){
+                                deviceCount = deviceList.size();
+                                for(Integer deviceId:deviceList){
+                                    HashMap deviceParams = new HashMap();
+                                    deviceParams.put("device_id",deviceId);
+                                    List<InspectionItemEntity> itemList = itemService.selectByMap(deviceParams);
+                                    itemCount += itemList.size();
+                                    InspectionTaskDeviceEntity taskDeviceEntity = new InspectionTaskDeviceEntity();
+                                    taskDeviceEntity.setDeviceId(deviceId);
+                                    taskDeviceEntity.setLineId(line.getId().longValue());
+                                    taskDeviceEntity.setTurnId(turn.getId());
+                                    taskDeviceEntity.setInsepctItemCount(itemList.size());
+                                    taskDeviceEntity.setInspectionDate(dt);
+                                    writeTaskDevice(line.getId(),turn.getId().intValue(),deviceId,simpleDateFormat.format(dt),taskDeviceEntity);
+                                }
+                                taskEntity.setInspectDeviceCount(deviceCount);
+                                taskEntity.setInspectItemCount(itemCount);
+
+                                if(period.getSpan() == 1){
+                                    if(period.getStartPoint() == day){
+                                        taskEntity.setIsSpan(0);
+                                        taskEntity.setInspectionSpanEndDate(dt);
+                                    }else{
+                                        taskEntity.setIsSpan(1);
+                                        cal.add(Calendar.DAY_OF_MONTH,1);
+                                        taskEntity.setInspectionSpanEndDate(cal.getTime());
+                                    }
+                                }
+
+                                writeTask(line.getId(),turn.getId().intValue(),simpleDateFormat.format(dt),taskEntity);
+                            }
+                        }
+                    }
                 }
             }
+        }
+    }
+
+    private void writeTask(Integer lineId,Integer turnId,String date,InspectionTaskEntity taskEntity){
+        HashMap taskParams = new HashMap();
+        taskParams.put("line_id",lineId);
+        taskParams.put("turn_id",turnId);
+        taskParams.put("inspection_span_end_date",date);
+        List<InspectionTaskEntity> taskList = taskService.selectByMap(taskParams);
+        try{
+            if(taskList.size() == 0){
+                taskService.insert(taskEntity);
+            }
+        }catch(Exception e){
+
+        }
+    }
+
+    private void writeTaskDevice(Integer lineId,Integer turnId,Integer deviceId,String date,InspectionTaskDeviceEntity taskDeviceEntity){
+        HashMap taskDeviceParams = new HashMap();
+        taskDeviceParams.put("device_id",deviceId);
+        taskDeviceParams.put("line_id",lineId);
+        taskDeviceParams.put("turn_id",turnId);
+        taskDeviceParams.put("inspection_date",date);
+        List<InspectionTaskDeviceEntity> taskDeviceList = taskDeviceService.selectByMap(taskDeviceParams);
+        try{
+            if(taskDeviceList.size() == 0){
+                taskDeviceService.insert(taskDeviceEntity);
+            }else if (taskDeviceList.size() > 0){
+                InspectionTaskDeviceEntity tmp = taskDeviceList.get(0);
+                taskDeviceEntity.setId(tmp.getId());
+                taskDeviceService.updateById(taskDeviceEntity);
+            }
+        }catch (Exception e){
+
         }
     }
 

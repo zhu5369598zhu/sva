@@ -124,7 +124,7 @@ public class TurnController {
             List<PeriodTurnEntity> periodTurnList = periodTurnService.selectByMap(params);
             if(periodTurnList.size() > 0) {
                 for(PeriodTurnEntity periodTurn:periodTurnList){
-                    InspectionPeriodEntity period = periodService.selectById(periodTurn.getTurnId());
+                    InspectionPeriodEntity period = periodService.selectById(periodTurn.getPeriodId());
                     if(period != null){
                         return R.error(400,"该轮次已被周期[" + period.getName() + "]绑定使用，请先在该周期将期删除.");
                     }

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.inspection.dao.InspectionTaskDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.inspection.entity.InspectionTaskEntity" id="inspectionTaskMap">
+        <result property="id" column="id"/>
+        <result property="lineId" column="line_id"/>
+        <result property="turnId" column="turn_id"/>
+        <result property="inspectionSpanEndDate" column="inspection_span_end_date"/>
+        <result property="inspectDeviceCount" column="inspect_device_count"/>
+        <result property="inspectedDeviceCount" column="inspected_device_count"/>
+        <result property="inspectItemCount" column="inspect_item_count"/>
+        <result property="inspectedItemCount" column="inspected_item_count"/>
+        <result property="isInspected" column="is_inspected"/>
+        <result property="isSpan" column="is_span"/>
+    </resultMap>
+
+    <select id="selectByDate" resultType="java.util.HashMap" parameterType="java.lang.String">
+        select sum(inspected_item_count) as inspectedItemSum,sum(inspect_item_count) as inspectItemSum
+        from tb_inspection_task
+        where inspection_span_end_date='${inspectDate}'
+    </select>
+
+</mapper>
