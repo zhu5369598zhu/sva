@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableName;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -64,6 +63,10 @@ public class DeviceExceptionEntity implements Serializable {
 	 * 该设备是否发送短信（0 不发送短信，1 发送短信）
 	 */
 	private Integer isOk;
+	/**
+	 * 该设备是否发送微信（0 不发送微信，1 发送微信）
+	 */
+	private Integer wxOk;
 	/**
 	 * type 是 level 设备等级分类，device 单个设备
 	 */
@@ -149,6 +152,13 @@ public class DeviceExceptionEntity implements Serializable {
 	}
 	public String getSmsUserIds() {
 		return smsUserIds;
+	}
+	
+	public Integer getWxOk() {
+		return wxOk;
+	}
+	public void setWxOk(Integer wxOk) {
+		this.wxOk = wxOk;
 	}
 	public Integer getIsOk() {
 		return isOk;

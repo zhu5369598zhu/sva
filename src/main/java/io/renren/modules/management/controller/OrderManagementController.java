@@ -35,6 +35,7 @@ import io.renren.common.utils.OrderUtils;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.common.utils.SendSms;
+import io.renren.common.utils.TestMessage;
 
 
 
@@ -246,6 +247,10 @@ public class OrderManagementController {
 				}
 				
 			}
+			String wechat = userEntity.getWechat();
+			if(!"".equals(wechat)) { 
+				TestMessage.ordersend(wechat, "您有一条已下发待受理的工单", orderManagement.getOrderNumber()); 
+			}
 			
 			OrderRecordEntity record = new OrderRecordEntity();
 			record.setNowTime(new Date()); // 当前时间
@@ -335,7 +340,10 @@ public class OrderManagementController {
 				}
 				
 			}
-			
+			String wechat = userEntity.getWechat();
+			if(!"".equals(wechat)) { 
+				TestMessage.ordersend(wechat, "您有一条转工单被拒绝的填报缺陷", orderManagement.getOrderNumber()); 
+			}
 
 		}else if(orderType ==2){// 巡检缺陷工单
 			// 修改通知
@@ -390,6 +398,10 @@ public class OrderManagementController {
 				}
 				
 			}
+			String wechat = userEntity.getWechat();
+			if(!"".equals(wechat)) { 
+				TestMessage.ordersend(wechat, "您有一条转工单被拒绝的巡检异常缺陷", orderManagement.getOrderNumber()); 
+			}
 		}
 		Integer defectiveId = orderManagement.getDefectiveId();
 
@@ -397,5 +409,17 @@ public class OrderManagementController {
 		boolean isok = orderManagementService.deleteById(orderManagement.getOrderId());// 删除工单
 		return R.ok();
 	}
+	
+	/**
+     * 导出列表
+     */
+    @RequestMapping("/export")
+    @RequiresPermissions("management:ordermanagement:export")
+    public R export(@RequestParam Map<String, Object> params){
+        List<OrderManagementEntity> all = orderManagementService.all(params);
 
+        return R.ok().put("list", all);
+    }
+	
+	
 }

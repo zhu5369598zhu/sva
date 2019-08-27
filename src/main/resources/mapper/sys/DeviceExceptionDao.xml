@@ -16,6 +16,7 @@
         <result property="smsRoleId" column="sms_role_id"/>
         <result property="smsUserIds" column="sms_user_ids"/>
         <result property="isOk" column="is_ok"/>
+        <result property="wxOk" column="wx_ok"/>
         <result property="type" column="type"/>
     </resultMap>
 
@@ -137,11 +138,11 @@
 	</select>
 	
 	<select id="findDeviceExceptionBydeviceId" resultType="io.renren.modules.sys.entity.DeviceExceptionEntity" parameterType="java.util.HashMap">
-	    select * from tb_device_exception where device_id = #{deviceId} and is_ok = 1
+	    select * from tb_device_exception where device_id = #{deviceId} 
 	</select>
 	
 	<select id="findDeviceExceptionByDeptidDeviceLevel" resultType="io.renren.modules.sys.entity.DeviceExceptionEntity" parameterType="java.util.HashMap">
-		select * from tb_device_exception where device_level = #{deviceLevel} and device_dept = #{deptId} and is_ok = 1
+		select * from tb_device_exception where device_level = #{deviceLevel} and device_dept = #{deptId} 
 	</select>
 	
 	<insert id="insertSms" parameterType="java.util.HashMap">

@@ -34,6 +34,7 @@ import io.renren.common.utils.OrderUtils;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.common.utils.SendSms;
+import io.renren.common.utils.TestMessage;
 
 
 
@@ -208,6 +209,10 @@ public class OrderManagementConfirmController {
 				}
 				
 			}
+			String wechat = userEntity.getWechat();
+			if(!"".equals(wechat)) { 
+				TestMessage.ordersend(wechat, "您有一条已上报待审核的工单被拒绝", orderManagement.getOrderNumber()); 
+			}
 			
 			
 			orderManagement.setOrderConfirmerId(0);
@@ -265,6 +270,10 @@ public class OrderManagementConfirmController {
 					}
 					
 				}
+				String wechat = userEntity.getWechat();
+				if(!"".equals(wechat)) { 
+					TestMessage.ordersend(wechat, "您有一条已完结的缺陷单", defectiveNumber); 
+				}
 				Integer orderApplicantId = orderManagement.getOrderApplicantId();
 				Integer orderAcceptorId = orderManagement.getOrderAcceptorId();
 				Integer orderConfirmerId = orderManagement.getOrderConfirmerId();
@@ -297,6 +306,11 @@ public class OrderManagementConfirmController {
 							hashMap.put("createTiem", new Date());
 							deviceExceptionService.insertSms(hashMap); // 发送短信记录
 						}
+					}
+					
+					String touser = user.getWechat();
+					if(!"".equals(touser)) { 
+						TestMessage.ordersend(touser, "您有一条已完结的工单", orderManagement.getOrderNumber()); 
 					}
 				}
 				
@@ -334,6 +348,10 @@ public class OrderManagementConfirmController {
 							hashMap.put("createTiem", new Date());
 							deviceExceptionService.insertSms(hashMap); // 发送短信记录
 						}
+					}
+					String touser = user.getWechat();
+					if(!"".equals(touser)) { 
+						TestMessage.ordersend(touser, "您有一条已完结的工单", orderManagement.getOrderNumber()); 
 					}
 				}
 			}
@@ -385,6 +403,10 @@ public class OrderManagementConfirmController {
 					deviceExceptionService.insertSms(map); // 发送短信记录
 				}
 				
+			}
+			String touser = userEntity.getWechat();
+			if(!"".equals(touser)) { 
+				TestMessage.ordersend(touser, "您有一条申请延期通过的工单待处理", orderManagement.getOrderNumber()); 
 			}
 			
 			orderManagement.setProcessingResult(null);
@@ -438,6 +460,10 @@ public class OrderManagementConfirmController {
 					deviceExceptionService.insertSms(map); // 发送短信记录
 				}
 				
+			}
+			String touser = userEntity.getWechat();
+			if(!"".equals(touser)) { 
+				TestMessage.ordersend(touser, "您有一条申请延期未通过的工单待处理", orderManagement.getOrderNumber()); 
 			}
 			
 			orderManagement.setProcessingResult(null);

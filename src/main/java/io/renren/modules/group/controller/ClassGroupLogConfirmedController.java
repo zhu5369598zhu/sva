@@ -23,6 +23,7 @@ import io.renren.common.utils.OrderUtils;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.common.utils.SendSms;
+import io.renren.common.utils.TestMessage;
 import io.renren.modules.group.entity.ClassGroupLogEntity;
 import io.renren.modules.group.service.ClassGroupLogConfirmedService;
 import io.renren.modules.setting.entity.BaseTurnEntity;
@@ -146,17 +147,21 @@ public class ClassGroupLogConfirmedController {
 	    			}
 	    			
 	    		}
+	    		String wechat = userEntity.getWechat();
+	    		if(!"".equals(wechat)) { 
+	    			TestMessage.ordersend(wechat, "您有一条已确认的班长日志", classGroupLog.getLogNumber()); 
+	    		}
         		
-    		}else if(classGroupLog.getLogStatus().equals("4")) { // 已驳回
+    		}else if(classGroupLog.getLogStatus().equals("4")) { // 已拒绝
         		// 查询之前是否有 驳回记录  ，没有就添加，有就修改 并且把 待确认状态的 通知 改为 无效状态
         		NewsEntity news= newsService.selectOne(new EntityWrapper<NewsEntity>()
     					.eq("news_type", 2)
-    					.eq("news_name", "您有一条驳回的班长日志")
+    					.eq("news_name", "您有一条被拒绝的班长日志")
     					.eq("user_id", classGroupLog.getHandoverPersonId())
     					.eq("news_number", classGroupLog.getLogNumber()));
         		if(news == null) {
         			NewsEntity newEntity = new NewsEntity();
-            		newEntity.setNewsName("您有一条驳回的班长日志");
+            		newEntity.setNewsName("您有一条被拒绝的班长日志");
             		newEntity.setNewsNumber(classGroupLog.getLogNumber());
             		newEntity.setNewsType(2);
             		newEntity.setUserId(classGroupLog.getHandoverPersonId()); 
@@ -169,7 +174,7 @@ public class ClassGroupLogConfirmedController {
         			newEntity.setUpdateTime(new Date()); 
         			newsService.update(newEntity, new EntityWrapper<NewsEntity>()
         					.eq("news_type", 2)
-        					.eq("news_name", "您有一条驳回的班长日志")
+        					.eq("news_name", "您有一条被拒绝的班长日志")
         					.eq("user_id", classGroupLog.getHandoverPersonId())
         					.eq("news_number", classGroupLog.getLogNumber()));
         		}
@@ -187,7 +192,7 @@ public class ClassGroupLogConfirmedController {
 	    		if(!"".equals(userEntity.getMobile())) {
 	    			
 	    			JSONObject returnJson = new JSONObject();
-	    			returnJson.put("news_name", "您有一条驳回的班长日志");
+	    			returnJson.put("news_name", "您有一条被拒绝的班长日志");
 	    			returnJson.put("news_number", classGroupLog.getLogNumber());
 	    			
 	    			String isOk = SendSms.ordersend(userEntity.getMobile(), returnJson);
@@ -195,7 +200,7 @@ public class ClassGroupLogConfirmedController {
 	    				HashMap<String,Object> map = new HashMap<String,Object>(); 
 	    				map.put("isOk", 1);
 	    				map.put("phone", userEntity.getMobile());
-	    				map.put("content", "您有一条驳回的班长日志");
+	    				map.put("content", "您有一条被拒绝的班长日志");
 	    				map.put("type", 3);
 	    				map.put("createTiem", new Date());
 	    				deviceExceptionService.insertSms(map); // 发送短信记录
@@ -203,12 +208,16 @@ public class ClassGroupLogConfirmedController {
 	    				HashMap<String,Object> map = new HashMap<String,Object>(); 
 	    				map.put("isOk", 0);
 	    				map.put("phone", userEntity.getMobile());
-	    				map.put("content", "您有一条驳回的班长日志");
+	    				map.put("content", "您有一条被拒绝的班长日志");
 	    				map.put("type", 3);
 	    				map.put("createTiem", new Date());
 	    				deviceExceptionService.insertSms(map); // 发送短信记录
 	    			}
 	    			
+	    		}
+	    		String wechat = userEntity.getWechat();
+	    		if(!"".equals(wechat)) { 
+	    			TestMessage.ordersend(wechat, "您有一条被拒绝的班长日志", classGroupLog.getLogNumber()); 
 	    		}
         	}
     	}else if(classGroupLog.getLogType().equals("2")) { // 班前日志
@@ -261,7 +270,10 @@ public class ClassGroupLogConfirmedController {
         	    			}
         	    			
         	    		}
-                		
+        	    		String wechat = userEntity.getWechat();
+        	    		if(!"".equals(wechat)) { 
+        	    			TestMessage.ordersend(wechat, "您有一条已确认的班前日志", classGroupLog.getLogNumber()); 
+        	    		}
                 		
         			}
     			}
@@ -289,7 +301,7 @@ public class ClassGroupLogConfirmedController {
         		// 通知 交底人 消息被 驳回  (存在就修改 ，不存在 就新增)
     			NewsEntity newsEntity = newsService.selectOne(new EntityWrapper<NewsEntity>()
     					.eq("user_id", classGroupLog.getHandoverPersonId())
-    					.eq("news_name", "您有一条被驳回的班前日志")
+    					.eq("news_name", "您有一条被拒绝的班前日志")
     					.eq("news_number", classGroupLog.getLogNumber()));
     			if(newsEntity !=null) {
     				newsEntity.setNewsType(2); 
@@ -299,7 +311,7 @@ public class ClassGroupLogConfirmedController {
     				NewsEntity newEntity = new NewsEntity();
             		newEntity.setUserId(classGroupLog.getHandoverPersonId()); 
             		newEntity.setNewsType(2); // 被驳回
-            		newEntity.setNewsName("您有一条被驳回的班前日志");
+            		newEntity.setNewsName("您有一条被拒绝的班前日志");
             		newEntity.setNewsNumber(classGroupLog.getLogNumber()); 
             		newEntity.setCreateTime(new Date());
             		newEntity.setUpdateTime(new Date());
@@ -318,7 +330,7 @@ public class ClassGroupLogConfirmedController {
 	    		if(!"".equals(userEntity.getMobile())) {
 	    			
 	    			JSONObject returnJson = new JSONObject();
-	    			returnJson.put("news_name", "您有一条被驳回的班前日志");
+	    			returnJson.put("news_name", "您有一条被拒绝的班前日志");
 	    			returnJson.put("news_number", classGroupLog.getLogNumber());
 	    			
 	    			String isOk = SendSms.ordersend(userEntity.getMobile(), returnJson);
@@ -326,7 +338,7 @@ public class ClassGroupLogConfirmedController {
 	    				HashMap<String,Object> map = new HashMap<String,Object>(); 
 	    				map.put("isOk", 1);
 	    				map.put("phone", userEntity.getMobile());
-	    				map.put("content", "您有一条被驳回的班前日志");
+	    				map.put("content", "您有一条被拒绝的班前日志");
 	    				map.put("type", 3);
 	    				map.put("createTiem", new Date());
 	    				deviceExceptionService.insertSms(map); // 发送短信记录
@@ -334,12 +346,16 @@ public class ClassGroupLogConfirmedController {
 	    				HashMap<String,Object> map = new HashMap<String,Object>(); 
 	    				map.put("isOk", 0);
 	    				map.put("phone", userEntity.getMobile());
-	    				map.put("content", "您有一条被驳回的班前日志");
+	    				map.put("content", "您有一条被拒绝的班前日志");
 	    				map.put("type", 3);
 	    				map.put("createTiem", new Date());
 	    				deviceExceptionService.insertSms(map); // 发送短信记录
 	    			}
 	    			
+	    		}
+	    		String wechat = userEntity.getWechat();
+	    		if(!"".equals(wechat)) { 
+	    			TestMessage.ordersend(wechat, "您有一条被拒绝的班前日志", classGroupLog.getLogNumber()); 
 	    		}
         		
         	}
@@ -392,6 +408,10 @@ public class ClassGroupLogConfirmedController {
         	    			}
         	    			
         	    		}
+        	    		String wechat = userEntity.getWechat();
+        	    		if(!"".equals(wechat)) { 
+        	    			TestMessage.ordersend(wechat, "您有一条已确认的班后日志", classGroupLog.getLogNumber()); 
+        	    		}
                     }
     			}
     			NewsEntity newEntity = new NewsEntity();
@@ -414,7 +434,7 @@ public class ClassGroupLogConfirmedController {
     			// 通知 交班人 消息被 驳回  (存在就修改 ，不存在 就新增)
     			NewsEntity newsEntity = newsService.selectOne(new EntityWrapper<NewsEntity>()
     					.eq("user_id", classGroupLog.getHandoverPersonId())
-    					.eq("news_name", "您有一条被驳回的班后日志")
+    					.eq("news_name", "您有一条被拒绝的班后日志")
     					.eq("news_number", classGroupLog.getLogNumber()));
     			if(newsEntity !=null) {
     				newsEntity.setNewsType(2); 
@@ -424,7 +444,7 @@ public class ClassGroupLogConfirmedController {
     				NewsEntity newEntity = new NewsEntity();
             		newEntity.setUserId(classGroupLog.getHandoverPersonId()); 
             		newEntity.setNewsType(2); // 被驳回
-            		newEntity.setNewsName("您有一条被驳回的班后日志");
+            		newEntity.setNewsName("您有一条被拒绝的班后日志");
             		newEntity.setNewsNumber(classGroupLog.getLogNumber()); 
             		newEntity.setCreateTime(new Date());
             		newEntity.setUpdateTime(new Date());
@@ -444,7 +464,7 @@ public class ClassGroupLogConfirmedController {
 	    		if(!"".equals(userEntity.getMobile())) {
 	    			
 	    			JSONObject returnJson = new JSONObject();
-	    			returnJson.put("news_name", "您有一条被驳回的班后日志");
+	    			returnJson.put("news_name", "您有一条被拒绝的班后日志");
 	    			returnJson.put("news_number", classGroupLog.getLogNumber());
 	    			
 	    			String isOk = SendSms.ordersend(userEntity.getMobile(), returnJson);
@@ -452,7 +472,7 @@ public class ClassGroupLogConfirmedController {
 	    				HashMap<String,Object> map = new HashMap<String,Object>(); 
 	    				map.put("isOk", 1);
 	    				map.put("phone", userEntity.getMobile());
-	    				map.put("content", "您有一条被驳回的班后日志");
+	    				map.put("content", "您有一条被拒绝的班后日志");
 	    				map.put("type", 3);
 	    				map.put("createTiem", new Date());
 	    				deviceExceptionService.insertSms(map); // 发送短信记录
@@ -460,14 +480,17 @@ public class ClassGroupLogConfirmedController {
 	    				HashMap<String,Object> map = new HashMap<String,Object>(); 
 	    				map.put("isOk", 0);
 	    				map.put("phone", userEntity.getMobile());
-	    				map.put("content", "您有一条被驳回的班后日志");
+	    				map.put("content", "您有一条被拒绝的班后日志");
 	    				map.put("type", 3);
 	    				map.put("createTiem", new Date());
 	    				deviceExceptionService.insertSms(map); // 发送短信记录
 	    			}
 	    			
 	    		}
-    			
+	    		String wechat = userEntity.getWechat();
+	    		if(!"".equals(wechat)) { 
+	    			TestMessage.ordersend(wechat, "您有一条被拒绝的班后日志", classGroupLog.getLogNumber()); 
+	    		}
         	}
     	}
     	classGroupLogConfirmedService.updateById(classGroupLog);
