@@ -59,9 +59,6 @@ public class AppInspectionController {
     @Autowired
     private ExceptionService exceptionService;
 
-    @Autowired
-	private InspectionLineService inspectionLineService;
-
     @GetMapping("upgrade")
     @ApiOperation("获取升级信息")
     public R upgrade(){
