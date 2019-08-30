@@ -7,16 +7,8 @@ import io.renren.common.utils.TestMessage;
 import io.renren.modules.app.annotation.Login;
 import io.renren.modules.app.annotation.LoginUser;
 import io.renren.modules.app.service.InspectionService;
-import io.renren.modules.inspection.entity.DeviceEntity;
-import io.renren.modules.inspection.entity.InspectionItemEntity;
-import io.renren.modules.inspection.entity.InspectionResultEntity;
-import io.renren.modules.inspection.entity.InspectionResultMediaEntity;
-import io.renren.modules.inspection.entity.PdaEntity;
-import io.renren.modules.inspection.service.DeviceService;
-import io.renren.modules.inspection.service.InspectionItemService;
-import io.renren.modules.inspection.service.InspectionResultMediaService;
-import io.renren.modules.inspection.service.InspectionResultService;
-import io.renren.modules.inspection.service.PdaService;
+import io.renren.modules.inspection.entity.*;
+import io.renren.modules.inspection.service.*;
 import io.renren.modules.setting.entity.ExceptionEntity;
 import io.renren.modules.setting.service.ExceptionService;
 import io.renren.modules.sys.entity.AppUpgradeEntity;
@@ -66,7 +58,9 @@ public class AppInspectionController {
 	private SysUserService sysUserService; 
     @Autowired
     private ExceptionService exceptionService;
-    
+
+    @Autowired
+	private InspectionLineService inspectionLineService;
 
     @GetMapping("upgrade")
     @ApiOperation("获取升级信息")
@@ -151,9 +145,10 @@ public class AppInspectionController {
         Map<String,Object> hashMap = new HashMap<String,Object>();
         hashMap.put("deviceId", deviceId);
         DeviceExceptionEntity deviceException = deviceExceptionService.findDeviceExceptionBydeviceId(hashMap);
-        if(deviceException ==null) {
+        if(deviceException == null) {
         	hashMap.put("deptId",device.getDeviceDept());
         	hashMap.put("deviceLevel",device.getDeviceLevel());
+        	hashMap.put("deviceId", 0);
         	DeviceExceptionEntity deviceExceptionEntity = deviceExceptionService.findDeviceExceptionByDeptidDeviceLevel(hashMap);
         	if(deviceExceptionEntity!=null) {
         		if(deviceExceptionEntity.getIsOk()==1) { // 发送短信
@@ -162,21 +157,19 @@ public class AppInspectionController {
                 	for(String s: split) {
                 		if(s.equals(inspectionResult.getExceptionId().toString())) {
                 			String smsUserIds = deviceExceptionEntity.getSmsUserIds();
+							String deviceName = device.getDeviceName(); // 设备名称
+							String itemName = inspctionItem.getName(); // 巡检项名称
+							ExceptionEntity exceptionEntity = exceptionService.selectById(s);
+							String exceptionName = exceptionEntity.getName(); // 异常等级名称
+							JSONObject returnJson = new JSONObject(new LinkedHashMap());
+							returnJson.put("deviceName", "["+deviceName+"]");
+							returnJson.put("itemName", "["+itemName+"]");
+							returnJson.put("exceptionName", "["+exceptionName+"]");
                 			if(!"".equals(smsUserIds)) { 
                 				String[] userIds = smsUserIds.split(",");
-                    			for(String userId: userIds) {
+								for(String userId: userIds) {
                     				SysUserEntity userEntity = sysUserService.selectById(Integer.parseInt(userId));
                     				String mobile = userEntity.getMobile();
-                    				String deviceName = device.getDeviceName(); // 设备名称
-                    				String itemName = inspctionItem.getName(); // 巡检项名称
-                    				ExceptionEntity exceptionEntity = exceptionService.selectById(s);
-                    				String exceptionName = exceptionEntity.getName(); // 异常等级名称
-                    				JSONObject returnJson = new JSONObject(new LinkedHashMap()); 
-                    				returnJson.put("deviceName", "["+deviceName+"]");
-                    				returnJson.put("itemName", "["+itemName+"]");
-                    				returnJson.put("exceptionName", "["+exceptionName+"]");
-                    				System.out.println("手机号"+ mobile);
-                    				System.out.println("数据"+ returnJson.toJSONString());
                     				String isOk = SendSms.deviceSend(mobile, returnJson);
                     				System.out.println("是否成功"+ isOk);
                     				HashMap<String,Object> map = new HashMap<String,Object>();
@@ -187,7 +180,7 @@ public class AppInspectionController {
                         				map.put("type", 1);
                         				map.put("createTiem", new Date());
                         				deviceExceptionService.insertSms(map); // 发送短信记录
-                    				}else { // 发送短信失败 
+                    				}else { // 发送短信失败
                         				map.put("isOk", 0);
                         				map.put("phone", mobile);
                         				map.put("content", "尊敬的用户，您的设备"+deviceName+"巡检"+itemName+"出现异常等级为"+exceptionName+",请您及时关注哦。");
@@ -195,8 +188,7 @@ public class AppInspectionController {
                         				map.put("createTiem", new Date());
                         				deviceExceptionService.insertSms(map); // 发送短信记录
                     				}
-                    			
-                    			}
+								}
                 			}
                 		}
                 	}
@@ -204,17 +196,17 @@ public class AppInspectionController {
         		if(deviceExceptionEntity.getWxOk() ==1) { // 发送微信
         			String exceptionIds = deviceExceptionEntity.getExceptionIds();
                 	String[] split = exceptionIds.split(",");
-                	for(String s: split) {
+					for(String s: split) {
                 		if(s.equals(inspectionResult.getExceptionId().toString())) {
-                			String smsUserIds = deviceExceptionEntity.getSmsUserIds();
-                			if(!"".equals(smsUserIds)) { 
+							ExceptionEntity exceptionEntity = exceptionService.selectById(s);
+							String exceptionName = exceptionEntity.getName(); // 异常等级名称
+							String deviceName = device.getDeviceName(); // 设备名称
+							String itemName = inspctionItem.getName(); // 巡检项名称
+							String smsUserIds = deviceExceptionEntity.getSmsUserIds();
+                			if(!"".equals(smsUserIds)) {
                 				String[] userIds = smsUserIds.split(",");
                     			for(String userId: userIds) {
                     				SysUserEntity userEntity = sysUserService.selectById(Integer.parseInt(userId));
-                    				String deviceName = device.getDeviceName(); // 设备名称
-                    				String itemName = inspctionItem.getName(); // 巡检项名称
-                    				ExceptionEntity exceptionEntity = exceptionService.selectById(s);
-                    				String exceptionName = exceptionEntity.getName(); // 异常等级名称
                     				String wechat = userEntity.getWechat();
                     				if(!"".equals(wechat)) {
                     					TestMessage.deviceSend(wechat, "尊敬的用户，您的设备["+deviceName+"]巡检["+itemName+"]出现异常等级为["+exceptionName+"],请您及时关注哦。");
@@ -231,20 +223,20 @@ public class AppInspectionController {
         		String[] split = exceptionIds.split(",");
             	for(String s: split) {
             		if(s.equals(inspectionResult.getExceptionId().toString())) {
+						String deviceName = device.getDeviceName(); // 设备名称
+						String itemName = inspctionItem.getName(); // 巡检项名称
+						ExceptionEntity exceptionEntity = exceptionService.selectById(s);
+						String exceptionName = exceptionEntity.getName(); // 异常等级名称
+						JSONObject returnJson = new JSONObject(new LinkedHashMap());
+						returnJson.put("deviceName", "["+deviceName+"]");
+						returnJson.put("itemName", "["+itemName+"]");
+						returnJson.put("exceptionName", "["+exceptionName+"]");
             			String smsUserIds = deviceException.getSmsUserIds();
             			if(!"".equals(smsUserIds)) { 
             				String[] userIds = smsUserIds.split(",");
-                			for(String userId: userIds) {
+							for(String userId: userIds) {
                 				SysUserEntity userEntity = sysUserService.selectById(Integer.parseInt(userId));
                 				String mobile = userEntity.getMobile();
-                				String deviceName = device.getDeviceName(); // 设备名称
-                				String itemName = inspctionItem.getName(); // 巡检项名称
-                				ExceptionEntity exceptionEntity = exceptionService.selectById(s);
-                				String exceptionName = exceptionEntity.getName(); // 异常等级名称
-                				JSONObject returnJson = new JSONObject(new LinkedHashMap());
-                				returnJson.put("deviceName", "["+deviceName+"]");
-                				returnJson.put("itemName", "["+itemName+"]");
-                				returnJson.put("exceptionName", "["+exceptionName+"]");
                 				System.out.println("数据"+ returnJson.toJSONString());
                 				String isOk = SendSms.deviceSend(mobile, returnJson);
                 				System.out.println("是否发送成功"+ isOk);
@@ -275,15 +267,15 @@ public class AppInspectionController {
         		String[] split = exceptionIds.split(",");
             	for(String s: split) {
             		if(s.equals(inspectionResult.getExceptionId().toString())) {
+						String deviceName = device.getDeviceName(); // 设备名称
+						String itemName = inspctionItem.getName(); // 巡检项名称
+						ExceptionEntity exceptionEntity = exceptionService.selectById(s);
+						String exceptionName = exceptionEntity.getName(); // 异常等级名称
             			String smsUserIds = deviceException.getSmsUserIds();
             			if(!"".equals(smsUserIds)) { 
             				String[] userIds = smsUserIds.split(",");
                 			for(String userId: userIds) {
                 				SysUserEntity userEntity = sysUserService.selectById(Integer.parseInt(userId));
-                				String deviceName = device.getDeviceName(); // 设备名称
-                				String itemName = inspctionItem.getName(); // 巡检项名称
-                				ExceptionEntity exceptionEntity = exceptionService.selectById(s);
-                				String exceptionName = exceptionEntity.getName(); // 异常等级名称
                 				String wechat = userEntity.getWechat();
                 				if(!"".equals(wechat)) {
                 					TestMessage.deviceSend(wechat, "尊敬的用户，您的设备["+deviceName+"]巡检["+itemName+"]出现异常等级为["+exceptionName+"],请您及时关注哦。");
@@ -293,7 +285,6 @@ public class AppInspectionController {
             		}
             	}
         	}
-        	
         }
         resultService.deleteByAppResultGuid(appResultGuid);
         String guid = resultService.insertResult(inspectionResult);

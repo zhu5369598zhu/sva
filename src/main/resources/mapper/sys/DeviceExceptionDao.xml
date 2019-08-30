@@ -142,7 +142,7 @@
 	</select>
 	
 	<select id="findDeviceExceptionByDeptidDeviceLevel" resultType="io.renren.modules.sys.entity.DeviceExceptionEntity" parameterType="java.util.HashMap">
-		select * from tb_device_exception where device_level = #{deviceLevel} and device_dept = #{deptId} 
+		select * from tb_device_exception where device_id = #{deviceId} and device_level = #{deviceLevel} and device_dept = #{deptId}
 	</select>
 	
 	<insert id="insertSms" parameterType="java.util.HashMap">
