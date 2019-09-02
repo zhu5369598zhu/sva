@@ -95,12 +95,19 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DeviceEntity> impl
         if (filterkey.equals("deviceCode")) {
             filterfield = "device_code";
         }
+        Integer[] array = null;
+        if(!deptId.equals("")){
+            List<Integer> deptIds = deptService.queryRecursiveChildByParentId(Long.parseLong(deptId));
+            Integer[] deptIdsIn = new Integer[deptIds.size()];
+            array = deptIds.toArray(deptIdsIn);
+        }
         String key = (String)params.get("key");
 
         List<DeviceEntity> list = this.selectList(
                 new EntityWrapper<DeviceEntity>()
                 .like(StringUtils.isNotBlank(key),filterfield, key)
-                .eq( deptId != null , "device_dept", deptId)
+                //.eq( deptId != null , "device_dept", deptId)
+                .in(array !=null,"device_dept",array)
                 .eq("is_delete",0)
         );
 

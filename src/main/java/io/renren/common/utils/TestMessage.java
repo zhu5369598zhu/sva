@@ -51,66 +51,68 @@ public class TestMessage {
 
 	// 工单 发送接口
 	public static void ordersend(String touser, String content,String num) {
-		
-		String access_token = TestMessage.getAccessToken();
-		content = "尊敬的用户,"+content+"编号"+num;
-		Text text = new Text();
-		text.setContent(content);
-		//1.获取json字符串：将message对象转换为json字符串    
-        JSONObject jsonMessage = new JSONObject();
-        jsonMessage.put("touser",touser);
-        jsonMessage.put("msgtype", "text");
-        jsonMessage.put("agentid", agentid);
-        jsonMessage.put("text", text);
-        jsonMessage.put("safe", 0);
-        System.out.println("jsonTextMessage:"+jsonMessage);
-        //2.获取请求的url  
-        String sendMessage_url="https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={ACCESS_TOKEN}";
-        sendMessage_url=sendMessage_url.replace("{ACCESS_TOKEN}", access_token);
-        try {
-        	//3.调用接口，发送消息
-			String sendMessageStr=HttpUtils.post(sendMessage_url, jsonMessage, access_token);
-			
-		} catch (ParseException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		if("".equals(corpId)){ // 没有开通微信推送接口
+
+		}else {
+			String access_token = TestMessage.getAccessToken();
+			content = "尊敬的用户,"+content+"编号"+num;
+			Text text = new Text();
+			text.setContent(content);
+			//1.获取json字符串：将message对象转换为json字符串
+			JSONObject jsonMessage = new JSONObject();
+			jsonMessage.put("touser",touser);
+			jsonMessage.put("msgtype", "text");
+			jsonMessage.put("agentid", agentid);
+			jsonMessage.put("text", text);
+			jsonMessage.put("safe", 0);
+			System.out.println("jsonTextMessage:"+jsonMessage);
+			//2.获取请求的url
+			String sendMessage_url="https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={ACCESS_TOKEN}";
+			sendMessage_url=sendMessage_url.replace("{ACCESS_TOKEN}", access_token);
+			try {
+				//3.调用接口，发送消息
+				String sendMessageStr=HttpUtils.post(sendMessage_url, jsonMessage, access_token);
+
+			} catch (ParseException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
-		
+
 	}
 	
 	/*
 	 * 推送规则 设备发送 微信接口。
 	 * */
 	public static void deviceSend(String touser, String content) {
-		
-		String access_token = TestMessage.getAccessToken();
-		Text text = new Text();
-		text.setContent(content);
-		//1.获取json字符串：将message对象转换为json字符串    
-        JSONObject jsonMessage = new JSONObject();
-        jsonMessage.put("touser",touser);
-        jsonMessage.put("msgtype", "text");
-        jsonMessage.put("agentid", agentid);
-        jsonMessage.put("text", text);
-        jsonMessage.put("safe", 0);
-        System.out.println("jsonTextMessage:"+jsonMessage);
-        //2.获取请求的url  
-        String sendMessage_url="https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={ACCESS_TOKEN}";
-        sendMessage_url=sendMessage_url.replace("{ACCESS_TOKEN}", access_token);
-        try {
-        	//3.调用接口，发送消息
-			String sendMessageStr=HttpUtils.post(sendMessage_url, jsonMessage, access_token);
-			
-		} catch (ParseException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		if("".equals(corpId)) { // 没有开通微信推送接口
+		}else{
+			String access_token = TestMessage.getAccessToken();
+			Text text = new Text();
+			text.setContent(content);
+			//1.获取json字符串：将message对象转换为json字符串
+			JSONObject jsonMessage = new JSONObject();
+			jsonMessage.put("touser",touser);
+			jsonMessage.put("msgtype", "text");
+			jsonMessage.put("agentid", agentid);
+			jsonMessage.put("text", text);
+			jsonMessage.put("safe", 0);
+			System.out.println("jsonTextMessage:"+jsonMessage);
+			//2.获取请求的url
+			String sendMessage_url="https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={ACCESS_TOKEN}";
+			sendMessage_url=sendMessage_url.replace("{ACCESS_TOKEN}", access_token);
+			try {
+				//3.调用接口，发送消息
+				String sendMessageStr=HttpUtils.post(sendMessage_url, jsonMessage, access_token);
+
+			} catch (ParseException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
-		
 	}
-	
-	
-	
+
 	
 }

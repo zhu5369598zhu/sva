@@ -30,65 +30,75 @@ public class SendSms {
 	 * 推送规则 设备发送 短信接口。
 	 * */
 	public static String deviceSend(String phone, JSONObject jsonObject) {
-		DefaultProfile profile = DefaultProfile.getProfile("cn-hangzhou", accessKeyId, accessKeySecret);
-        IAcsClient client = new DefaultAcsClient(profile);
+	    if("".equals(SignName)){ // 没有开通短信接口
 
-        CommonRequest request = new CommonRequest();
-        request.setMethod(MethodType.POST);
-        request.setDomain("dysmsapi.aliyuncs.com");
-        request.setVersion("2017-05-25");
-        request.setAction("SendSms");
-        request.putQueryParameter("RegionId", "cn-hangzhou");
-        request.putQueryParameter("PhoneNumbers", phone);
-        request.putQueryParameter("SignName", SignName);
-        request.putQueryParameter("TemplateCode", TemplateDeviceCode);
-        request.putQueryParameter("TemplateParam", jsonObject.toJSONString());
-        try {
-            CommonResponse response = client.getCommonResponse(request);
-            System.out.println(response.getData());
-            return "ok";
-        } catch (ServerException e) {
-            e.printStackTrace();
-            return "error";
-        } catch (ClientException e) {
-            e.printStackTrace();
-            return "error";
-        } catch (com.aliyuncs.exceptions.ClientException e) {
-            e.printStackTrace();
+	    }else {
+            DefaultProfile profile = DefaultProfile.getProfile("cn-hangzhou", accessKeyId, accessKeySecret);
+            IAcsClient client = new DefaultAcsClient(profile);
+
+            CommonRequest request = new CommonRequest();
+            request.setMethod(MethodType.POST);
+            request.setDomain("dysmsapi.aliyuncs.com");
+            request.setVersion("2017-05-25");
+            request.setAction("SendSms");
+            request.putQueryParameter("RegionId", "cn-hangzhou");
+            request.putQueryParameter("PhoneNumbers", phone);
+            request.putQueryParameter("SignName", SignName);
+            request.putQueryParameter("TemplateCode", TemplateDeviceCode);
+            request.putQueryParameter("TemplateParam", jsonObject.toJSONString());
+            try {
+                CommonResponse response = client.getCommonResponse(request);
+                System.out.println(response.getData());
+                return "ok";
+            } catch (ServerException e) {
+                e.printStackTrace();
+                return "error";
+            } catch (ClientException e) {
+                e.printStackTrace();
+                return "error";
+            } catch (com.aliyuncs.exceptions.ClientException e) {
+                e.printStackTrace();
+            }
         }
-        return null;
+
+        return "error";
     }
 	/*
 	 * 工单，日志发送接口
 	 * */
 	public static String ordersend(String phone, JSONObject jsonObject) {
-		DefaultProfile profile = DefaultProfile.getProfile("cn-hangzhou", accessKeyId, accessKeySecret);
-        IAcsClient client = new DefaultAcsClient(profile);
+	    if("".equals(SignName)){ // 没有开通短信接口
 
-        CommonRequest request = new CommonRequest();
-        request.setMethod(MethodType.POST);
-        request.setDomain("dysmsapi.aliyuncs.com");
-        request.setVersion("2017-05-25");
-        request.setAction("SendSms");
-        request.putQueryParameter("RegionId", "cn-hangzhou");
-        request.putQueryParameter("PhoneNumbers", phone);
-        request.putQueryParameter("SignName", SignName);
-        request.putQueryParameter("TemplateCode", TemplateOrderCode);
-        request.putQueryParameter("TemplateParam", jsonObject.toJSONString());
-        try {
-            CommonResponse response = client.getCommonResponse(request);
-            System.out.println(response.getData());
-            return "ok";
-        } catch (ServerException e) {
-            e.printStackTrace();
-            return "error";
-        } catch (ClientException e) {
-            e.printStackTrace();
-            return "error";
-        } catch (com.aliyuncs.exceptions.ClientException e) {
-            e.printStackTrace();
+        }else {
+            DefaultProfile profile = DefaultProfile.getProfile("cn-hangzhou", accessKeyId, accessKeySecret);
+            IAcsClient client = new DefaultAcsClient(profile);
+
+            CommonRequest request = new CommonRequest();
+            request.setMethod(MethodType.POST);
+            request.setDomain("dysmsapi.aliyuncs.com");
+            request.setVersion("2017-05-25");
+            request.setAction("SendSms");
+            request.putQueryParameter("RegionId", "cn-hangzhou");
+            request.putQueryParameter("PhoneNumbers", phone);
+            request.putQueryParameter("SignName", SignName);
+            request.putQueryParameter("TemplateCode", TemplateOrderCode);
+            request.putQueryParameter("TemplateParam", jsonObject.toJSONString());
+            try {
+                CommonResponse response = client.getCommonResponse(request);
+                System.out.println(response.getData());
+                return "ok";
+            } catch (ServerException e) {
+                e.printStackTrace();
+                return "error";
+            } catch (ClientException e) {
+                e.printStackTrace();
+                return "error";
+            } catch (com.aliyuncs.exceptions.ClientException e) {
+                e.printStackTrace();
+            }
         }
-        return null;
+
+        return "error";
     }
 	
 	
