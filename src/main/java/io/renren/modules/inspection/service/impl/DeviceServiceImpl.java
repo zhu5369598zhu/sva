@@ -55,7 +55,7 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DeviceEntity> impl
             filterfield = "device_code";
         }
         Integer[] array = null;
-        if(!deptId.equals("")){
+        if(!"".equals(deptId)&& deptId != null){
             List<Integer> deptIds = deptService.queryRecursiveChildByParentId(Long.parseLong(deptId));
             Integer[] deptIdsIn = new Integer[deptIds.size()];
             array = deptIds.toArray(deptIdsIn);
@@ -96,7 +96,7 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DeviceEntity> impl
             filterfield = "device_code";
         }
         Integer[] array = null;
-        if(!deptId.equals("")){
+        if(!"".equals(deptId)&& deptId != null){
             List<Integer> deptIds = deptService.queryRecursiveChildByParentId(Long.parseLong(deptId));
             Integer[] deptIdsIn = new Integer[deptIds.size()];
             array = deptIds.toArray(deptIdsIn);
