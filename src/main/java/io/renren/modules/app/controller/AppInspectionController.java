@@ -142,11 +142,14 @@ public class AppInspectionController {
         Map<String,Object> hashMap = new HashMap<String,Object>();
         hashMap.put("deviceId", deviceId);
         DeviceExceptionEntity deviceException = deviceExceptionService.findDeviceExceptionBydeviceId(hashMap);
+        System.out.println("查询" + deviceException);
         if(deviceException == null) {
+
         	hashMap.put("deptId",device.getDeviceDept());
         	hashMap.put("deviceLevel",device.getDeviceLevel());
         	hashMap.put("deviceId", 0);
         	DeviceExceptionEntity deviceExceptionEntity = deviceExceptionService.findDeviceExceptionByDeptidDeviceLevel(hashMap);
+        	System.out.println("查询是否存在" + deviceException);
         	if(deviceExceptionEntity!=null) {
         		if(deviceExceptionEntity.getIsOk()==1) { // 发送短信
         			String exceptionIds = deviceExceptionEntity.getExceptionIds();
@@ -177,7 +180,7 @@ public class AppInspectionController {
                         				map.put("type", 1);
                         				map.put("createTiem", new Date());
                         				deviceExceptionService.insertSms(map); // 发送短信记录
-                    				}else { // 发送短信失败
+                    				}else { //  发送短信失败
                         				map.put("isOk", 0);
                         				map.put("phone", mobile);
                         				map.put("content", "尊敬的用户，您的设备"+deviceName+"巡检"+itemName+"出现异常等级为"+exceptionName+",请您及时关注哦。");
@@ -215,6 +218,7 @@ public class AppInspectionController {
         		}
         	}
         }else {
+			System.out.println("查询存在" + deviceException);
         	if(deviceException.getIsOk() == 1) { // 发送短信
         		String exceptionIds = deviceException.getExceptionIds();
         		String[] split = exceptionIds.split(",");
