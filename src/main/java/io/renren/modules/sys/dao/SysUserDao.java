@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 系统用户
@@ -16,7 +17,7 @@ import java.util.List;
  */
 @Mapper
 public interface SysUserDao extends BaseMapper<SysUserEntity> {
-	
+
 	/**
 	 * 查询用户的所有权限
 	 * @param userId  用户ID
@@ -37,5 +38,12 @@ public interface SysUserDao extends BaseMapper<SysUserEntity> {
 
 	Integer isExist(@Param("userName") String userName, @Param("userCode") String userCode);
 
+	/**
+	 * 根据父部门查询子部门
+	 */
+	List<Map<String, Object>> queryListParentId(Integer parentId);
 
+	List<Map<String, Object>> findDeviceLeveList(Long id);
+
+	List<Map<String, Object>> querydeptListParentId(Long id);
 }

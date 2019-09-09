@@ -32,4 +32,15 @@
 		</if>)
 	</select>
 
+	<select id="queryListParentId" resultType="java.util.HashMap" parameterType="java.lang.Integer">
+		select dept_id as id, name as label, parent_id AS pid, 'dept' as type from sys_dept where parent_id = #{parentId} order by order_num asc
+	</select>
+
+	<select id="findDeviceLeveList" resultType="java.util.HashMap" parameterType="java.lang.Long">
+		SELECT user_id AS id, username AS label, dept_id AS pid, 'user' AS type FROM  sys_user WHERE is_delete = 0 and dept_id = #{id}
+	</select>
+
+	<select id="querydeptListParentId" resultType="java.util.HashMap" parameterType="java.lang.Long">
+		select dept_id as id, name as label, parent_id AS pid, 'dept' as type from sys_dept where parent_id = #{id} order by order_num asc
+	</select>
 </mapper>

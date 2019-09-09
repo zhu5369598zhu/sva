@@ -2,14 +2,16 @@ package io.renren.modules.sys.controller;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import io.renren.common.annotation.SysLog;
-import io.renren.common.utils.*;
+import io.renren.common.utils.Constant;
+import io.renren.common.utils.PageUtils;
+import io.renren.common.utils.PoiUtils;
+import io.renren.common.utils.R;
 import io.renren.common.validator.Assert;
 import io.renren.common.validator.ValidatorUtils;
 import io.renren.common.validator.group.AddGroup;
 import io.renren.common.validator.group.UpdateGroup;
 import io.renren.modules.inspection.entity.ClassGroupEntity;
 import io.renren.modules.inspection.entity.ClassWorkerEntity;
-import io.renren.modules.inspection.entity.DeviceEntity;
 import io.renren.modules.inspection.entity.InspectionLineEntity;
 import io.renren.modules.inspection.service.ClassGroupService;
 import io.renren.modules.inspection.service.ClassWorkerService;
@@ -21,7 +23,6 @@ import io.renren.modules.sys.service.SysDeptService;
 import io.renren.modules.sys.service.SysUserRoleService;
 import io.renren.modules.sys.service.SysUserService;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -293,4 +294,16 @@ public class SysUserController extends AbstractController {
 		
 		return R.ok();
 	}
+
+	/**
+	 * 获取部门树及用户树 用作班组选择用户
+	 */
+	@RequestMapping("/usertree")
+	@RequiresPermissions("sys:user:usertree")
+	public R usertree(){
+		List<Map<String,Object>> userTreeList = sysUserService.findByUserTree();
+		System.out.println(userTreeList);
+		return R.ok().put("userTreeList", userTreeList);
+	}
+
 }

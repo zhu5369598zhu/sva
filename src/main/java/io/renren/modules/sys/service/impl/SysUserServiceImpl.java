@@ -7,7 +7,6 @@ import io.renren.common.exception.RRException;
 import io.renren.common.utils.Constant;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
-import io.renren.common.validator.Assert;
 import io.renren.modules.app.form.LoginForm;
 import io.renren.modules.sys.dao.SysUserDao;
 import io.renren.modules.sys.entity.SysDeptEntity;
@@ -18,7 +17,6 @@ import io.renren.modules.sys.service.SysUserRoleService;
 import io.renren.modules.sys.service.SysUserService;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
-
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,6 +40,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
 	private SysRoleService sysRoleService;
 	@Autowired
 	private SysDeptService sysDeptService;
+	@Autowired
+	private SysUserDao sysUserDao;
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
@@ -234,4 +234,59 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
 	public Integer isExist(String userName, String userCode){
 		return baseMapper.isExist(userName, userCode);
 	}
+
+	@Override
+	public List<Map<String, Object>> findByUserTree() {
+
+
+		List<Map<String,Object>> root = sysUserDao.queryListParentId(0);
+
+		for(Map<String, Object> m : root){
+			getTreeNodeData(m);
+		}
+
+		return clearNode(root);
+	}
+
+	private List<Map<String, Object>> clearNode(List<Map<String, Object>> curNode) {
+		Iterator<Map<String,Object>> item = curNode.iterator();
+		while (item.hasNext()){
+			Map<String, Object> node = item.next();
+			String type = (String)node.get("type");
+			if(type.equals("dept")) {
+				List<Map<String,Object>> children = (List<Map<String,Object>>)node.get("children");
+				if (children.size() == 0){
+					item.remove();
+				} else {
+					clearNode(children);
+				}
+			}
+		}
+
+		return curNode;
+	}
+
+	private void getTreeNodeData(Map<String, Object> node) {
+		// 查看该部门下 的 用户
+		List<Map<String,Object>> users = sysUserDao.findDeviceLeveList((Long)node.get("id"));
+
+		if(node.get("type").equals("dept")){
+			List<Map<String, Object>> children  = sysUserDao.querydeptListParentId((Long)node.get("id"));
+			if(children != null && children.size() > 0 ){
+				children.addAll(users);
+				node.put("children", children);
+				for(Map<String, Object> m : children){
+					if(m.get("type").equals("dept")) { // 如果是部门才 继续循环，是设备等级 就循环下一个部门
+						getTreeNodeData(m);
+					}
+				}
+			} else {
+				node.put("children", users);
+			}
+		}
+
+
+	}
+
+
 }

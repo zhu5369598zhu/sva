@@ -76,4 +76,6 @@ public interface SysUserService extends IService<SysUserEntity> {
 	SysUserEntity selectByGuid(String guid);
 
 	Integer isExist(String userName, String userCode);
+
+    List<Map<String, Object>> findByUserTree();
 }
