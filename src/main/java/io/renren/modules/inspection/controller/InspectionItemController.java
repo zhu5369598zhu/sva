@@ -1,28 +1,22 @@
 package io.renren.modules.inspection.controller;
 
-import java.util.*;
-
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.mapper.Wrapper;
-import com.qiniu.common.Zone;
 import io.renren.common.annotation.SysLog;
+import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.PoiUtils;
+import io.renren.common.utils.R;
 import io.renren.modules.inspection.entity.*;
 import io.renren.modules.inspection.service.*;
 import io.renren.modules.setting.entity.*;
 import io.renren.modules.setting.service.*;
-import io.renren.modules.sys.entity.SysUserEntity;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.hibernate.validator.internal.util.IdentitySet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
-import io.renren.common.utils.PageUtils;
-import io.renren.common.utils.R;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.*;
 
 
 /**
@@ -393,7 +387,7 @@ public class InspectionItemController {
                     List<LineZoneEntity> lineZoneEntities = lineZoneService.selectByMap(lineZoneParams);
                     for(LineZoneEntity lineZoneEntity:lineZoneEntities){
                         InspectionLineEntity line = lineService.selectById(lineZoneEntity.getLineId());
-                        if(line != null && line.getIsPublish().equals(1)){
+                        if(line != null && line.getIsPublish().equals(1) && line.getIsDelete().equals(0)){
                             return R.error(400,"该巡检项对应巡检线路[" + line.getName() + "]已发布，不能删除。");
                         }
                     }

@@ -30,6 +30,7 @@ public class InspectionLinePublishServiceImpl extends ServiceImpl<InspectionLine
                 new Query<InspectionLinePublishEntity>(params).getPage(),
                 new EntityWrapper<InspectionLinePublishEntity>()
                 .eq( lineId != null, "line_id", lineId)
+                .orderBy("update_time",false)
         );
         List<InspectionLinePublishEntity> linePublishEntities = page.getRecords();
         for(InspectionLinePublishEntity publish:linePublishEntities)
