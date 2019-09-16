@@ -1,29 +1,8 @@
 package io.renren.modules.group.controller;
 
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-
-import io.renren.common.utils.OrderUtils;
-import io.renren.common.utils.PageUtils;
-import io.renren.common.utils.R;
-import io.renren.common.utils.SendSms;
-import io.renren.common.utils.TestMessage;
+import io.renren.common.utils.*;
 import io.renren.modules.group.entity.ClassGroupLogEntity;
 import io.renren.modules.group.service.ClassGroupLogConfirmedService;
 import io.renren.modules.setting.entity.BaseTurnEntity;
@@ -35,6 +14,12 @@ import io.renren.modules.sys.service.DeviceExceptionService;
 import io.renren.modules.sys.service.NewsService;
 import io.renren.modules.sys.service.SysDeptService;
 import io.renren.modules.sys.service.SysUserService;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * 班组日志(待确认)
@@ -145,7 +130,7 @@ public class ClassGroupLogConfirmedController {
 	    				map.put("createTiem", new Date());
 	    				deviceExceptionService.insertSms(map); // 发送短信记录
 	    			}
-	    			
+					DingdingSend.ordersend("您有一条已确认的班长日志编号"+classGroupLog.getLogNumber() ,userEntity.getMobile());
 	    		}
 	    		String wechat = userEntity.getWechat();
 	    		if(!"".equals(wechat)) { 
@@ -213,7 +198,7 @@ public class ClassGroupLogConfirmedController {
 	    				map.put("createTiem", new Date());
 	    				deviceExceptionService.insertSms(map); // 发送短信记录
 	    			}
-	    			
+					DingdingSend.ordersend("您有一条被拒绝的班长日志编号" + classGroupLog.getLogNumber(),userEntity.getMobile());
 	    		}
 	    		String wechat = userEntity.getWechat();
 	    		if(!"".equals(wechat)) { 
@@ -268,7 +253,7 @@ public class ClassGroupLogConfirmedController {
         	    				map.put("createTiem", new Date());
         	    				deviceExceptionService.insertSms(map); // 发送短信记录
         	    			}
-        	    			
+							DingdingSend.ordersend("您有一条已确认的班前日志编号"+ classGroupLog.getLogNumber(),userEntity.getMobile());
         	    		}
         	    		String wechat = userEntity.getWechat();
         	    		if(!"".equals(wechat)) { 
@@ -351,7 +336,7 @@ public class ClassGroupLogConfirmedController {
 	    				map.put("createTiem", new Date());
 	    				deviceExceptionService.insertSms(map); // 发送短信记录
 	    			}
-	    			
+					DingdingSend.ordersend("您有一条被拒绝的班前日志编号" +classGroupLog.getLogNumber(),userEntity.getMobile());
 	    		}
 	    		String wechat = userEntity.getWechat();
 	    		if(!"".equals(wechat)) { 
@@ -406,7 +391,7 @@ public class ClassGroupLogConfirmedController {
         	    				map.put("createTiem", new Date());
         	    				deviceExceptionService.insertSms(map); // 发送短信记录
         	    			}
-        	    			
+							DingdingSend.ordersend("您有一条已确认的班后日志编号"+classGroupLog.getLogNumber(),userEntity.getMobile());
         	    		}
         	    		String wechat = userEntity.getWechat();
         	    		if(!"".equals(wechat)) { 
@@ -485,7 +470,7 @@ public class ClassGroupLogConfirmedController {
 	    				map.put("createTiem", new Date());
 	    				deviceExceptionService.insertSms(map); // 发送短信记录
 	    			}
-	    			
+					DingdingSend.ordersend("您有一条被拒绝的班后日志编号"+classGroupLog.getLogNumber() ,userEntity.getMobile());
 	    		}
 	    		String wechat = userEntity.getWechat();
 	    		if(!"".equals(wechat)) { 

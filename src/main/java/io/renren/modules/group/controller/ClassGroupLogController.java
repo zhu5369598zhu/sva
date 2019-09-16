@@ -1,39 +1,25 @@
 package io.renren.modules.group.controller;
 
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import io.renren.modules.sys.entity.SysDeptEntity;
-import io.renren.modules.sys.entity.SysUserEntity;
-import io.renren.modules.sys.service.SysDeptService;
-import io.renren.modules.sys.service.SysUserService;
-
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import io.renren.common.utils.*;
 import io.renren.modules.group.entity.ClassGroupLogEntity;
 import io.renren.modules.group.service.ClassGroupLogService;
 import io.renren.modules.setting.entity.BaseTurnEntity;
 import io.renren.modules.setting.service.BaseTurnService;
 import io.renren.modules.sys.entity.NewsEntity;
+import io.renren.modules.sys.entity.SysDeptEntity;
+import io.renren.modules.sys.entity.SysUserEntity;
 import io.renren.modules.sys.service.DeviceExceptionService;
 import io.renren.modules.sys.service.NewsService;
-import io.renren.common.utils.OrderUtils;
-import io.renren.common.utils.PageUtils;
-import io.renren.common.utils.R;
-import io.renren.common.utils.SendSms;
-import io.renren.common.utils.TestMessage;
+import io.renren.modules.sys.service.SysDeptService;
+import io.renren.modules.sys.service.SysUserService;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 
@@ -83,7 +69,7 @@ public class ClassGroupLogController {
     @RequestMapping("/info/{classId}")
     @RequiresPermissions("group:classgrouplog:info")
     public R info(@PathVariable("classId") Integer classId){
-			ClassGroupLogEntity classGroupLog = classGroupLogService.selectById(classId);
+		ClassGroupLogEntity classGroupLog = classGroupLogService.selectById(classId);
 		// 获取部门(车间工段) 名称
 		SysDeptEntity sysDeptEntity = sysDeptService.selectById(classGroupLog.getDeptId());
 		classGroupLog.setDeptName(sysDeptEntity.getName());
@@ -141,11 +127,12 @@ public class ClassGroupLogController {
     				map.put("createTiem", new Date());
     				deviceExceptionService.insertSms(map); // 发送短信记录
     			}
-    			
+    			DingdingSend.ordersend("您有一条待确认班长日志编号"+classGroupLog.getLogNumber(),userEntity.getMobile());
     		}
     		String wechat = userEntity.getWechat();
     		if(!"".equals(wechat)) { 
-    			TestMessage.ordersend(wechat, "您有一条待确认班长日志", classGroupLog.getLogNumber()); 
+    			TestMessage.ordersend(wechat, "您有一条待确认班长日志", classGroupLog.getLogNumber());
+
     		}
     		
     	}	
@@ -187,7 +174,7 @@ public class ClassGroupLogController {
 	    				map.put("createTiem", new Date());
 	    				deviceExceptionService.insertSms(map); // 发送短信记录
 	    			}
-	    			
+					DingdingSend.ordersend("您有一条待确认班前日志编号"+ classGroupLog.getLogNumber(),userEntity.getMobile());
 	    		}
 	    		String wechat = userEntity.getWechat();
 	    		if(!"".equals(wechat)) { 
@@ -233,7 +220,7 @@ public class ClassGroupLogController {
 	    				map.put("createTiem", new Date());
 	    				deviceExceptionService.insertSms(map); // 发送短信记录
 	    			}
-	    			
+					DingdingSend.ordersend("您有一条待确认班后日志编号"+ classGroupLog.getLogNumber(),userEntity.getMobile());
 	    		}
 	    		String wechat = userEntity.getWechat();
 	    		if(!"".equals(wechat)) { 
@@ -292,7 +279,7 @@ public class ClassGroupLogController {
 	    				map.put("createTiem", new Date());
 	    				deviceExceptionService.insertSms(map); // 发送短信记录
 	    			}
-	    			
+					DingdingSend.ordersend("您有一条待确认班长日志编号"+classGroupLog.getLogNumber(),userEntity.getMobile());
 	    		}
 	    		String wechat = userEntity.getWechat();
 	    		if(!"".equals(wechat)) { 
@@ -342,7 +329,7 @@ public class ClassGroupLogController {
 		    				map.put("createTiem", new Date());
 		    				deviceExceptionService.insertSms(map); // 发送短信记录
 		    			}
-		    			
+						DingdingSend.ordersend("您有一条待确认班前日志编号"+ classGroupLog.getLogNumber(),userEntity.getMobile());
 		    		}
 		    		String wechat = userEntity.getWechat();
 		    		if(!"".equals(wechat)) { 
@@ -392,7 +379,7 @@ public class ClassGroupLogController {
 		    				map.put("createTiem", new Date());
 		    				deviceExceptionService.insertSms(map); // 发送短信记录
 		    			}
-		    			
+						DingdingSend.ordersend("您有一条待确认班后日志编号"+ classGroupLog.getLogNumber(),userEntity.getMobile());
 		    		}
 		    		String wechat = userEntity.getWechat();
 		    		if(!"".equals(wechat)) { 

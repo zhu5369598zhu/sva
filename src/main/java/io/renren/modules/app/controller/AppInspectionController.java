@@ -1,6 +1,7 @@
 package io.renren.modules.app.controller;
 
 import io.renren.common.exception.RRException;
+import io.renren.common.utils.DingdingSend;
 import io.renren.common.utils.R;
 import io.renren.common.utils.SendSms;
 import io.renren.common.utils.TestMessage;
@@ -176,18 +177,18 @@ public class AppInspectionController {
                     				if(isOk.equals("ok")) { // 发送短信成功
                         				map.put("isOk", 1);
                         				map.put("phone", mobile);
-                        				map.put("content", "尊敬的用户，您的设备"+deviceName+"巡检"+itemName+"出现异常等级为"+exceptionName+",请您及时关注哦。");
+                        				map.put("content", "尊敬的用户，您的设备"+deviceName+"巡检项"+itemName+"出现"+exceptionName+"的异常等级,请您及时关注哦。");
                         				map.put("type", 1);
                         				map.put("createTiem", new Date());
                         				deviceExceptionService.insertSms(map); // 发送短信记录
                     				}else { //  发送短信失败
                         				map.put("isOk", 0);
                         				map.put("phone", mobile);
-                        				map.put("content", "尊敬的用户，您的设备"+deviceName+"巡检"+itemName+"出现异常等级为"+exceptionName+",请您及时关注哦。");
-                        				map.put("type", 1);
+										map.put("content", "尊敬的用户，您的设备"+deviceName+"巡检项"+itemName+"出现"+exceptionName+"的异常等级,请您及时关注哦。");                        				map.put("type", 1);
                         				map.put("createTiem", new Date());
                         				deviceExceptionService.insertSms(map); // 发送短信记录
                     				}
+									DingdingSend.ordersend("尊敬的用户，您的设备"+deviceName+"巡检项"+itemName+"出现"+exceptionName+"的异常等级,请您及时关注哦,", mobile);
 								}
                 			}
                 		}
@@ -209,7 +210,7 @@ public class AppInspectionController {
                     				SysUserEntity userEntity = sysUserService.selectById(Integer.parseInt(userId));
                     				String wechat = userEntity.getWechat();
                     				if(!"".equals(wechat)) {
-                    					TestMessage.deviceSend(wechat, "尊敬的用户，您的设备["+deviceName+"]巡检["+itemName+"]出现异常等级为["+exceptionName+"],请您及时关注哦。");
+                    					TestMessage.deviceSend(wechat, "尊敬的用户，您的设备["+deviceName+"]巡检项["+itemName+"]出现["+exceptionName+"]的异常等级,请您及时关注哦。");
                     				}
                     			}
                 			}
@@ -245,7 +246,7 @@ public class AppInspectionController {
                 					HashMap<String,Object> map = new HashMap<String,Object>();
                     				map.put("isOk", 1);
                     				map.put("phone", mobile);
-                    				map.put("content", "尊敬的用户，您的设备"+deviceName+"巡检"+itemName+"出现异常等级为"+exceptionName+",请您及时关注哦。");
+                    				map.put("content", "尊敬的用户，您的设备"+deviceName+"巡检项"+itemName+"出现"+exceptionName+"的异常等级,请您及时关注哦。");
                     				map.put("type", 1);
                     				map.put("createTiem", new Date());
                     				deviceExceptionService.insertSms(map); // 发送短信记录
@@ -253,11 +254,12 @@ public class AppInspectionController {
                 					HashMap<String,Object> map = new HashMap<String,Object>();
                     				map.put("isOk", 0);
                     				map.put("phone", mobile);
-                    				map.put("content", "尊敬的用户，您的设备"+deviceName+"巡检"+itemName+"出现异常等级为"+exceptionName+",请您及时关注哦。");
+									map.put("content", "尊敬的用户，您的设备"+deviceName+"巡检项"+itemName+"出现"+exceptionName+"的异常等级,请您及时关注哦。");
                     				map.put("type", 1);
                     				map.put("createTiem", new Date());
                     				deviceExceptionService.insertSms(map); // 发送短信记录
                 				}
+								DingdingSend.ordersend("尊敬的用户，您的设备"+deviceName+"巡检项"+itemName+"出现"+exceptionName+"的异常等级,请您及时关注哦,", mobile);
                 			}
             			}
             		}
@@ -279,7 +281,7 @@ public class AppInspectionController {
                 				SysUserEntity userEntity = sysUserService.selectById(Integer.parseInt(userId));
                 				String wechat = userEntity.getWechat();
                 				if(!"".equals(wechat)) {
-                					TestMessage.deviceSend(wechat, "尊敬的用户，您的设备["+deviceName+"]巡检["+itemName+"]出现异常等级为["+exceptionName+"],请您及时关注哦。");
+                					TestMessage.deviceSend(wechat, "尊敬的用户，您的设备["+deviceName+"]巡检项["+itemName+"]出现["+exceptionName+"]的异常等级,请您及时关注哦。");
                 				}
                 			}
             			}

@@ -13,7 +13,7 @@ server:
 spring:
   # 环境 dev|test|prod
   profiles:
-    active: dev
+    active: prod
   # jackson时间格式化
   jackson:
     time-zone: GMT+8
@@ -90,11 +90,13 @@ company:
   accessKeySecret: 2uLQpuedE2BZPKR2kuB3kf0SDTjDsV
   accessKeyId: LTAI1jFQEmsk61wR
   SignName: 北京国能华控科技有限公司
-  TemplateDeviceCode: SMS_172603667
+  TemplateDeviceCode: SMS_174029173
   TemplateOrderCode: SMS_172603704
   corpId: "ww4a9ff8a5d1318da2"
   corpsecret: "KuZk4I5HT5dCxHvqm1FkHJwQjfkCyRbh_X6S2Ny5ZZQ"
   agentid: "1000005"
-  
+  dingdingagentid: "290492309"
+  appkey: "ding5g0bdrqajoylqqcm"
+  appsecret: "NrE7Gkmm5BzlFg5cZVOVUWHov_RKbm6gVSWJJOCdC_yQ8KToAzMzy6_neAxm5Zto"
   
   
