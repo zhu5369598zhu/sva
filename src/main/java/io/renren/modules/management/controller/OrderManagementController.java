@@ -1,29 +1,18 @@
 package io.renren.modules.management.controller;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import io.renren.modules.inspection.entity.InspectionResultEntity;
-import io.renren.modules.inspection.service.InspectionResultService;
-import io.renren.modules.setting.entity.OrderExceptionEntity;
-import io.renren.modules.setting.service.OrderExceptionService;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-
+import io.renren.common.utils.*;
+import io.renren.modules.inspection.entity.InspectionResultEntity;
+import io.renren.modules.inspection.service.InspectionResultService;
 import io.renren.modules.management.entity.OrderDefectiveEntity;
 import io.renren.modules.management.entity.OrderManagementEntity;
 import io.renren.modules.management.entity.OrderRecordEntity;
 import io.renren.modules.management.service.OrderDefectiveService;
 import io.renren.modules.management.service.OrderManagementService;
 import io.renren.modules.management.service.OrderRecordService;
+import io.renren.modules.setting.entity.OrderExceptionEntity;
+import io.renren.modules.setting.service.OrderExceptionService;
 import io.renren.modules.sys.entity.NewsEntity;
 import io.renren.modules.sys.entity.SysDeptEntity;
 import io.renren.modules.sys.entity.SysUserEntity;
@@ -31,12 +20,12 @@ import io.renren.modules.sys.service.DeviceExceptionService;
 import io.renren.modules.sys.service.NewsService;
 import io.renren.modules.sys.service.SysDeptService;
 import io.renren.modules.sys.service.SysUserService;
-import io.renren.common.utils.OrderUtils;
-import io.renren.common.utils.PageUtils;
-import io.renren.common.utils.R;
-import io.renren.common.utils.SendSms;
-import io.renren.common.utils.TestMessage;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 /**
@@ -245,7 +234,7 @@ public class OrderManagementController {
 					map.put("createTiem", new Date());
 					deviceExceptionService.insertSms(map); // 发送短信记录
 				}
-				
+				DingdingSend.ordersend("尊敬的用户,您有一条已下发待受理的工单编号"+orderManagement.getOrderNumber() ,userEntity.getMobile());
 			}
 			String wechat = userEntity.getWechat();
 			if(!"".equals(wechat)) { 
@@ -338,7 +327,7 @@ public class OrderManagementController {
 					map.put("createTiem", new Date());
 					deviceExceptionService.insertSms(map); // 发送短信记录
 				}
-				
+				DingdingSend.ordersend("尊敬的用户,您有一条转工单被拒绝的填报缺陷编号"+orderManagement.getOrderNumber(),userEntity.getMobile());
 			}
 			String wechat = userEntity.getWechat();
 			if(!"".equals(wechat)) { 
@@ -396,7 +385,7 @@ public class OrderManagementController {
 					map.put("createTiem", new Date());
 					deviceExceptionService.insertSms(map); // 发送短信记录
 				}
-				
+				DingdingSend.ordersend("尊敬的用户,您有一条转工单被拒绝的巡检异常缺陷编号"+orderManagement.getOrderNumber(),userEntity.getMobile());
 			}
 			String wechat = userEntity.getWechat();
 			if(!"".equals(wechat)) { 
