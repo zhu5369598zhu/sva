@@ -86,6 +86,7 @@ public class lineScanTask {
             for (InspectionPeriodEntity period:periods) {
                 InspectionTaskEntity taskEntity = new InspectionTaskEntity();
                 taskEntity.setLineId(line.getId());
+                taskEntity.setPeriodId(period.getId().intValue());
                 taskEntity.setIsSpan(0);
                 taskEntity.setIsInspected(0);
                 taskEntity.setInspectedDeviceCount(0);
@@ -99,6 +100,9 @@ public class lineScanTask {
                     TurnEntity turn = turnService.selectById(periodTurn.getTurnId());
                     if(turn !=null){
                         taskEntity.setTurnId(turn.getId());
+                        String today = simpleDateFormat.format(dt);
+                        taskEntity.setTurnStartTime(today + " " + turn.getStartTime());
+                        taskEntity.setTurnEndTime(today + " " + turn.getEndTime());
 
                         if(period.getFrequency() == 1){
                             deviceCount = deviceList.size();
@@ -224,7 +228,7 @@ public class lineScanTask {
                 taskService.insert(taskEntity);
             }
         }catch(Exception e){
-
+            logger.error(e.toString());
         }
     }
 

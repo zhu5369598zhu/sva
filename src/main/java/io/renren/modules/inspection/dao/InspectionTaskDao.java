@@ -20,5 +20,6 @@ import java.util.Map;
 @Mapper
 public interface InspectionTaskDao extends BaseMapper<InspectionTaskEntity> {
     List<Map<String,Object>> selectByDate(@Param("inspectDate") String inspectionDate);
+    List<Map<String,Object>> selectListByDate(@Param("inspectionStartDate") String inspectionStartDate,@Param("inspectionEndDate")  String inspectionEndDate);
 	
 }

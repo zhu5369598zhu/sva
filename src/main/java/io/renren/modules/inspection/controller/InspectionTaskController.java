@@ -56,6 +56,16 @@ public class InspectionTaskController {
     }
 
     /**
+     * 获取完成率
+     */
+    @RequestMapping("/selectListByDate")
+    public R getstatus1(String date){
+        List<Map<String,Object>> statusList = inspectionTaskService.selectByDate(date);
+
+        return R.ok().put("status", statusList);
+    }
+
+    /**
      * 信息
      */
     @RequestMapping("/info/{id}")

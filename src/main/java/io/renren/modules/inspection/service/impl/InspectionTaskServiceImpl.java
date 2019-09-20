@@ -34,4 +34,9 @@ public class InspectionTaskServiceImpl extends ServiceImpl<InspectionTaskDao, In
         return baseMapper.selectByDate(inspectionDate);
     }
 
+    @Override
+    public List<Map<String,Object>> selectListByDate(String inspectionStartDate,String inspectionEndDate){
+        return baseMapper.selectListByDate(inspectionStartDate,inspectionEndDate);
+    }
+
 }

@@ -17,6 +17,7 @@ import java.util.Map;
  */
 public interface InspectionTaskService extends IService<InspectionTaskEntity> {
     List<Map<String,Object>> selectByDate(String inspectionDate);
+    List<Map<String,Object>> selectListByDate(String inspectionStartDate,String inspectionEndDate);
     PageUtils queryPage(Map<String, Object> params);
 }
 
