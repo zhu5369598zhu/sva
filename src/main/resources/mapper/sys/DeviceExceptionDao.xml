@@ -17,6 +17,7 @@
         <result property="smsUserIds" column="sms_user_ids"/>
         <result property="isOk" column="is_ok"/>
         <result property="wxOk" column="wx_ok"/>
+		<result property="ddOk" column="dd_ok"/>
         <result property="type" column="type"/>
     </resultMap>
 
