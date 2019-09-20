@@ -68,6 +68,10 @@ public class DeviceExceptionEntity implements Serializable {
 	 */
 	private Integer wxOk;
 	/**
+	 * 该设备是否发送钉钉消息（0 不发送钉钉，1 发送钉钉）
+	 */
+	private Integer ddOk;
+	/**
 	 * type 是 level 设备等级分类，device 单个设备
 	 */
 	private String type;
@@ -163,6 +167,7 @@ public class DeviceExceptionEntity implements Serializable {
 	public Integer getIsOk() {
 		return isOk;
 	}
+	public Integer getDdOk() { return ddOk; }
 	public void setDeviceId(Integer deviceId) {
 		this.deviceId = deviceId;
 	}
@@ -181,6 +186,7 @@ public class DeviceExceptionEntity implements Serializable {
 	public void setIsOk(Integer isOk) {
 		this.isOk = isOk;
 	}
+	public void setDdOk(Integer ddOk) { this.ddOk = ddOk; }
 	public String getType() {
 		return type;
 	}

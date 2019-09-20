@@ -145,149 +145,146 @@ public class AppInspectionController {
         DeviceExceptionEntity deviceException = deviceExceptionService.findDeviceExceptionBydeviceId(hashMap);
         System.out.println("查询" + deviceException);
         if(deviceException == null) {
-
         	hashMap.put("deptId",device.getDeviceDept());
         	hashMap.put("deviceLevel",device.getDeviceLevel());
         	hashMap.put("deviceId", 0);
         	DeviceExceptionEntity deviceExceptionEntity = deviceExceptionService.findDeviceExceptionByDeptidDeviceLevel(hashMap);
         	System.out.println("查询是否存在" + deviceException);
         	if(deviceExceptionEntity!=null) {
-        		if(deviceExceptionEntity.getIsOk()==1) { // 发送短信
-        			String exceptionIds = deviceExceptionEntity.getExceptionIds();
-                	String[] split = exceptionIds.split(",");
-                	for(String s: split) {
-                		if(s.equals(inspectionResult.getExceptionId().toString())) {
-                			String smsUserIds = deviceExceptionEntity.getSmsUserIds();
-							String deviceName = device.getDeviceName(); // 设备名称
-							String itemName = inspctionItem.getName(); // 巡检项名称
-							ExceptionEntity exceptionEntity = exceptionService.selectById(s);
-							String exceptionName = exceptionEntity.getName(); // 异常等级名称
+				String exceptionIds = deviceExceptionEntity.getExceptionIds();
+				String[] split = exceptionIds.split(",");
+				for(String s: split) {
+					if(s.equals(inspectionResult.getExceptionId().toString())) {
+						String smsUserIds = deviceExceptionEntity.getSmsUserIds();
+						String deviceName = device.getDeviceName(); // 设备名称
+						String itemName = inspctionItem.getName(); // 巡检项名称
+						ExceptionEntity exceptionEntity = exceptionService.selectById(s);
+						String exceptionName = exceptionEntity.getName(); // 异常等级名称
+						if(deviceExceptionEntity.getIsOk()==1){ // 发送短信
 							JSONObject returnJson = new JSONObject(new LinkedHashMap());
 							returnJson.put("deviceName", "["+deviceName+"]");
 							returnJson.put("itemName", "["+itemName+"]");
 							returnJson.put("exceptionName", "["+exceptionName+"]");
-                			if(!"".equals(smsUserIds)) { 
-                				String[] userIds = smsUserIds.split(",");
+							if(!"".equals(smsUserIds)) {
+								String[] userIds = smsUserIds.split(",");
 								for(String userId: userIds) {
-                    				SysUserEntity userEntity = sysUserService.selectById(Integer.parseInt(userId));
-                    				String mobile = userEntity.getMobile();
-                    				String isOk = SendSms.deviceSend(mobile, returnJson);
-                    				System.out.println("是否成功"+ isOk);
-                    				HashMap<String,Object> map = new HashMap<String,Object>();
-                    				if(isOk.equals("ok")) { // 发送短信成功
-                        				map.put("isOk", 1);
-                        				map.put("phone", mobile);
-                        				map.put("content", "尊敬的用户，您的设备"+deviceName+"巡检项"+itemName+"出现"+exceptionName+"的异常等级,请您及时关注哦。");
-                        				map.put("type", 1);
-                        				map.put("createTiem", new Date());
-                        				deviceExceptionService.insertSms(map); // 发送短信记录
-                    				}else { //  发送短信失败
-                        				map.put("isOk", 0);
-                        				map.put("phone", mobile);
+									SysUserEntity userEntity = sysUserService.selectById(Integer.parseInt(userId));
+									String mobile = userEntity.getMobile();
+									String isOk = SendSms.deviceSend(mobile, returnJson);
+									System.out.println("是否成功"+ isOk);
+									HashMap<String,Object> map = new HashMap<String,Object>();
+									if(isOk.equals("ok")) { // 发送短信成功
+										map.put("isOk", 1);
+										map.put("phone", mobile);
+										map.put("content", "尊敬的用户，您的设备"+deviceName+"巡检项"+itemName+"出现"+exceptionName+"的异常等级,请您及时关注哦。");
+										map.put("type", 1);
+										map.put("createTiem", new Date());
+										deviceExceptionService.insertSms(map); // 发送短信记录
+									}else { //  发送短信失败
+										map.put("isOk", 0);
+										map.put("phone", mobile);
 										map.put("content", "尊敬的用户，您的设备"+deviceName+"巡检项"+itemName+"出现"+exceptionName+"的异常等级,请您及时关注哦。");                        				map.put("type", 1);
-                        				map.put("createTiem", new Date());
-                        				deviceExceptionService.insertSms(map); // 发送短信记录
-                    				}
-									DingdingSend.ordersend("尊敬的用户，您的设备"+deviceName+"巡检项"+itemName+"出现"+exceptionName+"的异常等级,请您及时关注哦,", mobile);
+										map.put("createTiem", new Date());
+										deviceExceptionService.insertSms(map); // 发送短信记录
+									}
 								}
-                			}
-                		}
-                	}
-        		}
-        		if(deviceExceptionEntity.getWxOk() ==1) { // 发送微信
-        			String exceptionIds = deviceExceptionEntity.getExceptionIds();
-                	String[] split = exceptionIds.split(",");
-					for(String s: split) {
-                		if(s.equals(inspectionResult.getExceptionId().toString())) {
-							ExceptionEntity exceptionEntity = exceptionService.selectById(s);
-							String exceptionName = exceptionEntity.getName(); // 异常等级名称
-							String deviceName = device.getDeviceName(); // 设备名称
-							String itemName = inspctionItem.getName(); // 巡检项名称
-							String smsUserIds = deviceExceptionEntity.getSmsUserIds();
-                			if(!"".equals(smsUserIds)) {
-                				String[] userIds = smsUserIds.split(",");
-                    			for(String userId: userIds) {
-                    				SysUserEntity userEntity = sysUserService.selectById(Integer.parseInt(userId));
-                    				String wechat = userEntity.getWechat();
-                    				if(!"".equals(wechat)) {
-                    					TestMessage.deviceSend(wechat, "尊敬的用户，您的设备["+deviceName+"]巡检项["+itemName+"]出现["+exceptionName+"]的异常等级,请您及时关注哦。");
-                    				}
-                    			}
-                			}
-                		}
-                	}
-        		}
+							}
+						}
+						if(deviceExceptionEntity.getWxOk() ==1) { // 发送微信
+							if(!"".equals(smsUserIds)) {
+								String[] userIds = smsUserIds.split(",");
+								for(String userId: userIds) {
+									SysUserEntity userEntity = sysUserService.selectById(Integer.parseInt(userId));
+									String wechat = userEntity.getWechat();
+									if(!"".equals(wechat)) {
+										TestMessage.deviceSend(wechat, "尊敬的用户，您的设备["+deviceName+"]巡检项["+itemName+"]出现["+exceptionName+"]的异常等级,请您及时关注哦。");
+									}
+								}
+							}
+						}
+						if(deviceExceptionEntity.getDdOk() == 1){ // 发送钉钉消息
+							if(!"".equals(smsUserIds)) {
+								String[] userIds = smsUserIds.split(",");
+								for(String userId: userIds) {
+									SysUserEntity userEntity = sysUserService.selectById(Integer.parseInt(userId));
+									String mobile = userEntity.getMobile();
+									DingdingSend.ordersend("尊敬的用户，您的设备"+deviceName+"巡检项"+itemName+"出现"+exceptionName+"的异常等级,请您及时关注哦", mobile);
+								}
+							}
+						}
+
+					}
+				}
         	}
         }else {
 			System.out.println("查询存在" + deviceException);
-        	if(deviceException.getIsOk() == 1) { // 发送短信
-        		String exceptionIds = deviceException.getExceptionIds();
-        		String[] split = exceptionIds.split(",");
-            	for(String s: split) {
-            		if(s.equals(inspectionResult.getExceptionId().toString())) {
-						String deviceName = device.getDeviceName(); // 设备名称
-						String itemName = inspctionItem.getName(); // 巡检项名称
-						ExceptionEntity exceptionEntity = exceptionService.selectById(s);
-						String exceptionName = exceptionEntity.getName(); // 异常等级名称
+			String exceptionIds = deviceException.getExceptionIds();
+			String[] split = exceptionIds.split(",");
+			for(String s: split) {
+				if(s.equals(inspectionResult.getExceptionId().toString())) {
+					String deviceName = device.getDeviceName(); // 设备名称
+					String itemName = inspctionItem.getName(); // 巡检项名称
+					ExceptionEntity exceptionEntity = exceptionService.selectById(s);
+					String exceptionName = exceptionEntity.getName(); // 异常等级名称
+					String smsUserIds = deviceException.getSmsUserIds();
+
+					if(deviceException.getIsOk() == 1) { // 发送短信
 						JSONObject returnJson = new JSONObject(new LinkedHashMap());
 						returnJson.put("deviceName", "["+deviceName+"]");
 						returnJson.put("itemName", "["+itemName+"]");
 						returnJson.put("exceptionName", "["+exceptionName+"]");
-            			String smsUserIds = deviceException.getSmsUserIds();
-            			if(!"".equals(smsUserIds)) { 
-            				String[] userIds = smsUserIds.split(",");
+						if(!"".equals(smsUserIds)) {
+							String[] userIds = smsUserIds.split(",");
 							for(String userId: userIds) {
-                				SysUserEntity userEntity = sysUserService.selectById(Integer.parseInt(userId));
-                				String mobile = userEntity.getMobile();
-                				System.out.println("数据"+ returnJson.toJSONString());
-                				String isOk = SendSms.deviceSend(mobile, returnJson);
-                				System.out.println("是否发送成功"+ isOk);
-                				if(isOk.equals("ok")) { // 发送短信成功
-                					HashMap<String,Object> map = new HashMap<String,Object>();
-                    				map.put("isOk", 1);
-                    				map.put("phone", mobile);
-                    				map.put("content", "尊敬的用户，您的设备"+deviceName+"巡检项"+itemName+"出现"+exceptionName+"的异常等级,请您及时关注哦。");
-                    				map.put("type", 1);
-                    				map.put("createTiem", new Date());
-                    				deviceExceptionService.insertSms(map); // 发送短信记录
-                				}else { // 发送短信失败 
-                					HashMap<String,Object> map = new HashMap<String,Object>();
-                    				map.put("isOk", 0);
-                    				map.put("phone", mobile);
+								SysUserEntity userEntity = sysUserService.selectById(Integer.parseInt(userId));
+								String mobile = userEntity.getMobile();
+								System.out.println("数据"+ returnJson.toJSONString());
+								String isOk = SendSms.deviceSend(mobile, returnJson);
+								System.out.println("是否发送成功"+ isOk);
+								if(isOk.equals("ok")) { // 发送短信成功
+									HashMap<String,Object> map = new HashMap<String,Object>();
+									map.put("isOk", 1);
+									map.put("phone", mobile);
 									map.put("content", "尊敬的用户，您的设备"+deviceName+"巡检项"+itemName+"出现"+exceptionName+"的异常等级,请您及时关注哦。");
-                    				map.put("type", 1);
-                    				map.put("createTiem", new Date());
-                    				deviceExceptionService.insertSms(map); // 发送短信记录
-                				}
-								DingdingSend.ordersend("尊敬的用户，您的设备"+deviceName+"巡检项"+itemName+"出现"+exceptionName+"的异常等级,请您及时关注哦,", mobile);
-                			}
-            			}
-            		}
-            	}
-        	}
-        	if(deviceException.getWxOk() ==1) { // 发送微信
-        		String exceptionIds = deviceException.getExceptionIds();
-        		String[] split = exceptionIds.split(",");
-            	for(String s: split) {
-            		if(s.equals(inspectionResult.getExceptionId().toString())) {
-						String deviceName = device.getDeviceName(); // 设备名称
-						String itemName = inspctionItem.getName(); // 巡检项名称
-						ExceptionEntity exceptionEntity = exceptionService.selectById(s);
-						String exceptionName = exceptionEntity.getName(); // 异常等级名称
-            			String smsUserIds = deviceException.getSmsUserIds();
-            			if(!"".equals(smsUserIds)) { 
-            				String[] userIds = smsUserIds.split(",");
-                			for(String userId: userIds) {
-                				SysUserEntity userEntity = sysUserService.selectById(Integer.parseInt(userId));
-                				String wechat = userEntity.getWechat();
-                				if(!"".equals(wechat)) {
-                					TestMessage.deviceSend(wechat, "尊敬的用户，您的设备["+deviceName+"]巡检项["+itemName+"]出现["+exceptionName+"]的异常等级,请您及时关注哦。");
-                				}
-                			}
-            			}
-            		}
-            	}
-        	}
+									map.put("type", 1);
+									map.put("createTiem", new Date());
+									deviceExceptionService.insertSms(map); // 发送短信记录
+								}else { // 发送短信失败
+									HashMap<String,Object> map = new HashMap<String,Object>();
+									map.put("isOk", 0);
+									map.put("phone", mobile);
+									map.put("content", "尊敬的用户，您的设备"+deviceName+"巡检项"+itemName+"出现"+exceptionName+"的异常等级,请您及时关注哦。");
+									map.put("type", 1);
+									map.put("createTiem", new Date());
+									deviceExceptionService.insertSms(map); // 发送短信记录
+								}
+							}
+						}
+					}
+					if(deviceException.getWxOk() ==1) { // 发送微信
+						if(!"".equals(smsUserIds)) {
+							String[] userIds = smsUserIds.split(",");
+							for(String userId: userIds) {
+								SysUserEntity userEntity = sysUserService.selectById(Integer.parseInt(userId));
+								String wechat = userEntity.getWechat();
+								if(!"".equals(wechat)) {
+									TestMessage.deviceSend(wechat, "尊敬的用户，您的设备["+deviceName+"]巡检项["+itemName+"]出现["+exceptionName+"]的异常等级,请您及时关注哦。");
+								}
+							}
+						}
+					}
+					if(deviceException.getDdOk()==1) { // 发送钉钉消息
+						if (!"".equals(smsUserIds)) {
+							String[] userIds = smsUserIds.split(",");
+							for (String userId : userIds) {
+								SysUserEntity userEntity = sysUserService.selectById(Integer.parseInt(userId));
+								String mobile = userEntity.getMobile();
+								DingdingSend.ordersend("尊敬的用户，您的设备" + deviceName + "巡检项" + itemName + "出现" + exceptionName + "的异常等级,请您及时关注哦", mobile);
+							}
+						}
+					}
+				}
+			}
         }
         resultService.deleteByAppResultGuid(appResultGuid);
         String guid = resultService.insertResult(inspectionResult);
