@@ -238,12 +238,23 @@ public class DeviceController {
 
 
     /**
-     * 获取部门树及下属设备
+     * 获取部门树及巡检线路
      */
     @RequestMapping("/linetree")
     @RequiresPermissions("inspection:device:tree")
     public R linetree(@RequestParam Map<String, Object> params){
         List<Map<String,Object>> lineTreeList = deviceService.findLineTree(params);
+
+        return R.ok().put("lineTree", lineTreeList);
+    }
+
+    /**
+     * 获取部门树及巡检线路及更多节点
+     */
+    @RequestMapping("/onlylinetree")
+    @RequiresPermissions("inspection:device:tree")
+    public R onlylinetree(@RequestParam Map<String, Object> params){
+        List<Map<String,Object>> lineTreeList = deviceService.findOnlyLineTree(params);
 
         return R.ok().put("lineTree", lineTreeList);
     }

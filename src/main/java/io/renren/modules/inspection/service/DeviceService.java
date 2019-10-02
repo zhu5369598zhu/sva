@@ -34,6 +34,11 @@ public interface DeviceService extends IService<DeviceEntity> {
     public List<Map<String,Object>> findLineTree(Map<String, Object> params);
 
     /**
+     * 获取设备树
+     */
+    public List<Map<String,Object>> findOnlyLineTree(Map<String, Object> params);
+
+    /**
      * 获取设备异常统计信息
      */
     public List<Map<String,Object>> getDeviceStatus(Map<String, Object> params);

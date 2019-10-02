@@ -2,6 +2,7 @@ package io.renren.modules.inspection.entity;
 
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -50,7 +51,20 @@ public class InspectionTaskDeviceEntity implements Serializable {
 	 * 是否更新
 	 */
 	private Integer isUpdate;
+	/**
+	 * 开始巡检时间
+	 */
+	private String startTime;
+	/**
+	 * 结束巡检时间
+	 */
 
+	private String endTime;
+	/**
+	 * 上传时间
+	 */
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+	private Date createTime;
 
 	/**
 	 * 设置：自增id
@@ -147,5 +161,42 @@ public class InspectionTaskDeviceEntity implements Serializable {
 	 */
 	public Integer getIsUpdate() {
 		return isUpdate;
+	}
+	/**
+	 * 设置：开始巡检时间
+	 */
+
+	public void setStartTime(String startTime) {
+		this.startTime = startTime;
+	}
+	/**
+	 * 获取：开始巡检时间
+	 */
+	public String getStartTime() {
+		return startTime;
+	}
+	/**
+	 * 设置：结束巡检时间
+	 */
+	public void setEndTime(String endTime) {
+		this.endTime = endTime;
+	}
+	/**
+	 * 获取：结束巡检时间
+	 */
+	public String getEndTime() {
+		return endTime;
+	}
+	/**
+	 * 设置：上传巡检时间
+	 */
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+	/**
+	 * 获取：上传巡检时间
+	 */
+	public Date getCreateTime() {
+		return createTime;
 	}
 }

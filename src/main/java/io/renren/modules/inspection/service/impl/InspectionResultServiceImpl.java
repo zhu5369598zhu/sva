@@ -911,6 +911,9 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
                     }else{
                         taskDeviceEntity.setIsUpdate(1);
                     }
+                    taskDeviceEntity.setStartTime(result.getStartTime());
+                    taskDeviceEntity.setEndTime(result.getEndTime());
+                    taskDeviceEntity.setCreateTime(result.getCreateTime());
                     taskDeviceService.updateById(taskDeviceEntity);
                 }else{
                     taskDeviceEntity = new InspectionTaskDeviceEntity();
@@ -918,8 +921,12 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
                     taskDeviceEntity.setDeviceId(itemEntity.getDeviceId());
                     taskDeviceEntity.setInspectedItemCount(1);
                     taskDeviceEntity.setInspectionDate(dt);
+                    taskDeviceEntity.setStartTime(result.getStartTime());
+                    taskDeviceEntity.setEndTime(result.getEndTime());
+                    taskDeviceEntity.setCreateTime(result.getCreateTime());
                     taskDeviceEntity.setIsUpdate(1);
                     taskDeviceService.insert(taskDeviceEntity);
+
                 }
             }
             return result.getGuid();

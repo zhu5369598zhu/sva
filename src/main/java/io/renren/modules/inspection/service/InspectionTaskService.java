@@ -17,7 +17,15 @@ import java.util.Map;
  */
 public interface InspectionTaskService extends IService<InspectionTaskEntity> {
     List<Map<String,Object>> selectByDate(String inspectionDate);
-    List<Map<String,Object>> selectListByDate(String inspectionStartDate,String inspectionEndDate);
+    PageUtils getAbsenceByDate(Map<String, Object> params);
+    List<Map<String,Object>> getAllAbsenceByDate(Map<String, Object> params);
+    Map<String,Object> getAbsenceStatisticsByDate(Map<String, Object> params);
+    PageUtils getLineByDate(Map<String, Object> params);
+    List<Map<String,Object>> getAllLineByDate(Map<String, Object> params);
+    Map<String,Object> getLineStatisticsByDate(Map<String, Object> params);
+    PageUtils getTurnByDate(Map<String, Object> params);
+    List<Map<String,Object>> getAllTurnByDate(Map<String, Object> params);
+    Map<String,Object> getTurnStatisticsByDate(Map<String, Object> params);
     PageUtils queryPage(Map<String, Object> params);
 }
 

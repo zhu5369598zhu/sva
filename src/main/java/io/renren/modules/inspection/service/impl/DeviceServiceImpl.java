@@ -275,6 +275,39 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DeviceEntity> impl
         }
     }
 
+    /**
+     * 获取设备树
+     */
+    public List<Map<String,Object>> findOnlyLineTree(Map<String, Object> params){
+        List<Map<String,Object>> root = deptService.queryListParentId(0l);
+
+        for(Map<String, Object> m : root){
+            getOnlyLineTreeNodeData(m);
+        }
+
+        return clearNode(root);
+    }
+
+    private void getOnlyLineTreeNodeData(Map<String,Object> node){
+        List<Map<String,Object>> lines = lineService.selectByDept((Long)node.get("id"));
+        logger.error("node:" + node.toString());
+        logger.error("lines:" + lines.toString());
+
+
+        if (node.get("type").equals("dept")){
+            List<Map<String,Object>> children = deptService.queryListParentId((Long)node.get("id"));
+            logger.error("children:" + children.toString());
+            if(children != null && children.size() > 0 ){
+                children.addAll(lines);
+                node.put("children", children);
+                for(Map<String, Object> m : children){
+                    getOnlyLineTreeNodeData(m);
+                }
+            } else {
+                node.put("children", lines);
+            }
+        }
+    }
 
     public List<Map<String,Object>> clearNode(List<Map<String,Object>> curNode){
 

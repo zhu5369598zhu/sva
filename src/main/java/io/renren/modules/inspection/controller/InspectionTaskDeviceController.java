@@ -1,6 +1,7 @@
 package io.renren.modules.inspection.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -42,6 +43,95 @@ public class InspectionTaskDeviceController {
         return R.ok().put("page", page);
     }
 
+    /**
+     * 获取缺勤详情
+     */
+    @RequestMapping("/getmissingbydate")
+    public R getMissingByDate(@RequestParam Map<String, Object> params){
+        PageUtils page = inspectionTaskDeviceService.getMissingByDate(params);
+
+        return R.ok().put("page", page);
+    }
+
+    /**
+     * 获取缺勤详情（不分页）
+     */
+    @RequestMapping("/getallmissingbydate")
+    public R getAllMissingByDate(@RequestParam Map<String, Object> params){
+        List<Map<String,Object>> list = inspectionTaskDeviceService.getAllMissingByDate(params);
+
+        return R.ok().put("list", list);
+    }
+
+    /**
+     * 获取缺勤统计
+     */
+    @RequestMapping("/getmissingstatisticsbydate")
+    public R getMissingStatisticsByDate(@RequestParam Map<String, Object> params){
+        Map<String,Object> data = inspectionTaskDeviceService.getMissingStatisticsByDate(params);
+
+        return R.ok().put("data", data);
+    }
+
+    /**
+     * 获取缺勤详情
+     */
+    @RequestMapping("/getlinebydate")
+    public R getLineByDate(@RequestParam Map<String, Object> params){
+        PageUtils page = inspectionTaskDeviceService.getLineByDate(params);
+
+        return R.ok().put("page", page);
+    }
+
+    /**
+     * 获取缺勤详情（不分页）
+     */
+    @RequestMapping("/getalllinebydate")
+    public R getAllLineByDate(@RequestParam Map<String, Object> params){
+        List<Map<String,Object>> list = inspectionTaskDeviceService.getAllLineByDate(params);
+
+        return R.ok().put("list", list);
+    }
+
+    /**
+     * 获取缺勤统计
+     */
+    @RequestMapping("/getlinestatisticsbydate")
+    public R getLineStatisticsByDate(@RequestParam Map<String, Object> params){
+        Map<String,Object> data = inspectionTaskDeviceService.getLineStatisticsByDate(params);
+
+        return R.ok().put("data", data);
+    }
+
+    /**
+     * 获取缺勤详情
+     */
+    @RequestMapping("/getturnbydate")
+    public R getTurnByDate(@RequestParam Map<String, Object> params){
+        PageUtils page = inspectionTaskDeviceService.getTurnByDate(params);
+
+        return R.ok().put("page", page);
+    }
+
+    /**
+     * 获取缺勤详情（不分页）
+     */
+    @RequestMapping("/getallturnbydate")
+    public R getAllTurnByDate(@RequestParam Map<String, Object> params){
+        List<Map<String,Object>> list = inspectionTaskDeviceService.getAllTurnByDate(params);
+
+        return R.ok().put("list", list);
+    }
+
+    /**
+     * 获取缺勤统计
+     */
+    @RequestMapping("/getturnstatisticsbydate")
+    public R getTurnStatisticsByDate(@RequestParam Map<String, Object> params){
+        Map<String,Object> data = inspectionTaskDeviceService.getTurnStatisticsByDate(params);
+
+        return R.ok().put("data", data);
+    }
 
     /**
      * 信息
