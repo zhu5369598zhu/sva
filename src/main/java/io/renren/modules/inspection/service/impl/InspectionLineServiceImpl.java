@@ -1,7 +1,15 @@
 package io.renren.modules.inspection.service.impl;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.plugins.Page;
+import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import io.renren.common.utils.PageUtils;
+import io.renren.common.utils.Query;
+import io.renren.modules.inspection.dao.InspectionLineDao;
+import io.renren.modules.inspection.entity.InspectionLineEntity;
 import io.renren.modules.inspection.entity.InspectionLinePublishEntity;
 import io.renren.modules.inspection.service.InspectionLinePublishService;
+import io.renren.modules.inspection.service.InspectionLineService;
 import io.renren.modules.sys.entity.SysDeptEntity;
 import io.renren.modules.sys.service.SysDeptService;
 import org.apache.commons.lang.StringUtils;
@@ -10,18 +18,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.plugins.Page;
-import com.baomidou.mybatisplus.service.impl.ServiceImpl;
-import io.renren.common.utils.PageUtils;
-import io.renren.common.utils.Query;
-
-import io.renren.modules.inspection.dao.InspectionLineDao;
-import io.renren.modules.inspection.entity.InspectionLineEntity;
-import io.renren.modules.inspection.service.InspectionLineService;
 
 
 @Service("inspectionLineService")
@@ -42,7 +40,7 @@ public class InspectionLineServiceImpl extends ServiceImpl<InspectionLineDao, In
                         .eq(deptId!=null,"dept_id",deptId)
                         .eq("is_delete",0)
                         .like(StringUtils.isNotBlank(name),"name",name)
-
+                        .orderBy("order_num")
         );
 
         for(InspectionLineEntity inspectionLineEntity : page.getRecords()){

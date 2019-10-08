@@ -100,7 +100,7 @@
             and r.end_time&lt;=#{endTime}
         </if>
         group by d.device_id
-        order by count(r.id) desc limit 10
+        order by count(r.id) desc limit 5
 	</select>
 
 </mapper>
