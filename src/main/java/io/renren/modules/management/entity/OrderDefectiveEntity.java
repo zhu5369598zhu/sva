@@ -119,6 +119,10 @@ public class OrderDefectiveEntity implements Serializable {
 	@TableField(strategy= FieldStrategy.IGNORED)
 	private Date requirementTime;
 	/**
+	 * 归属设备id
+	 */
+	private Integer deviceId;
+	/**
 	 * 归属设备
 	 */
 	private String defectiveDevice;
@@ -407,9 +411,17 @@ public class OrderDefectiveEntity implements Serializable {
 		return requirementTime;
 	}
 	/**
+	 * 设置：归属设备id
+	 */
+	public void setDeviceId(Integer deviceId) { this.deviceId = deviceId; }
+	/**
+	 * 获取：归属设备id
+	 */
+	public Integer getDeviceId() { return deviceId; }
+	/**
 	 * 设置：归属设备
 	 */
-	public void setDefectiveDevice(String defectiveDevice) {
+	public void set设备(String defectiveDevice) {
 		this.defectiveDevice = defectiveDevice;
 	}
 	/**
@@ -430,17 +442,9 @@ public class OrderDefectiveEntity implements Serializable {
 	public Integer getResultId() {
 		return resultId;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
 }
