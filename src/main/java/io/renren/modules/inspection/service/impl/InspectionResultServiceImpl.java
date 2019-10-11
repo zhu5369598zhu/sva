@@ -1,13 +1,13 @@
 package io.renren.modules.inspection.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import io.renren.common.utils.FftUtils;
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.plugins.Page;
+import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import io.renren.common.utils.MapUtils;
+import io.renren.common.utils.PageUtils;
+import io.renren.common.utils.Query;
+import io.renren.modules.inspection.dao.InspectionResultDao;
 import io.renren.modules.inspection.entity.*;
 import io.renren.modules.inspection.service.*;
 import io.renren.modules.setting.entity.ExceptionEntity;
@@ -17,22 +17,11 @@ import io.renren.modules.setting.service.UnitService;
 import io.renren.modules.sys.entity.SysUserEntity;
 import io.renren.modules.sys.service.SysDeptService;
 import io.renren.modules.sys.service.SysUserService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.plugins.Page;
-import com.baomidou.mybatisplus.service.impl.ServiceImpl;
-import io.renren.common.utils.PageUtils;
-import io.renren.common.utils.Query;
-
-import io.renren.modules.inspection.dao.InspectionResultDao;
 
 
 @Service("inspectionResultService")
@@ -209,26 +198,35 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
 
     @Override
     public Map<String,Object> selectByItem(Map<String, Object> params) {
+        String itemId = (String)params.get("itemId");
         List<InspectionResultEntity> resultList = selectAll(params);
-
-        String[] ids = new String[resultList.size()];
-        String[] category = new String[resultList.size()];
-        String[] series = new String[resultList.size()];
-
         HashMap<String, Object> json = new HashMap<>();
-        Integer k = 0;
-        for(Integer i = resultList.size() -1; i >= 0; i--){
-            InspectionResultEntity result = (InspectionResultEntity)resultList.get(i);
-            ids[k] = result.getId().toString();
-            category[k] = result.getStartTime().toString();
-            series[k] = result.getResult();
-            k = k + 1;
+        if(!"".equals(itemId)){
+            String[] ids = new String[resultList.size()];
+            String[] category = new String[resultList.size()];
+            String[] series = new String[resultList.size()];
+
+            Integer k = 0;
+            for(Integer i = resultList.size() -1; i >= 0; i--){
+                InspectionResultEntity result = (InspectionResultEntity)resultList.get(i);
+                ids[k] = result.getId().toString();
+                category[k] = result.getStartTime().toString();
+                series[k] = result.getResult();
+                k = k + 1;
+            }
+
+            json.put("ids", ids);
+            json.put("category", category);
+            json.put("series", series);
+            return json;
+        }else{
+            json.put("ids", null);
+            json.put("category", null);
+            json.put("series", null);
+            return json;
         }
 
-        json.put("ids", ids);
-        json.put("category", category);
-        json.put("series", series);
-        return json;
+
     }
 
     @Override
@@ -408,9 +406,12 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
         HashMap<String, Object> series = new HashMap();
         HashMap<String, Object> yAxis = new HashMap<>();
         HashMap<String, Object> json = new HashMap<>();
-        LinkedHashSet<Long> normalList = new LinkedHashSet();
+        /*LinkedHashSet<Long> normalList = new LinkedHashSet();
         LinkedHashSet<Long> unNormalList = new LinkedHashSet();
-        LinkedHashSet<Long> allList = new LinkedHashSet();
+        LinkedHashSet<Long> allList = new LinkedHashSet();*/
+        ArrayList<Long> normalList = new ArrayList<>();
+        ArrayList<Long> unNormalList = new ArrayList<>();
+        ArrayList<Long> allList = new ArrayList<>();
         for(Map<String,Object> item:resultExceptionList){
             category.add(item.get("deviceName").toString());
             HashMap<String, Object> device = (HashMap<String, Object>)yAxis.get(item.get("deviceName").toString());
