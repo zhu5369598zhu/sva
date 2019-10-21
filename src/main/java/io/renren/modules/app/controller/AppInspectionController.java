@@ -147,6 +147,25 @@ public class AppInspectionController {
 		InspectionItemEntity inspctionItem = null;
         if(inspctionItems.size() > 0){
         	inspctionItem = inspctionItems.get(0);
+			inspectionResult.setExceptionId(1);
+			inspectionResult.setIsOk(1);
+			Double result = Double.valueOf(inspectionResult.getResult());
+			if( result > inspctionItem.getUpupLimit()){
+				inspectionResult.setExceptionId(3);
+				inspectionResult.setIsOk(0);
+			}
+			if(result > inspctionItem.getUpLimit() && result < inspctionItem.getUpupLimit()){
+				inspectionResult.setExceptionId(2);
+				inspectionResult.setIsOk(0);
+			}
+			if(result < inspctionItem.getDowndownLimit()){
+				inspectionResult.setExceptionId(3);
+				inspectionResult.setIsOk(0);
+			}
+			if(result < inspctionItem.getDownLimit() && result > inspctionItem.getDowndownLimit()){
+				inspectionResult.setExceptionId(2);
+				inspectionResult.setIsOk(0);
+			}
 		}
 		Integer deviceId = inspctionItem.getDeviceId();
         if(deviceId == null){
