@@ -3,12 +3,11 @@ package io.renren.modules.management.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import io.renren.common.utils.*;
+import io.renren.modules.management.entity.DeviceMaintainEntity;
 import io.renren.modules.management.entity.OrderDefectiveEntity;
 import io.renren.modules.management.entity.OrderManagementEntity;
 import io.renren.modules.management.entity.OrderRecordEntity;
-import io.renren.modules.management.service.OrderDefectiveListService;
-import io.renren.modules.management.service.OrderManagementConfirmService;
-import io.renren.modules.management.service.OrderRecordService;
+import io.renren.modules.management.service.*;
 import io.renren.modules.setting.entity.OrderExceptionEntity;
 import io.renren.modules.setting.service.OrderExceptionService;
 import io.renren.modules.sys.entity.NewsEntity;
@@ -61,6 +60,12 @@ public class OrderManagementConfirmController {
 	
 	@Autowired
     private OrderDefectiveListService orderDefectiveListService;
+
+	@Autowired
+	private DeviceMaintainService deviceMaintainService;
+
+	@Autowired
+	private OrderDefectiveService orderDefectiveService;
     /**
      * 列表
      */
@@ -224,11 +229,21 @@ public class OrderManagementConfirmController {
             record.setOrderPeople(orderManagement.getOrderConfirmer());
             record.setOrderPeopleId(3);//确认人
             record.setOrderType(orderManagement.getOrderType());
-			
 			orderRecordService.insert(record);
-			
 			Integer defectiveId = orderManagement.getDefectiveId();
 			if(defectiveId != 0) { // 属于缺陷工单转成 工单
+				// 生成设备维护记录表
+				OrderDefectiveEntity orderDefective = orderDefectiveService.selectOne(new EntityWrapper<OrderDefectiveEntity>().eq("defective_number", orderManagement.getDefectiveNumber()));
+				Integer deviceId = orderDefective.getDeviceId();
+				// 生成记录表
+				DeviceMaintainEntity deviceMaintainEntity = new DeviceMaintainEntity();
+				deviceMaintainEntity.setDeviceId(deviceId);
+				deviceMaintainEntity.setOrderNumber(orderManagement.getOrderNumber());
+				deviceMaintainEntity.setDefectiveNumber(orderManagement.getDefectiveNumber());
+				deviceMaintainEntity.setDefectiveTheme(orderManagement.getDefectiveTheme());
+				deviceMaintainEntity.setConfirmedTime(orderManagement.getConfirmedTime());
+				deviceMaintainService.insert(deviceMaintainEntity);
+
 				OrderDefectiveEntity orderDefectiveEntity = orderDefectiveListService.selectById(defectiveId);
 				Integer defectiveNameId = orderDefectiveEntity.getDefectiveNameId();
 				String defectiveNumber = orderDefectiveEntity.getDefectiveNumber();

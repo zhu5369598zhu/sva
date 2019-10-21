@@ -24,6 +24,7 @@
         <result property="orderAcceptor" column="order_acceptor"></result>
         <result property="orderAcceptorId" column="order_acceptor_id"></result>
         <result property="requirementTime" column="requirement_time"></result>
+		<result property="deviceId" column="device_id"></result>
         <result property="defectiveDevice" column="defective_device"/>
         <result property="resultId" column="result_id"/>
     </resultMap>

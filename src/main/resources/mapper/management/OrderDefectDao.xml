@@ -24,6 +24,7 @@
         <result property="orderAcceptor" column="order_acceptor"></result>
         <result property="orderAcceptorId" column="order_acceptor_id"></result>
         <result property="requirementTime" column="requirement_time"></result>
+		<result property="deviceId" column="device_id"></result>
         <result property="defectiveDevice" column="defective_device"/>
         <result property="resultId" column="result_id"/>
     </resultMap>
@@ -32,7 +33,7 @@
 	<select id="selectResultList"
 		resultType="io.renren.modules.inspection.entity.InspectionResultEntity"
 		parameterType="io.renren.modules.inspection.entity.InspectionResultEntity">
-		select distinct r.id,d.device_name as device_name,r.item_id,i.name as
+		select distinct r.id,d.device_id as device_id,d.device_name as device_name,r.item_id,i.name as
 		item_name,defective.defective_number as defectiveNumber,r.hang_up as hangUp, t.name as inspection_type,i.unit,r.is_ok,r.exception_id
 		,i.up_limit,i.upup_limit,i.down_limit,i.downdown_limit
 		,e.name as
@@ -84,7 +85,8 @@
 		select r.defective_id, r.defective_number, r.defective_theme, r.defective_type, r.dept_id,
 		r.exception_id ,r.order_content ,r.defective_name ,r.defective_name_id ,r.defective_name_opinion ,
 		r.create_time ,r.order_status ,r.order_confirmer ,r.order_confirmer_id, r.confirmed_time,
-		r.order_confirmer_opinion ,r.order_acceptor ,r.order_acceptor_id ,r.requirement_time ,r.defective_device,
+		r.order_confirmer_opinion ,r.order_acceptor ,r.order_acceptor_id ,r.requirement_time ,
+		r.device_id ,r.defective_device,
 		r.result_id 
 		from tb_order_defective r
 		left join `tb_exception` e on e.id = r.exception_id
