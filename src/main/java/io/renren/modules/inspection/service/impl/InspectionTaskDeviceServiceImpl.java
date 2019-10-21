@@ -134,7 +134,7 @@ public class InspectionTaskDeviceServiceImpl extends ServiceImpl<InspectionTaskD
 
         LinkedHashSet<String> legend = new LinkedHashSet();
         LinkedHashSet<String>  category = new LinkedHashSet();
-        LinkedHashSet<Long> series = new LinkedHashSet();
+        LinkedList<Long> series = new LinkedList();
 
         HashMap<String, Object> json = new HashMap<>();
         Integer i = 0;
@@ -244,7 +244,7 @@ public class InspectionTaskDeviceServiceImpl extends ServiceImpl<InspectionTaskD
 
         LinkedHashSet<String>  legend = new LinkedHashSet();
         LinkedHashSet<String>  category = new LinkedHashSet();
-        LinkedHashSet series = new LinkedHashSet();
+        LinkedList series = new LinkedList();
 
         HashMap<String, Object> inspectedHash = new HashMap();
         HashMap<String, Object> missInspectHash = new HashMap();

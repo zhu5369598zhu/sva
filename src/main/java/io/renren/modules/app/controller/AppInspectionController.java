@@ -20,6 +20,8 @@ import io.renren.modules.sys.service.DeviceExceptionService;
 import io.renren.modules.sys.service.SysUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,6 +41,8 @@ import java.util.*;
 @RequestMapping("/app/inspection/")
 @Api("APP巡检相关接口")
 public class AppInspectionController {
+	private Logger logger = LoggerFactory.getLogger(getClass());
+
     @Autowired
     private InspectionService inspectionService;
     @Autowired
@@ -137,8 +141,17 @@ public class AppInspectionController {
         if(inspectionResult.getEndTime() == null){
             return R.error(400, "endTime不能为空");
         }
-        InspectionItemEntity inspctionItem = itemService.selectByGuid(itemGuid);
-        Integer deviceId = inspctionItem.getDeviceId();
+		Map<String,Object> itemHashMap = new HashMap<String,Object>();
+		itemHashMap.put("guid", itemGuid);
+        List<InspectionItemEntity> inspctionItems = itemService.selectByMap(itemHashMap);
+		InspectionItemEntity inspctionItem = null;
+        if(inspctionItems.size() > 0){
+        	inspctionItem = inspctionItems.get(0);
+		}
+		Integer deviceId = inspctionItem.getDeviceId();
+        if(deviceId == null){
+        	logger.error("item not found:" + itemGuid);
+		}
         DeviceEntity device = deviceService.selectById(deviceId);
         Map<String,Object> hashMap = new HashMap<String,Object>();
         hashMap.put("deviceId", deviceId);

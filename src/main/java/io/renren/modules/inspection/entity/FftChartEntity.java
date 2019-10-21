@@ -9,7 +9,7 @@ public class FftChartEntity {
     private Double Fs = 0.0;
     private Integer N = 0;
     private Double[] timeYData;
-    private Integer[] timeXData;
+    private Double[] timeXData;
     private Double[] fftYData;
     private Double[] fftXData;
     private Double pk = null;
@@ -54,7 +54,7 @@ public class FftChartEntity {
         return timeYData;
     }
 
-    public Integer[] getTimeXData() {
+    public Double[] getTimeXData() {
         return timeXData;
     }
 
@@ -134,7 +134,7 @@ public class FftChartEntity {
         this.timeYData = timeYData;
     }
 
-    public void setTimeXData(Integer[] timeXData) {
+    public void setTimeXData(Double[] timeXData) {
         this.timeXData = timeXData;
     }
 

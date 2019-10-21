@@ -846,7 +846,14 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
         } else {
             return "轮次没有找到";
         }
-        SysUserEntity user = userService.selectByGuid(result.getUserGuid());
+
+        Map<String,Object> userHashMap = new HashMap<String,Object>();
+        userHashMap.put("guid", result.getUserGuid());
+        List<SysUserEntity> users = userService.selectByMap(userHashMap);
+        SysUserEntity user = null;
+        if(users.size() > 0){
+            user = users.get(0);
+        }
         if(user != null){
             result.setUserId(user.getUserId().intValue());
         } else {
@@ -858,7 +865,13 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
             return "异常信息没有找到";
         }
 
-        InspectionItemEntity item = itemService.selectByGuid(result.getItemGuid());
+        Map<String,Object> itemHashMap = new HashMap<String,Object>();
+        itemHashMap.put("guid", result.getItemGuid());
+        List<InspectionItemEntity> inspctionItems = itemService.selectByMap(itemHashMap);
+        InspectionItemEntity item = null;
+        if(inspctionItems.size() > 0){
+            item = inspctionItems.get(0);
+        }
         if(item != null){
             result.setItemId(item.getId());
         } else {
@@ -918,6 +931,7 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
                 }else{
                     taskDeviceEntity = new InspectionTaskDeviceEntity();
                     taskDeviceEntity.setTurnId(turn.getId());
+                    taskDeviceEntity.setLineId(turn.getInspectionLineId());
                     taskDeviceEntity.setDeviceId(itemEntity.getDeviceId());
                     taskDeviceEntity.setInspectedItemCount(1);
                     taskDeviceEntity.setInspectionDate(dt);

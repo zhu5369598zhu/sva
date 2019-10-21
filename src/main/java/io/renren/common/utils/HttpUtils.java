@@ -121,6 +121,64 @@ public class HttpUtils {
 	 * @throws IOException
 	 * @throws ParseException
 	 */
+	public static String post(String url, String json, String token)
+			throws ParseException, IOException {
+		HttpPost post = new HttpPost(url);
+		int code = 0;
+		try {
+
+			if (postClient == null) {
+				postClient = getClient(true);
+			}
+			StringEntity s = new StringEntity(json,Charset.forName("utf-8"));
+			s.setContentEncoding("UTF-8");
+			s.setContentType("application/json;charset=UTF-8");
+			if (token != null) {
+				post.addHeader("Authorization", "Bearer " + token);
+			}
+			post.setEntity(s);
+			post.setHeader("Content-Type","application/json;charset=UTF-8");  
+
+			httpResponse = postClient.execute(post);
+			code = httpResponse.getStatusLine().getStatusCode();
+			System.out.println("postcode:" + code);
+			if (code >= 200 && code < 300) {
+				HttpEntity entity = httpResponse.getEntity();
+				if (entity != null) {
+					String charset = EntityUtils.toString(entity);
+					System.out.println("post返回的东西:" + charset);
+					return charset;
+				} else {
+					return null;
+				}
+			} else {
+				return null;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (httpResponse != null) {
+				EntityUtils.consume(httpResponse.getEntity());
+			}
+			if (post != null) { // 不要忘记释放，尽量通过该方法实现，
+
+				post.releaseConnection();
+
+			}
+		}
+		return null;
+
+	}
+
+	/**
+	 * 通过post发送!
+	 *
+	 * @param url
+	 * @param json
+	 * @return
+	 * @throws IOException
+	 * @throws ParseException
+	 */
 	public static String post(String url, JSONObject json, String token)
 			throws ParseException, IOException {
 		HttpPost post = new HttpPost(url);
@@ -137,7 +195,7 @@ public class HttpUtils {
 				post.addHeader("Authorization", "Bearer " + token);
 			}
 			post.setEntity(s);
-			post.setHeader("Content-Type","application/json;charset=UTF-8");  
+			post.setHeader("Content-Type","application/json;charset=UTF-8");
 
 			httpResponse = postClient.execute(post);
 			code = httpResponse.getStatusLine().getStatusCode();
