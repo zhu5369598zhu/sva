@@ -72,6 +72,7 @@ public class ShiroConfig {
         filterMap.put("/inspection/inspectionresultmedia/mp3", "anon");
         filterMap.put("/inspection/inspectionresultmedia/mp4", "anon");
         filterMap.put("/inspection/devicepic/pic.png", "anon");
+        filterMap.put("/sys/userpic/pic.png", "anon");
         filterMap.put("/inspection/deviceqrcode/qrcode.png", "anon");
         filterMap.put("/inspection/devicedoc/download", "anon");
         filterMap.put("/sys/appupgrade/app.apk", "anon");
