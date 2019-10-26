@@ -30,7 +30,7 @@
         left join tb_turn as turn on turn.id=task.turn_id
         left join sys_dept as dept on dept.dept_id=line.dept_id
         left join tb_inspection_period as period on period.line_id=line.id
-        where task.is_inspected=0 and task.inspection_span_end_date >= '${inspectStartDate}' and task.inspection_span_end_date &lt;= '${inspectEndDate}'
+        where task.is_inspected=0 and task.inspection_span_end_date >= '${inspectStartDate}' and task.inspection_span_end_date &lt; '${inspectEndDate}'
         <if test="deptIds!=null">
             and dept.dept_id in
             <foreach item="item" index="index" collection="deptIds" open="(" separator="," close=")">
@@ -53,7 +53,7 @@
         left join tb_turn as turn on turn.id=task.turn_id
         left join sys_dept as dept on dept.dept_id=line.dept_id
         left join tb_inspection_period as period on period.line_id=line.id
-        where task.is_inspected=0 and task.inspection_span_end_date >= '${inspectStartDate}' and inspection_span_end_date &lt;= '${inspectEndDate}'
+        where task.is_inspected=0 and task.inspection_span_end_date >= '${inspectStartDate}' and inspection_span_end_date &lt; '${inspectEndDate}'
         <if test="deptIds!=null">
             and dept.dept_id in
             <foreach item="item" index="index" collection="deptIds" open="(" separator="," close=")">
@@ -67,16 +67,17 @@
     </select>
 
     <select id="selectAbsenceLineByDate" resultType="java.util.HashMap" parameterType="java.lang.String">
-        select dept.name as deptName,line.name as lineName,turn.id as turnId,turn.name as turnName,
-        sum(task.inspect_device_count) as inspectDeviceCount ,sum(task.inspected_device_count) as inspectedDeviceCount,
-        sum(task.inspect_device_count) - sum(task.inspected_device_count) as mustInspectDeviceCount,concat(round((sum(task.inspect_device_count) - sum(task.inspected_device_count))/sum(task.inspect_device_count)*100,2),'%') as inspectRate,
+        select dept.name as deptName,line.name as lineName,turn.id as turnId,turn.name as turnName,task.inspection_span_end_date,
+        count(task.line_id) as inspectCount ,sum(case task.is_inspected when 1 then 1 else 0 end) as inspectedCount,
+        count(task.line_id) - sum(case task.is_inspected when 1 then 1 else 0 end) as mustInspectCount,
+        concat(round((count(task.line_id) - sum(case task.is_inspected when 1 then 1 else 0 end))/count(task.line_id)*100,2),'%') as inspectRate,
         '${inspectStartDate}' as inspectStartDate,'${inspectEndDate}' as inspectEndDate
         from tb_inspection_task as task
         left join tb_inspection_line as line on line.id=task.`line_id`
         left join tb_turn as turn on turn.id=task.turn_id
         left join sys_dept as dept on dept.dept_id=line.dept_id
         left join tb_inspection_period as period on period.line_id=line.id
-        where task.is_inspected=0 and task.inspection_span_end_date >= '${inspectStartDate}' and task.inspection_span_end_date &lt;= '${inspectEndDate}'
+        where task.inspection_span_end_date >= '${inspectStartDate}' and task.inspection_span_end_date &lt; '${inspectEndDate}'
         <if test="deptIds!=null">
             and dept.dept_id in
             <foreach item="item" index="index" collection="deptIds" open="(" separator="," close=")">
@@ -91,14 +92,14 @@
 
     <select id="selectAbsenceTurnByDate" resultType="java.util.HashMap" parameterType="java.lang.String">
         select dept.name as deptName,line.name as lineName,turn.id as turnId,turn.name as turnName,
-        sum(task.inspect_device_count) as inspectDeviceCount ,sum(task.inspected_device_count) as inspectedDeviceCount,
+        count(task.line_id) as inspectCount ,sum(case task.is_inspected when 1 then 1 else 0 end) as inspectedCount,
         '${inspectStartDate}' as inspectionStartDate,'${inspectEndDate}' as inspectionEndDate
         from tb_inspection_task as task
         left join tb_inspection_line as line on line.id=task.`line_id`
         left join tb_turn as turn on turn.id=task.turn_id
         left join sys_dept as dept on dept.dept_id=line.dept_id
         left join tb_inspection_period as period on period.line_id=line.id
-        where task.is_inspected=0 and inspection_span_end_date >= '${inspectStartDate}' and inspection_span_end_date &lt;= '${inspectEndDate}'
+        where inspection_span_end_date >= '${inspectStartDate}' and inspection_span_end_date &lt; '${inspectEndDate}'
         <if test="deptIds!=null">
             and dept.dept_id in
             <foreach item="item" index="index" collection="deptIds" open="(" separator="," close=")">

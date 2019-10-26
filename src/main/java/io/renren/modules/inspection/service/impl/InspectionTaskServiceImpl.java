@@ -259,8 +259,8 @@ public class InspectionTaskServiceImpl extends ServiceImpl<InspectionTaskDao, In
         Long inspected = 0L;
         Long mustInspect = 0L;
         for(Map<String, Object> item:list){
-            inspected += Long.parseLong(item.get("inspectedDeviceCount").toString());
-            mustInspect += Long.parseLong(item.get("mustInspectDeviceCount").toString());
+            inspected += Long.parseLong(item.get("inspectedCount").toString());
+            mustInspect += Long.parseLong(item.get("mustInspectCount").toString());
         }
 
         legend.add("已检");
@@ -270,8 +270,10 @@ public class InspectionTaskServiceImpl extends ServiceImpl<InspectionTaskDao, In
         mustInspectHash.put("name","漏检");
         mustInspectHash.put("value",mustInspect);
 
-        series.add(mustInspectHash);
-        series.add(inspectedHash);
+        if(list.size() > 0){
+            series.add(mustInspectHash);
+            series.add(inspectedHash);
+        }
 
         json.put("legend", legend);
         json.put("series", series);
@@ -381,8 +383,8 @@ public class InspectionTaskServiceImpl extends ServiceImpl<InspectionTaskDao, In
         Integer i = 0;
         for(Map<String, Object> item:list){
             category.add((String)item.get("turnName"));
-            inspectedList.add(Long.parseLong(item.get("inspectedDeviceCount").toString()));
-            InspectList.add(Long.parseLong(item.get("inspectDeviceCount").toString()));
+            inspectedList.add(Long.parseLong(item.get("inspectedCount").toString()));
+            InspectList.add(Long.parseLong(item.get("inspectCount").toString()));
         }
 
         legend.add("已检");

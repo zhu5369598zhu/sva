@@ -899,6 +899,7 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
                 InspectionItemEntity itemEntity = itemList.get(0);
                 HashMap taskDeviceParams = new HashMap();
                 taskDeviceParams.put("turn_id",turn.getId());
+                taskDeviceParams.put("device_id",itemEntity.getDeviceId());
                 taskDeviceParams.put("line_id",turn.getInspectionLineId());
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 taskDeviceParams.put("inspection_date",simpleDateFormat.format(new Date()));
@@ -908,23 +909,24 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
                 if(taskDeviceList.size() > 0){
                     taskDeviceEntity = taskDeviceList.get(0);
                     taskDeviceEntity.setInspectedItemCount(taskDeviceEntity.getInspectedItemCount() + 1);
-                    if(taskDeviceEntity.getInspectedItemCount() >= taskDeviceEntity.getInsepctItemCount()){
-                        taskDeviceEntity.setIsUpdate(0);
-                        HashMap taskParams = new HashMap();
-                        taskParams.put("line_id",turn.getInspectionLineId());
-                        taskParams.put("turn_id",turn.getId());
-                        taskParams.put("inspection_span_end_date",simpleDateFormat.format(new Date()));
-                        List<InspectionTaskEntity> taskList = taskService.selectByMap(taskParams);
-                        if(taskList.size() >0){
-                            InspectionTaskEntity task = taskList.get(0);
-                            task.setIsInspected(1);
+                    HashMap taskParams = new HashMap();
+                    taskParams.put("line_id",turn.getInspectionLineId());
+                    taskParams.put("turn_id",turn.getId());
+                    taskParams.put("inspection_span_end_date",simpleDateFormat.format(new Date()));
+                    List<InspectionTaskEntity> taskList = taskService.selectByMap(taskParams);
+                    if(taskList.size() >0){
+                        InspectionTaskEntity task = taskList.get(0);
+                        task.setIsInspected(1);
+                        if(taskDeviceEntity.getInspectedItemCount() >= taskDeviceEntity.getInsepctItemCount()){
+                            taskDeviceEntity.setIsUpdate(1);
                             task.setInspectedDeviceCount(task.getInspectedDeviceCount() + 1);
-                            task.setInspectedItemCount(taskDeviceEntity.getInspectedItemCount());
-                            taskService.updateById(task);
                         }
-                    }else{
-                        taskDeviceEntity.setIsUpdate(1);
+
+                        task.setInspectedItemCount(taskDeviceEntity.getInspectedItemCount());
+                        taskService.updateById(task);
                     }
+
+                    taskDeviceEntity.setIsInspected(1);
                     taskDeviceEntity.setStartTime(result.getStartTime());
                     taskDeviceEntity.setEndTime(result.getEndTime());
                     taskDeviceEntity.setCreateTime(result.getCreateTime());
@@ -936,10 +938,10 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
                     taskDeviceEntity.setDeviceId(itemEntity.getDeviceId());
                     taskDeviceEntity.setInspectedItemCount(1);
                     taskDeviceEntity.setInspectionDate(dt);
+                    taskDeviceEntity.setIsInspected(1);
                     taskDeviceEntity.setStartTime(result.getStartTime());
                     taskDeviceEntity.setEndTime(result.getEndTime());
                     taskDeviceEntity.setCreateTime(result.getCreateTime());
-                    taskDeviceEntity.setIsUpdate(1);
                     taskDeviceService.insert(taskDeviceEntity);
 
                 }

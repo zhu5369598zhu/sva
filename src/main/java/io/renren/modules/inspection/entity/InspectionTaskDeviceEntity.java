@@ -52,6 +52,10 @@ public class InspectionTaskDeviceEntity implements Serializable {
 	 */
 	private Integer isUpdate;
 	/**
+	 * 是否巡检
+	 */
+	private Integer isInspected;
+	/**
 	 * 开始巡检时间
 	 */
 	private String startTime;
@@ -161,6 +165,18 @@ public class InspectionTaskDeviceEntity implements Serializable {
 	 */
 	public Integer getIsUpdate() {
 		return isUpdate;
+	}
+	/**
+	 * 设置：是否已巡检
+	 */
+	public void setIsInspected(Integer isInspected) {
+		this.isInspected = isInspected;
+	}
+	/**
+	 * 获取：是否已巡检
+	 */
+	public Integer getIsInspected() {
+		return isInspected;
 	}
 	/**
 	 * 设置：开始巡检时间
