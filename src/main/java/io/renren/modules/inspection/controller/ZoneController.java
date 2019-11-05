@@ -1,30 +1,27 @@
 package io.renren.modules.inspection.controller;
 
-import java.util.*;
-
 import io.renren.common.annotation.SysLog;
+import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.PoiUtils;
+import io.renren.common.utils.R;
 import io.renren.modules.inspection.entity.InspectionLineEntity;
 import io.renren.modules.inspection.entity.LineZoneEntity;
 import io.renren.modules.inspection.entity.ZoneDeviceEntity;
+import io.renren.modules.inspection.entity.ZoneEntity;
 import io.renren.modules.inspection.service.InspectionLineService;
 import io.renren.modules.inspection.service.LineZoneService;
 import io.renren.modules.inspection.service.ZoneDeviceService;
+import io.renren.modules.inspection.service.ZoneService;
 import io.renren.modules.sys.entity.SysDeptEntity;
-import io.renren.modules.sys.entity.SysUserEntity;
 import io.renren.modules.sys.service.SysDeptService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
-import io.renren.modules.inspection.entity.ZoneEntity;
-import io.renren.modules.inspection.service.ZoneService;
-import io.renren.common.utils.PageUtils;
-import io.renren.common.utils.R;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.*;
 
 
 /**
@@ -180,17 +177,14 @@ public class ZoneController {
     @RequestMapping("/update")
     @RequiresPermissions("inspection:zone:update")
     public R update(@RequestBody ZoneEntity zone){
-        ZoneEntity tmp = zoneService.selectByZoneCode(zone.getZoneCode());
+        List<ZoneEntity> tmp = zoneService.selectByZoneCodeList(zone.getZoneCode());
         if(tmp != null){
-            if(tmp.getZoneId() == zone.getZoneId()){
-                zoneService.updateById(zone);
-            } else {
+            if(tmp.size() > 0){
                 return R.error(400, "编码已绑定过其它巡区，不能再次绑定。");
+            } else {
+                zoneService.updateById(zone);
             }
-        }else{
-            zoneService.updateById(zone);
         }
-
         return R.ok();
     }
 

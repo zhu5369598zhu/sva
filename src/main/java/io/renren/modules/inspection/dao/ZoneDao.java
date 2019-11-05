@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * 
  * 
@@ -18,4 +20,5 @@ public interface ZoneDao extends BaseMapper<ZoneEntity> {
     Integer isExist(@Param("zoneName") String zoneName, @Param("zoneCode") String zoneCode);
     ZoneEntity selectByName(@Param("zoneName") String zoneName);
     public ZoneEntity selectByZoneCode(@Param("zoneCode") String zoneCode);
+    List<ZoneEntity> selectByZoneCodeList(@Param("zoneCode") String zoneCode);
 }

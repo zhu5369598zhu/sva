@@ -1,25 +1,19 @@
 package io.renren.modules.inspection.controller;
 
-import java.util.*;
-
 import io.renren.common.annotation.SysLog;
-import io.renren.modules.inspection.entity.DeviceEntity;
-import io.renren.modules.inspection.entity.InspectionLineEntity;
-import io.renren.modules.inspection.entity.InspectionLinePublishEntity;
-import io.renren.modules.inspection.service.InspectionLinePublishService;
-import io.renren.modules.inspection.service.InspectionLineService;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import io.renren.modules.inspection.entity.PdaEntity;
-import io.renren.modules.inspection.service.PdaService;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
+import io.renren.modules.inspection.entity.InspectionLineEntity;
+import io.renren.modules.inspection.entity.InspectionLinePublishEntity;
+import io.renren.modules.inspection.entity.PdaEntity;
+import io.renren.modules.inspection.service.InspectionLinePublishService;
+import io.renren.modules.inspection.service.InspectionLineService;
+import io.renren.modules.inspection.service.PdaService;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.*;
 
 
 
@@ -141,7 +135,7 @@ public class PdaController {
                 if(publishEntities.size() > 0 ){
                     for(InspectionLinePublishEntity publish:publishEntities){
                         InspectionLineEntity line = lineService.selectById(publish.getLineId());
-                        if(line != null){
+                        if(line != null && line.getIsDelete()==0 ){ // 绑定巡线并且巡线被没有删除
                             return R.error(400,"该设备已绑定到巡检线路" + line.getName() + "中，不能删除。");
                         }
                     }

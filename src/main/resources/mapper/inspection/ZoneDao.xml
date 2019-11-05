@@ -28,4 +28,8 @@
 		select * from tb_zone where is_delete=0 and zone_code = #{zoneCode}
 	</select>
 
+    <select id="selectByZoneCodeList" resultType="io.renren.modules.inspection.entity.ZoneEntity">
+        select * from tb_zone where is_delete=0 and zone_code = #{zoneCode}
+    </select>
+
 </mapper>

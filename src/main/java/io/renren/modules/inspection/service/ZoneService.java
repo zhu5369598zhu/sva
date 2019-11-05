@@ -22,5 +22,6 @@ public interface ZoneService extends IService<ZoneEntity> {
     Integer isExist(String zoneName, String zoneCode);
     ZoneEntity selectByName(String zoneName);
     ZoneEntity selectByZoneCode(String zoneCode);
+    List<ZoneEntity> selectByZoneCodeList(String zoneCode);
 }
 

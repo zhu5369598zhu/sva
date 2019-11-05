@@ -30,14 +30,22 @@ public class InspectionLineServiceImpl extends ServiceImpl<InspectionLineDao, In
     @Autowired
     private InspectionLinePublishService publishService;
 
+    @Autowired
+    private SysDeptService deptService;
+
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         String deptId = (String)params.get("deptId");
         String name = (String)params.get("name");
+        List<Integer> deptIds = null;
+        if(deptId != null && !deptId.equals("")){
+            deptIds = deptService.queryRecursiveChildByParentId(Long.parseLong(deptId));
+        }
         Page<InspectionLineEntity> page = this.selectPage(
                 new Query<InspectionLineEntity>(params).getPage(),
                 new EntityWrapper<InspectionLineEntity>()
-                        .eq(deptId!=null,"dept_id",deptId)
+                        //.eq(deptId!=null,"dept_id",deptId)
+                        .in(deptIds != null ,"dept_id",deptIds)
                         .eq("is_delete",0)
                         .like(StringUtils.isNotBlank(name),"name",name)
                         .orderBy("order_num")
