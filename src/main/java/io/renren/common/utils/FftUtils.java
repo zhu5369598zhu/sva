@@ -29,8 +29,14 @@ public class FftUtils {
             params[i] = dis.readFloat();
         }
         if (params.length == 2) {
-            //out.ratio = params[0];
-            out.setOffset(params[1].doubleValue());
+            try{
+                out.setRatio(params[0].doubleValue());
+            }catch(Exception e){
+            }
+            try{
+                out.setOffset(params[1].doubleValue());
+            }catch(Exception e) {
+            }
         }
 
         Integer settingLen = dis.readInt();
@@ -98,8 +104,22 @@ public class FftUtils {
         double rm = jsonRes.getDouble("rm");
         out.setRm(rm);
 
-        int index = 0;
+        Double ratio = out.getRatio();
+        Double offset = out.getOffset();
+        if(type.equals("acc") && ratio >= 0 && offset >=0){
+            double tmpPk = out.getPk()*ratio + offset;
+            out.setPk(tmpPk);
+        }
+        if(type.equals("speed") && ratio > 0 && offset >=0){
+            double tmpRm = out.getRm()*ratio + offset;
+            out.setRm(tmpRm);
+        }
+        if(type.equals("distance") && ratio > 0 && offset >=0){
+            double tmpPk2pk = out.getPk2pk()*ratio + offset;
+            out.setPk2pk(tmpPk2pk);
+        }
 
+        int index = 0;
         ArrayList<Double> fft_list = new ArrayList<>(Arrays.asList(fftYData));
         List<Double> freq_list = new ArrayList<>(Arrays.asList(fftXData));
         double fft_first = Collections.max(fft_list);
