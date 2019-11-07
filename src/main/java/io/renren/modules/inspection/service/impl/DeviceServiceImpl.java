@@ -246,9 +246,6 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DeviceEntity> impl
 
     private void getLineTreeNodeData(Map<String,Object> node, Integer inspectionType){
         List<Map<String,Object>> lines = lineService.selectByDept((Long)node.get("id"));
-        logger.error("node:" + node.toString());
-        logger.error("lines:" + lines.toString());
-
 
         for(Map<String,Object> line:lines){
             List<Map<String,Object>> devices = deviceService.selectByLine((Long)line.get("id"));
@@ -262,7 +259,6 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DeviceEntity> impl
 
         if (node.get("type").equals("dept")){
             List<Map<String,Object>> children = deptService.queryListParentId((Long)node.get("id"));
-            logger.error("children:" + children.toString());
             if(children != null && children.size() > 0 ){
                 children.addAll(lines);
                 node.put("children", children);
@@ -290,13 +286,10 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DeviceEntity> impl
 
     private void getOnlyLineTreeNodeData(Map<String,Object> node){
         List<Map<String,Object>> lines = lineService.selectByDept((Long)node.get("id"));
-        logger.error("node:" + node.toString());
-        logger.error("lines:" + lines.toString());
 
 
         if (node.get("type").equals("dept")){
             List<Map<String,Object>> children = deptService.queryListParentId((Long)node.get("id"));
-            logger.error("children:" + children.toString());
             if(children != null && children.size() > 0 ){
                 children.addAll(lines);
                 node.put("children", children);
