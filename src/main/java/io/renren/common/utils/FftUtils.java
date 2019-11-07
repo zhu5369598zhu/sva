@@ -12,12 +12,11 @@ import java.util.*;
 @Component
 public class FftUtils {
 
-    @Value("${interface.url}")
     private static String interfaceUrl;
 
-
-    public static String getInterfaceUrl() {
-        return interfaceUrl;
+    @Value("${interface.url}")
+    public void setInterfaceUrl(String interfaceUrl) {
+        this.interfaceUrl =  interfaceUrl;
     }
 
     public static FftChartEntity fromByte(byte[] data, String type) throws IOException {
@@ -58,7 +57,8 @@ public class FftUtils {
         jsonObject.put("n",out.getN());
         jsonObject.put("fs",out.getFs());
         jsonObject.put("type",type);
-        String res = HttpUtils.post("http://py.gronhco.cn/api",jsonObject.toJSONString(),"");
+        String reqUrl = interfaceUrl;
+        String res = HttpUtils.post(reqUrl,jsonObject.toJSONString(),"");
         if(res == null){
             return null;
         }
