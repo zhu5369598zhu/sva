@@ -179,7 +179,11 @@ public class ZoneController {
     public R update(@RequestBody ZoneEntity zone){
         List<ZoneEntity> tmp = zoneService.selectByZoneCodeList(zone.getZoneCode());
         if(tmp != null){
-            if(tmp.size() > 0){
+            if(tmp.size() == 1){
+                if(tmp.get(0).getZoneId() != zone.getZoneId()){
+                    return R.error(400, "编码已绑定过其它巡区，不能再次绑定。");
+                }
+            } else if (tmp.size()>1) {
                 return R.error(400, "编码已绑定过其它巡区，不能再次绑定。");
             } else {
                 zoneService.updateById(zone);
