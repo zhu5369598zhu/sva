@@ -86,7 +86,6 @@ public class lineScanTask {
             for (InspectionPeriodEntity period:periods) {
                 InspectionTaskEntity taskEntity = new InspectionTaskEntity();
                 taskEntity.setLineId(line.getId());
-                taskEntity.setPeriodId(period.getId().intValue());
                 taskEntity.setIsSpan(0);
                 taskEntity.setIsInspected(0);
                 taskEntity.setInspectedDeviceCount(0);
@@ -102,20 +101,24 @@ public class lineScanTask {
                         taskEntity.setTurnId(turn.getId());
                         String today = simpleDateFormat.format(dt);
                         taskEntity.setTurnStartTime(today + " " + turn.getStartTime());
+                        if(turn.getEndTime().equals("00:00")){
+                            turn.setEndTime("23:59");
+                        }
                         taskEntity.setTurnEndTime(today + " " + turn.getEndTime());
 
                         if(period.getFrequency() == 1){
                             deviceCount = deviceList.size();
                             for(Integer deviceId:deviceList){
-                                HashMap deviceParams = new HashMap();
-                                deviceParams.put("device_id",deviceId);
-                                List<InspectionItemEntity> itemList = itemService.selectByMap(deviceParams);
+                                HashMap itemParams = new HashMap();
+                                itemParams.put("device_id",deviceId);
+                                itemParams.put("is_delete",0);
+                                List<InspectionItemEntity> itemList = itemService.selectByMap(itemParams);
                                 itemCount += itemList.size();
                                 InspectionTaskDeviceEntity taskDeviceEntity = new InspectionTaskDeviceEntity();
                                 taskDeviceEntity.setDeviceId(deviceId);
                                 taskDeviceEntity.setLineId(line.getId().longValue());
                                 taskDeviceEntity.setTurnId(turn.getId());
-                                taskDeviceEntity.setInsepctItemCount(itemList.size());
+                                taskDeviceEntity.setInspectItemCount(itemList.size());
                                 taskDeviceEntity.setInspectionDate(dt);
                                 writeTaskDevice(line.getId(),turn.getId().intValue(),deviceId,simpleDateFormat.format(dt),taskDeviceEntity);
                             }
@@ -132,15 +135,16 @@ public class lineScanTask {
                                     if (period.getStartPoint() == week) {
                                         deviceCount = deviceList.size();
                                         for(Integer deviceId:deviceList){
-                                            HashMap deviceParams = new HashMap();
-                                            deviceParams.put("device_id",deviceId);
-                                            List<InspectionItemEntity> itemList = itemService.selectByMap(deviceParams);
+                                            HashMap itemParams = new HashMap();
+                                            itemParams.put("device_id",deviceId);
+                                            itemParams.put("is_delete",0);
+                                            List<InspectionItemEntity> itemList = itemService.selectByMap(itemParams);
                                             itemCount += itemList.size();
                                             InspectionTaskDeviceEntity taskDeviceEntity = new InspectionTaskDeviceEntity();
                                             taskDeviceEntity.setDeviceId(deviceId);
                                             taskDeviceEntity.setLineId(line.getId().longValue());
                                             taskDeviceEntity.setTurnId(turn.getId());
-                                            taskDeviceEntity.setInsepctItemCount(itemList.size());
+                                            taskDeviceEntity.setInspectItemCount(itemList.size());
                                             taskDeviceEntity.setInspectionDate(dt);
                                             writeTaskDevice(line.getId(),turn.getId().intValue(),deviceId,simpleDateFormat.format(dt),taskDeviceEntity);
                                         }
@@ -155,15 +159,16 @@ public class lineScanTask {
                                     if (period.getStartPoint() + period.getSpan() == week) {
                                         deviceCount = deviceList.size();
                                         for(Integer deviceId:deviceList){
-                                            HashMap deviceParams = new HashMap();
-                                            deviceParams.put("device_id",deviceId);
-                                            List<InspectionItemEntity> itemList = itemService.selectByMap(deviceParams);
+                                            HashMap itemParams = new HashMap();
+                                            itemParams.put("device_id",deviceId);
+                                            itemParams.put("is_delete",0);
+                                            List<InspectionItemEntity> itemList = itemService.selectByMap(itemParams);
                                             itemCount += itemList.size();
                                             InspectionTaskDeviceEntity taskDeviceEntity = new InspectionTaskDeviceEntity();
                                             taskDeviceEntity.setDeviceId(deviceId);
                                             taskDeviceEntity.setLineId(line.getId().longValue());
                                             taskDeviceEntity.setTurnId(turn.getId());
-                                            taskDeviceEntity.setInsepctItemCount(itemList.size());
+                                            taskDeviceEntity.setInspectItemCount(itemList.size());
                                             taskDeviceEntity.setInspectionDate(dt);
                                             writeTaskDevice(line.getId(),turn.getId().intValue(),deviceId,simpleDateFormat.format(dt),taskDeviceEntity);
                                         }
@@ -182,15 +187,16 @@ public class lineScanTask {
                             if(basePoint.getTime()< dt.getTime()){
                                 deviceCount = deviceList.size();
                                 for(Integer deviceId:deviceList){
-                                    HashMap deviceParams = new HashMap();
-                                    deviceParams.put("device_id",deviceId);
-                                    List<InspectionItemEntity> itemList = itemService.selectByMap(deviceParams);
+                                    HashMap itemParams = new HashMap();
+                                    itemParams.put("device_id",deviceId);
+                                    itemParams.put("is_delete",0);
+                                    List<InspectionItemEntity> itemList = itemService.selectByMap(itemParams);
                                     itemCount += itemList.size();
                                     InspectionTaskDeviceEntity taskDeviceEntity = new InspectionTaskDeviceEntity();
                                     taskDeviceEntity.setDeviceId(deviceId);
                                     taskDeviceEntity.setLineId(line.getId().longValue());
                                     taskDeviceEntity.setTurnId(turn.getId());
-                                    taskDeviceEntity.setInsepctItemCount(itemList.size());
+                                    taskDeviceEntity.setInspectItemCount(itemList.size());
                                     taskDeviceEntity.setInspectionDate(dt);
                                     writeTaskDevice(line.getId(),turn.getId().intValue(),deviceId,simpleDateFormat.format(dt),taskDeviceEntity);
                                 }
@@ -226,6 +232,10 @@ public class lineScanTask {
         try{
             if(taskList.size() == 0){
                 taskService.insert(taskEntity);
+            }else{
+                InspectionTaskEntity task = taskList.get(0);
+                task.setInspectDeviceCount(taskEntity.getInspectDeviceCount());
+                taskService.updateById(task);
             }
         }catch(Exception e){
             logger.error(e.toString());
@@ -244,8 +254,8 @@ public class lineScanTask {
                 taskDeviceService.insert(taskDeviceEntity);
             }else if (taskDeviceList.size() > 0){
                 InspectionTaskDeviceEntity tmp = taskDeviceList.get(0);
-                taskDeviceEntity.setId(tmp.getId());
-                taskDeviceService.updateById(taskDeviceEntity);
+                tmp.setInspectItemCount(taskDeviceEntity.getInspectItemCount());
+                taskDeviceService.updateById(tmp);
             }
         }catch (Exception e){
 

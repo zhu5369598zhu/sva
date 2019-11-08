@@ -917,9 +917,11 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
                     if(taskList.size() >0){
                         InspectionTaskEntity task = taskList.get(0);
                         task.setIsInspected(1);
-                        if(taskDeviceEntity.getInspectedItemCount() >= taskDeviceEntity.getInsepctItemCount()){
+                        if(taskDeviceEntity.getInspectedItemCount() >= taskDeviceEntity.getInspectItemCount()){
                             taskDeviceEntity.setIsUpdate(1);
-                            task.setInspectedDeviceCount(task.getInspectedDeviceCount() + 1);
+                            if(task.getInspectedDeviceCount() <  task.getInspectDeviceCount()){
+                                task.setInspectedDeviceCount(task.getInspectedDeviceCount() + 1);
+                            }
                         }
 
                         task.setInspectedItemCount(taskDeviceEntity.getInspectedItemCount());
@@ -928,6 +930,10 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
 
                     taskDeviceEntity.setIsInspected(1);
                     taskDeviceEntity.setStartTime(result.getStartTime());
+                    //if(taskDeviceEntity.getEndTime().compareToIgnoreCase(result.getEndTime()) < 0){
+                    //    taskDeviceEntity.setEndTime(result.getEndTime());
+                    //}
+                    taskDeviceEntity.setEndTime(result.getEndTime());
                     taskDeviceEntity.setEndTime(result.getEndTime());
                     taskDeviceEntity.setCreateTime(result.getCreateTime());
                     taskDeviceService.updateById(taskDeviceEntity);

@@ -38,7 +38,7 @@ public class InspectionTaskDeviceEntity implements Serializable {
 	/**
 	 * 应检项数
 	 */
-	private Integer insepctItemCount;
+	private Integer inspectItemCount;
 	/**
 	 * 已检项数
 	 */
@@ -121,14 +121,14 @@ public class InspectionTaskDeviceEntity implements Serializable {
 	/**
 	 * 设置：应检项数
 	 */
-	public void setInsepctItemCount(Integer insepctItemCount) {
-		this.insepctItemCount = insepctItemCount;
+	public void setInspectItemCount(Integer inspectItemCount) {
+		this.inspectItemCount = inspectItemCount;
 	}
 	/**
 	 * 获取：应检项数
 	 */
-	public Integer getInsepctItemCount() {
-		return insepctItemCount;
+	public Integer getInspectItemCount() {
+		return inspectItemCount;
 	}
 	/**
 	 * 设置：已检项数

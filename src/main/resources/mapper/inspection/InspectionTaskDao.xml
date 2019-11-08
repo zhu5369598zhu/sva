@@ -77,7 +77,7 @@
         left join tb_turn as turn on turn.id=task.turn_id
         left join sys_dept as dept on dept.dept_id=line.dept_id
         left join tb_inspection_period as period on period.line_id=line.id
-        where task.inspection_span_end_date >= '${inspectStartDate}' and task.inspection_span_end_date &lt; '${inspectEndDate}'
+        where task.inspection_span_end_date >= '${inspectStartDate}' and task.inspection_span_end_date &lt;= '${inspectEndDate}'
         <if test="deptIds!=null">
             and dept.dept_id in
             <foreach item="item" index="index" collection="deptIds" open="(" separator="," close=")">
@@ -99,7 +99,7 @@
         left join tb_turn as turn on turn.id=task.turn_id
         left join sys_dept as dept on dept.dept_id=line.dept_id
         left join tb_inspection_period as period on period.line_id=line.id
-        where inspection_span_end_date >= '${inspectStartDate}' and inspection_span_end_date &lt; '${inspectEndDate}'
+        where inspection_span_end_date >= '${inspectStartDate}' and inspection_span_end_date &lt;= '${inspectEndDate}'
         <if test="deptIds!=null">
             and dept.dept_id in
             <foreach item="item" index="index" collection="deptIds" open="(" separator="," close=")">

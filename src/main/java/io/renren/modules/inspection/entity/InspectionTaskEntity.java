@@ -59,10 +59,6 @@ public class InspectionTaskEntity implements Serializable {
 	 */
 	private Date inspectionSpanEndDate;
 	/**
-	 *  巡检周期id
-	 */
-	private Integer periodId;
-	/**
 	 * 巡检开始时间
 	 */
 	private String turnStartTime;
@@ -190,20 +186,6 @@ public class InspectionTaskEntity implements Serializable {
 	 */
 	public Date getInspectionSpanEndDate() {
 		return inspectionSpanEndDate;
-	}
-
-	/**
-	 * 设置：巡检周期id
-	 */
-	public void setPeriodId(Integer periodId){
-		this.periodId = periodId;
-	}
-
-	/**
-	 * 获取：巡检周期id
-	 */
-	public Integer getPeriodId(){
-		return this.periodId;
 	}
 
 	/**

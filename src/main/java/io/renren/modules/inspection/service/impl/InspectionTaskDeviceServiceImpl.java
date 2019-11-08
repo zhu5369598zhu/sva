@@ -252,8 +252,8 @@ public class InspectionTaskDeviceServiceImpl extends ServiceImpl<InspectionTaskD
         Long inspected = 0L;
         Long missInspect = 0L;
         for(Map<String, Object> item:list){
-            inspected += Long.parseLong(item.get("inspectedCount").toString());
-            missInspect += Long.parseLong(item.get("inspectMissCount").toString());
+            inspected += Long.parseLong(item.get("inspectedItemCount").toString());
+            missInspect += Long.parseLong(item.get("inspectMissItemCount").toString());
         }
 
         legend.add("已检");
@@ -377,9 +377,9 @@ public class InspectionTaskDeviceServiceImpl extends ServiceImpl<InspectionTaskD
         Integer i = 0;
         for(Map<String, Object> item:list){
             category.add((String)item.get("turnName"));
-            inspectedList.add(Long.parseLong(item.get("inspectedCount").toString()));
-            InspectList.add(Long.parseLong(item.get("inspectCount").toString()));
-            InspectMissList.add(Long.parseLong(item.get("inspectMissCount").toString()));
+            inspectedList.add(Long.parseLong(item.get("inspectedItemCount").toString()));
+            InspectList.add(Long.parseLong(item.get("inspectItemCount").toString()));
+            InspectMissList.add(Long.parseLong(item.get("inspectMissItemCount").toString()));
         }
 
         legend.add("已检");
