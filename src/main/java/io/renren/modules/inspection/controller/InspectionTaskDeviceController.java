@@ -174,7 +174,7 @@ public class InspectionTaskDeviceController {
     /**
      *  设备耗时统计
      * */
-    @RequestMapping("getdevicebytime")
+    @RequestMapping("/getdevicebytime")
     public R getDeviceDate(@RequestParam Map<String, Object> params){
         PageUtils page = inspectionTaskDeviceService.getDeviceDate(params);
         return R.ok().put("page", page);

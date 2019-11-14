@@ -412,6 +412,7 @@ public class InspectionTaskDeviceServiceImpl extends ServiceImpl<InspectionTaskD
         String lineId = (String)params.get("lineId");
         String inspectStartTime = (String)params.get("startTime");
         String inspectEndTime = (String)params.get("endTime");
+        inspectEndTime = inspectEndTime + " 23:59:59";
 
         if(deptId != null && !deptId.equals("")){
             deptIds = deptService.queryRecursiveChildByParentId(Long.parseLong(deptId));
