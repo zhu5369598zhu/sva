@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.service.IService;
 import io.renren.common.utils.PageUtils;
 import io.renren.modules.inspection.entity.InspectionTaskEntity;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -27,5 +26,6 @@ public interface InspectionTaskService extends IService<InspectionTaskEntity> {
     List<Map<String,Object>> getAllTurnByDate(Map<String, Object> params);
     Map<String,Object> getTurnStatisticsByDate(Map<String, Object> params);
     PageUtils queryPage(Map<String, Object> params);
+    PageUtils getLineByTime(Map<String, Object> params);
 }
 

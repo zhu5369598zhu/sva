@@ -1,26 +1,22 @@
 package io.renren.modules.inspection.service.impl;
 
-import io.renren.modules.inspection.entity.ClassGroupEntity;
-import io.renren.modules.inspection.entity.TurnClassGroupEntity;
-import io.renren.modules.inspection.service.ClassGroupService;
-import io.renren.modules.inspection.service.TurnClassGroupService;
-import io.renren.modules.inspection.service.TurnService;
-import io.renren.modules.sys.service.SysDeptService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.util.*;
-
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
-
 import io.renren.modules.inspection.dao.InspectionTaskDao;
+import io.renren.modules.inspection.entity.ClassGroupEntity;
 import io.renren.modules.inspection.entity.InspectionTaskEntity;
+import io.renren.modules.inspection.entity.TurnClassGroupEntity;
+import io.renren.modules.inspection.service.ClassGroupService;
 import io.renren.modules.inspection.service.InspectionTaskService;
+import io.renren.modules.inspection.service.TurnClassGroupService;
+import io.renren.modules.sys.service.SysDeptService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
 
 
 @Service("inspectionTaskService")
@@ -398,5 +394,42 @@ public class InspectionTaskServiceImpl extends ServiceImpl<InspectionTaskDao, In
         json.put("series", series);
 
         return json;
+    }
+
+    @Override
+    public PageUtils getLineByTime(Map<String, Object> params) {
+        List<Integer> deptIds = null;
+        String deptId = (String)params.get("deptId");
+        String lineId = (String)params.get("lineId");
+        String inspectStartTime = (String)params.get("startTime");
+        String inspectEndTime = (String)params.get("endTime");
+
+        if(deptId != null && !deptId.equals("")){
+            deptIds = deptService.queryRecursiveChildByParentId(Long.parseLong(deptId));
+        }
+        Page<Map<String, Object>> page = new Query<Map<String, Object>>(params).getPage();
+        List<Map<String, Object>> list = this.baseMapper.getLineByTime(
+                page,
+                lineId,
+                deptIds,
+                inspectStartTime,
+                inspectEndTime
+        );
+        for(Map<String, Object> item:list){
+            List<String> classGroupList = new ArrayList<>();
+            Long turnId = (Long)item.get("turnId");
+            HashMap<String,Object> turnClassparams = new HashMap<>();
+            turnClassparams.put("turn_id",turnId);
+            List<TurnClassGroupEntity> turnClassGroupEntities = turnClassGroupService.selectByMap(turnClassparams);
+            for(TurnClassGroupEntity turnClassGroupEntity:turnClassGroupEntities){
+                ClassGroupEntity classGroupEntity = classGroupService.selectById(turnClassGroupEntity.getClassGroupId());
+                if(classGroupEntity != null){
+                    classGroupList.add(classGroupEntity.getName());
+                }
+            }
+            item.put("workerList",org.apache.commons.lang.StringUtils.join(classGroupList.toArray(), '/'));
+        }
+        page.setRecords(list);
+        return new PageUtils(page);
     }
 }

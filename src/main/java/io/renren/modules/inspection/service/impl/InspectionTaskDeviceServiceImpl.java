@@ -1,24 +1,22 @@
 package io.renren.modules.inspection.service.impl;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.plugins.Page;
+import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import io.renren.common.utils.PageUtils;
+import io.renren.common.utils.Query;
+import io.renren.modules.inspection.dao.InspectionTaskDeviceDao;
 import io.renren.modules.inspection.entity.ClassGroupEntity;
+import io.renren.modules.inspection.entity.InspectionTaskDeviceEntity;
 import io.renren.modules.inspection.entity.TurnClassGroupEntity;
 import io.renren.modules.inspection.service.ClassGroupService;
+import io.renren.modules.inspection.service.InspectionTaskDeviceService;
 import io.renren.modules.inspection.service.TurnClassGroupService;
 import io.renren.modules.sys.service.SysDeptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.plugins.Page;
-import com.baomidou.mybatisplus.service.impl.ServiceImpl;
-import io.renren.common.utils.PageUtils;
-import io.renren.common.utils.Query;
-
-import io.renren.modules.inspection.dao.InspectionTaskDeviceDao;
-import io.renren.modules.inspection.entity.InspectionTaskDeviceEntity;
-import io.renren.modules.inspection.service.InspectionTaskDeviceService;
 
 
 @Service("inspectionTaskDeviceService")
@@ -38,6 +36,16 @@ public class InspectionTaskDeviceServiceImpl extends ServiceImpl<InspectionTaskD
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public Map<String, Object> selectByParams(Map<String, Object> params) {
+
+        //String lineId = (String)((Number)params.get("line_id")).intValue();
+        String lineId = params.get("line_id").toString();
+        String turnId = params.get("turn_id").toString();
+        //String inspectionDate  = (String)params.get("inspection_date");
+        return this.baseMapper.selectByParams(lineId, turnId);
     }
 
     @Override
@@ -395,5 +403,42 @@ public class InspectionTaskDeviceServiceImpl extends ServiceImpl<InspectionTaskD
         json.put("series", series);
 
         return json;
+    }
+
+    @Override
+    public PageUtils getDeviceDate(Map<String, Object> params) {
+        List<Integer> deptIds = null;
+        String deptId = (String)params.get("deptId");
+        String lineId = (String)params.get("lineId");
+        String inspectStartTime = (String)params.get("startTime");
+        String inspectEndTime = (String)params.get("endTime");
+
+        if(deptId != null && !deptId.equals("")){
+            deptIds = deptService.queryRecursiveChildByParentId(Long.parseLong(deptId));
+        }
+        Page<Map<String, Object>> page = new Query<Map<String, Object>>(params).getPage();
+        List<Map<String, Object>> list = this.baseMapper.getDeviceByTime(
+                page,
+                lineId,
+                deptIds,
+                inspectStartTime,
+                inspectEndTime
+        );
+        for(Map<String, Object> item:list){
+            List<String> classGroupList = new ArrayList<>();
+            Long turnId = (Long)item.get("turnId");
+            HashMap<String,Object> turnClassparams = new HashMap<>();
+            turnClassparams.put("turn_id",turnId);
+            List<TurnClassGroupEntity> turnClassGroupEntities = turnClassGroupService.selectByMap(turnClassparams);
+            for(TurnClassGroupEntity turnClassGroupEntity:turnClassGroupEntities){
+                ClassGroupEntity classGroupEntity = classGroupService.selectById(turnClassGroupEntity.getClassGroupId());
+                if(classGroupEntity != null){
+                    classGroupList.add(classGroupEntity.getName());
+                }
+            }
+            item.put("workerList",org.apache.commons.lang.StringUtils.join(classGroupList.toArray(), '/'));
+        }
+        page.setRecords(list);
+        return new PageUtils(page);
     }
 }

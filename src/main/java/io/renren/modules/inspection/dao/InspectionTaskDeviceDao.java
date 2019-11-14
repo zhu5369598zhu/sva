@@ -1,5 +1,6 @@
 package io.renren.modules.inspection.dao;
 
+import com.baomidou.mybatisplus.plugins.Page;
 import com.baomidou.mybatisplus.plugins.pagination.Pagination;
 import io.renren.modules.inspection.entity.InspectionTaskDeviceEntity;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
@@ -25,5 +26,6 @@ public interface InspectionTaskDeviceDao extends BaseMapper<InspectionTaskDevice
     List<Map<String,Object>> selectMissingLineByDate(Pagination page, @Param("lineId") String lineId, @Param("deptIds") List<Integer> deptIds, @Param("inspectStartDate") String inspectStartDate, @Param("inspectEndDate")  String inspectEndDate);
     List<Map<String,Object>> selectMissingTurnByDate(@Param("lineId") String lineId, @Param("deptIds") List<Integer> deptIds, @Param("inspectStartDate") String inspectStartDate,@Param("inspectEndDate")  String inspectEndDate);
     List<Map<String,Object>> selectMissingTurnByDate(Pagination page, @Param("lineId") String lineId, @Param("deptIds") List<Integer> deptIds, @Param("inspectStartDate") String inspectStartDate,@Param("inspectEndDate")  String inspectEndDate);
-	
+    Map<String, Object> selectByParams(@Param("lineId") String lineId, @Param("turnId") String turnId);
+    List<Map<String, Object>> getDeviceByTime(Page<Map<String, Object>> page,@Param("lineId") String lineId,@Param("deptIds") List<Integer> deptIds,@Param("inspectStartDate") String inspectStartTime,@Param("inspectEndDate") String inspectEndTime);
 }

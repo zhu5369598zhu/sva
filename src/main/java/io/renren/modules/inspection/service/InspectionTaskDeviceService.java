@@ -25,5 +25,7 @@ public interface InspectionTaskDeviceService extends IService<InspectionTaskDevi
     List<Map<String,Object>> getAllTurnByDate(Map<String, Object> params);
     Map<String,Object> getTurnStatisticsByDate(Map<String, Object> params);
     PageUtils queryPage(Map<String, Object> params);
+    Map<String,Object> selectByParams(Map<String, Object> params);
+    PageUtils getDeviceDate(Map<String, Object> params);
 }
 

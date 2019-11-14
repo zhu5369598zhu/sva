@@ -66,6 +66,16 @@ public class InspectionTaskEntity implements Serializable {
 	 * 巡检结束时间
 	 */
 	private String turnEndTime;
+    /**
+	 * 员工实际巡检开始实际
+	 * */
+	private String inspectedStartTime;
+    /**
+	 * 员工实际巡检结束时间
+	 * */
+	private String inspectedEndTime;
+
+
 	/**
 	 * 设置：自动增加
 	 */
@@ -215,4 +225,29 @@ public class InspectionTaskEntity implements Serializable {
 	public String getTurnEndTime(){
 		return turnEndTime;
 	}
+	/**
+	 * 获取：员工实际开始巡检时间
+	* */
+	public String getInspectedStartTime() {
+		return inspectedStartTime;
+	}
+    /**
+	 * 设置：员工实际开始巡检时间
+	 * */
+	public void setInspectedStartTime(String inspectedStartTime) {
+		this.inspectedStartTime = inspectedStartTime;
+	}
+    /**
+	 * 获取：员工实际结束巡检时间
+	 * */
+	public String getInspectedEndTime() {
+		return inspectedEndTime;
+	}
+    /**
+	 * 设置：员工实际结束巡检时间
+	 * */
+	public void setInspectedEndTime(String inspectedEndTime) {
+		this.inspectedEndTime = inspectedEndTime;
+	}
+
 }

@@ -892,7 +892,7 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
 
         Integer id = this.baseMapper.insert(result);
         if(id > 0){
-            HashMap itemParams = new HashMap();
+           HashMap itemParams = new HashMap();
             itemParams.put("id",result.getItemId());
             List<InspectionItemEntity>  itemList= itemService.selectByMap(itemParams);
             if(itemList.size() > 0){
@@ -905,11 +905,30 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
                 taskDeviceParams.put("inspection_date",simpleDateFormat.format(new Date()));
                 Date dt = new Date();
                 InspectionTaskDeviceEntity taskDeviceEntity = null;
-                List<InspectionTaskDeviceEntity> taskDeviceList = taskDeviceService.selectByMap(taskDeviceParams);
-                if(taskDeviceList.size() > 0){
+                List<InspectionTaskDeviceEntity> taskDeviceList = taskDeviceService.selectByMap(taskDeviceParams);// 查询今天的设备上传
+                if(taskDeviceList.size() > 0){ // 已经有上传
                     taskDeviceEntity = taskDeviceList.get(0);
-                    taskDeviceEntity.setInspectedItemCount(taskDeviceEntity.getInspectedItemCount() + 1);
-                    HashMap taskParams = new HashMap();
+                    taskDeviceEntity.setInspectedItemCount(taskDeviceEntity.getInspectedItemCount() + 1); // 巡检项数目加1
+                    taskDeviceEntity.setIsInspected(1);
+                    if(taskDeviceEntity.getInspectedItemCount() >= taskDeviceEntity.getInspectItemCount()){
+                        taskDeviceEntity.setIsUpdate(1);
+                    }
+                    if(taskDeviceEntity.getStartTime()!= null &&taskDeviceEntity.getStartTime().compareToIgnoreCase(result.getStartTime())> 0){
+                        taskDeviceEntity.setStartTime(result.getStartTime());
+                    }
+                    if(taskDeviceEntity.getStartTime() == null) {
+                        taskDeviceEntity.setStartTime(result.getStartTime());
+                    }
+                    if(taskDeviceEntity.getStartTime().compareToIgnoreCase(result.getEndTime())< 0){
+                        taskDeviceEntity.setEndTime(result.getEndTime());
+                    }
+                    if(taskDeviceEntity.getEndTime() == null){
+                        taskDeviceEntity.setEndTime(result.getEndTime());
+                    }
+                    taskDeviceEntity.setCreateTime(result.getCreateTime());
+                    taskDeviceService.updateById(taskDeviceEntity);
+
+                    HashMap<String, Object> taskParams = new HashMap();
                     taskParams.put("line_id",turn.getInspectionLineId());
                     taskParams.put("turn_id",turn.getId());
                     taskParams.put("inspection_span_end_date",simpleDateFormat.format(new Date()));
@@ -917,34 +936,30 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
                     if(taskList.size() >0){
                         InspectionTaskEntity task = taskList.get(0);
                         task.setIsInspected(1);
-                        if(taskDeviceEntity.getInspectedItemCount() >= taskDeviceEntity.getInspectItemCount()){
-                            taskDeviceEntity.setIsUpdate(1);
-                            if(task.getInspectedDeviceCount() <  task.getInspectDeviceCount()){
+                        if(taskDeviceEntity.getInspectedItemCount() >= taskDeviceEntity.getInspectItemCount()){ // 单个设备的巡检项已经完成
+                            // taskDeviceEntity.setIsUpdate(1);
+                            if(task.getInspectedDeviceCount() <  task.getInspectDeviceCount()){// 已检设备数小于 应检设备数
                                 task.setInspectedDeviceCount(task.getInspectedDeviceCount() + 1);
+                                // 计算耗时时间
+                                Map<String, Object> taskDeviceDto = taskDeviceService.selectByParams(taskDeviceParams);
+                                SimpleDateFormat simpleDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                String startTime = simpleDate.format(taskDeviceDto.get("start_time"));
+                                String endTime = simpleDate.format(taskDeviceDto.get("end_time"));
+                                task.setInspectedStartTime(startTime);
+                                task.setInspectedEndTime(endTime);
                             }
                         }
-
-                        task.setInspectedItemCount(taskDeviceEntity.getInspectedItemCount());
+                        task.setInspectedItemCount(task.getInspectedItemCount() + 1);
                         taskService.updateById(task);
                     }
-
-                    taskDeviceEntity.setIsInspected(1);
-                    taskDeviceEntity.setStartTime(result.getStartTime());
-                    //if(taskDeviceEntity.getEndTime().compareToIgnoreCase(result.getEndTime()) < 0){
-                    //    taskDeviceEntity.setEndTime(result.getEndTime());
-                    //}
-                    taskDeviceEntity.setEndTime(result.getEndTime());
-                    taskDeviceEntity.setEndTime(result.getEndTime());
-                    taskDeviceEntity.setCreateTime(result.getCreateTime());
-                    taskDeviceService.updateById(taskDeviceEntity);
-                }else{
+                }else{ // 今天第一次上传　直接新增
                     taskDeviceEntity = new InspectionTaskDeviceEntity();
                     taskDeviceEntity.setTurnId(turn.getId());
                     taskDeviceEntity.setLineId(turn.getInspectionLineId());
                     taskDeviceEntity.setDeviceId(itemEntity.getDeviceId());
                     taskDeviceEntity.setInspectedItemCount(1);
                     taskDeviceEntity.setInspectionDate(dt);
-                    taskDeviceEntity.setIsInspected(1);
+                    taskDeviceEntity.setIsInspected(1);  //这个设备巡检了。
                     taskDeviceEntity.setStartTime(result.getStartTime());
                     taskDeviceEntity.setEndTime(result.getEndTime());
                     taskDeviceEntity.setCreateTime(result.getCreateTime());

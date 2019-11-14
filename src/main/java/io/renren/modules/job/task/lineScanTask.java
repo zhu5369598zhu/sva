@@ -1,6 +1,5 @@
 package io.renren.modules.job.task;
 
-import com.qiniu.common.Zone;
 import io.renren.modules.inspection.entity.*;
 import io.renren.modules.inspection.service.*;
 import org.slf4j.Logger;
@@ -63,6 +62,7 @@ public class lineScanTask {
         Calendar cal = Calendar.getInstance();
         HashMap lineParams = new HashMap();
         lineParams.put("is_publish", 1);
+        lineParams.put("is_delete", 0);
         List<InspectionLineEntity> lines = lineService.selectByMap(lineParams);
         HashSet<Integer> deviceList = new HashSet<>();
         for (InspectionLineEntity line:lines) {

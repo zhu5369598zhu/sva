@@ -1,21 +1,16 @@
 package io.renren.modules.inspection.controller;
 
+import io.renren.common.utils.PageUtils;
+import io.renren.common.utils.R;
+import io.renren.modules.inspection.entity.InspectionTaskDeviceEntity;
+import io.renren.modules.inspection.service.InspectionTaskDeviceService;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import io.renren.modules.inspection.entity.InspectionTaskDeviceEntity;
-import io.renren.modules.inspection.service.InspectionTaskDeviceService;
-import io.renren.common.utils.PageUtils;
-import io.renren.common.utils.R;
 
 
 
@@ -175,6 +170,14 @@ public class InspectionTaskDeviceController {
 			inspectionTaskDeviceService.deleteBatchIds(Arrays.asList(ids));
 
         return R.ok();
+    }
+    /**
+     *  设备耗时统计
+     * */
+    @RequestMapping("getdevicebytime")
+    public R getDeviceDate(@RequestParam Map<String, Object> params){
+        PageUtils page = inspectionTaskDeviceService.getDeviceDate(params);
+        return R.ok().put("page", page);
     }
 
 }

@@ -15,6 +15,8 @@
         <result property="inspectedItemCount" column="inspected_item_count"/>
         <result property="isInspected" column="is_inspected"/>
         <result property="isSpan" column="is_span"/>
+        <result property="inspectedStartTime" column="inspected_start_time" />
+        <result property="inspectedEndTime" column="inspected_end_time"/>
     </resultMap>
 
     <select id="selectByDate" resultType="java.util.HashMap" parameterType="java.lang.String">
@@ -45,7 +47,7 @@
 
     <select id="selectAbsenceDetailByDate" resultType="java.util.HashMap" parameterType="java.lang.String">
         select dept.name as deptName,line.name as lineName,case line.period_type
-        when 1 then '天' when 2 then '日' when 3 then '月' end as periodName,turn.id as turnId,turn.name as turnName,
+        when 1 then '天' when 2 then '日' when 3 then '月' end as periodName,turn.id as turnId,turn.name as turnName
         case period.turn_finish_mod when 0 then '全体完成' when 1 then '班组完成' when 2 then '个人完成' end as turnFinishMod,
         task.turn_start_time as turnStartTime,task.turn_end_time as turnEndTime
         from tb_inspection_task as task
@@ -110,6 +112,57 @@
             and line.id=#{lineId}
         </if>
         group by line.id,turn.id
+    </select>
+
+    <select id="getLineByTime" resultType="java.util.HashMap" parameterType="java.lang.String">
+        SELECT
+            dept. NAME AS deptName,
+            line. NAME AS lineName,
+            CASE line.period_type
+        WHEN 1 THEN
+            '天'
+        WHEN 2 THEN
+            '日'
+        WHEN 3 THEN
+            '月'
+        END AS periodName,
+         turn.id AS turnId,
+         turn.name as turnName,
+         CASE period.turn_finish_mod
+        WHEN 0 THEN
+            '全体完成'
+        WHEN 1 THEN
+            '班组完成'
+        WHEN 2 THEN
+            '个人完成'
+        END AS turnFinishMod,
+         task.inspect_item_count,
+         task.inspected_item_count,
+         task.turn_start_time AS turnStartTime,
+         task.turn_end_time AS turnEndTime,
+         task.inspected_start_time AS inspectedStartTime,
+         task.inspected_end_time AS inspectedEndTime,
+         TIMESTAMPDIFF(SECOND,task.inspected_start_time,task.inspected_end_time) as haoshi
+        FROM
+            tb_inspection_task AS task
+        LEFT JOIN tb_inspection_line AS line ON line.id = task.`line_id`
+        LEFT JOIN tb_turn AS turn ON turn.id = task.turn_id
+        LEFT JOIN sys_dept AS dept ON dept.dept_id = line.dept_id
+        LEFT JOIN tb_inspection_period AS period ON period.line_id = line.id
+        where task.inspection_span_end_date >= '${inspectStartDate}'
+        and task.inspection_span_end_date &lt;= '${inspectEndDate}'
+        and task.inspected_start_time >0
+        <if test="deptIds!=null">
+            and dept.dept_id in
+            <foreach item="item" index="index" collection="deptIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="lineId!=null">
+            and line.id=#{lineId}
+        </if>
+
+
     </select>
 
 
