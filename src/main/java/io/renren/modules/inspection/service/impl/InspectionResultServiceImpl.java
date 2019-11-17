@@ -211,7 +211,12 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
                 InspectionResultEntity result = (InspectionResultEntity)resultList.get(i);
                 ids[k] = result.getId().toString();
                 category[k] = result.getStartTime().toString();
-                series[k] = result.getResult();
+                if(result.getInspectionTypeId()==8 || result.getInspectionTypeId()==9)
+                {
+                    series[k] = result.getExceptionId().toString();
+                }else{
+                    series[k] = result.getResult();
+                }
                 k = k + 1;
             }
 
@@ -928,7 +933,11 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
                     taskDeviceEntity.setCreateTime(result.getCreateTime());
                     taskDeviceService.updateById(taskDeviceEntity);
 
-                    HashMap<String, Object> taskParams = new HashMap();
+                    if(taskDeviceEntity.getInspectedItemCount() < taskDeviceEntity.getInspectItemCount()){
+                        taskDeviceEntity.setInspectedItemCount(taskDeviceEntity.getInspectedItemCount() + 1);
+                    }
+
+                    HashMap taskParams = new HashMap();
                     taskParams.put("line_id",turn.getInspectionLineId());
                     taskParams.put("turn_id",turn.getId());
                     taskParams.put("inspection_span_end_date",simpleDateFormat.format(new Date()));
@@ -950,6 +959,11 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
                             }
                         }
                         task.setInspectedItemCount(task.getInspectedItemCount() + 1);
+
+                        if(taskDeviceEntity.getInspectedItemCount() <= taskDeviceEntity.getInspectItemCount()){
+                            task.setInspectedItemCount(task.getInspectedDeviceCount() + 1);
+                        }
+
                         taskService.updateById(task);
                     }
                 }else{ // 今天第一次上传　直接新增
