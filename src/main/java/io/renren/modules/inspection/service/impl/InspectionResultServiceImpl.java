@@ -933,10 +933,6 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
                     taskDeviceEntity.setCreateTime(result.getCreateTime());
                     taskDeviceService.updateById(taskDeviceEntity);
 
-                    if(taskDeviceEntity.getInspectedItemCount() < taskDeviceEntity.getInspectItemCount()){
-                        taskDeviceEntity.setInspectedItemCount(taskDeviceEntity.getInspectedItemCount() + 1);
-                    }
-
                     HashMap taskParams = new HashMap();
                     taskParams.put("line_id",turn.getInspectionLineId());
                     taskParams.put("turn_id",turn.getId());
@@ -954,16 +950,15 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
                                 SimpleDateFormat simpleDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                                 String startTime = simpleDate.format(taskDeviceDto.get("start_time"));
                                 String endTime = simpleDate.format(taskDeviceDto.get("end_time"));
-                                task.setInspectedStartTime(startTime);
+                                if(endTime.compareToIgnoreCase(result.getEndTime())< 0){
+                                    task.setInspectedEndTime(result.getEndTime());
+                                }else{
+                                    task.setInspectedStartTime(startTime);
+                                }
                                 task.setInspectedEndTime(endTime);
                             }
                         }
                         task.setInspectedItemCount(task.getInspectedItemCount() + 1);
-
-                        if(taskDeviceEntity.getInspectedItemCount() <= taskDeviceEntity.getInspectItemCount()){
-                            task.setInspectedItemCount(task.getInspectedDeviceCount() + 1);
-                        }
-
                         taskService.updateById(task);
                     }
                 }else{ // 今天第一次上传　直接新增
