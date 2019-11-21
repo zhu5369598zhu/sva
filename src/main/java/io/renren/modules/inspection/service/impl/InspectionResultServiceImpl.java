@@ -946,6 +946,8 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
                             if(task.getInspectedDeviceCount() <  task.getInspectDeviceCount()){// 已检设备数小于 应检设备数
                                 task.setInspectedDeviceCount(task.getInspectedDeviceCount() + 1);
                                 // 计算耗时时间
+                                taskDeviceParams.put("turn_start_time",task.getTurnStartTime());
+                                taskDeviceParams.put("turn_end_time",task.getTurnEndTime());
                                 Map<String, Object> taskDeviceDto = taskDeviceService.selectByParams(taskDeviceParams);
                                 SimpleDateFormat simpleDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                                 String startTime = simpleDate.format(taskDeviceDto.get("start_time"));

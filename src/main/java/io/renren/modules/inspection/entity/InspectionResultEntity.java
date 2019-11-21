@@ -739,12 +739,14 @@ public class InspectionResultEntity implements Serializable {
 	/**
 	 * 设置：下下限
 	 */
-	public void setDowndownLimit(Double downLimit) { this.downLimit = downLimit; }
+	public void setDowndownLimit(Double downdownLimit) {
+		this.downdownLimit = downdownLimit;
+	}
 	/**
 	 * 获取：下下限
 	 */
 	public Double getDowndownLimit() {
-		return downLimit;
+		return downdownLimit;
 	}
 	/**
 	 * 设置：媒体

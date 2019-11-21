@@ -142,7 +142,7 @@
          task.turn_end_time AS turnEndTime,
          task.inspected_start_time AS inspectedStartTime,
          task.inspected_end_time AS inspectedEndTime,
-         TIMESTAMPDIFF(SECOND,task.inspected_start_time,task.inspected_end_time) as haoshi
+         TIMESTAMPDIFF(MINUTE,task.inspected_start_time,task.inspected_end_time) as haoshi
         FROM
             tb_inspection_task AS task
         LEFT JOIN tb_inspection_line AS line ON line.id = task.`line_id`
@@ -151,6 +151,8 @@
         LEFT JOIN tb_inspection_period AS period ON period.line_id = line.id
         where task.inspection_span_end_date >= '${inspectStartDate}'
         and task.inspection_span_end_date &lt;= '${inspectEndDate}'
+        and task.inspected_start_time >= task.turn_start_time
+        and task.inspected_end_time &lt;= task.turn_end_time
         and task.inspected_start_time >0
         <if test="deptIds!=null">
             and dept.dept_id in

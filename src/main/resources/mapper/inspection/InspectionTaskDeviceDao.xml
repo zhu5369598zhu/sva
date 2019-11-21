@@ -115,7 +115,7 @@
     </select>
 
     <select id="selectByParams" resultType="java.util.HashMap" parameterType="java.lang.String">
-       select  MIN(start_time) AS start_time ,MAX(end_time) as end_time FROM tb_inspection_task_device where line_id = #{lineId} and turn_id = #{turnId}
+       select  MIN(start_time) AS start_time ,MAX(end_time) as end_time FROM tb_inspection_task_device where line_id = #{lineId} and turn_id = #{turnId} and start_time >= #{turnStartTime} and end_time &lt;= #{turnEndTime}
     </select>
 
     <select id="getDeviceByTime" resultType="java.util.HashMap" parameterType="java.lang.String">

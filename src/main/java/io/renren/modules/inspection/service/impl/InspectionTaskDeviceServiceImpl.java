@@ -44,8 +44,9 @@ public class InspectionTaskDeviceServiceImpl extends ServiceImpl<InspectionTaskD
         //String lineId = (String)((Number)params.get("line_id")).intValue();
         String lineId = params.get("line_id").toString();
         String turnId = params.get("turn_id").toString();
-        //String inspectionDate  = (String)params.get("inspection_date");
-        return this.baseMapper.selectByParams(lineId, turnId);
+        String turnStartTime = params.get("turn_start_time").toString();
+        String turnEndTime = params.get("turn_end_time").toString();
+        return this.baseMapper.selectByParams(lineId, turnId, turnStartTime, turnEndTime);
     }
 
     @Override

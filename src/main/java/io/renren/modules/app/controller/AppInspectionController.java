@@ -179,13 +179,11 @@ public class AppInspectionController {
         Map<String,Object> hashMap = new HashMap<String,Object>();
         hashMap.put("deviceId", deviceId);
         DeviceExceptionEntity deviceException = deviceExceptionService.findDeviceExceptionBydeviceId(hashMap);
-        System.out.println("查询" + deviceException);
         if(deviceException == null) {
         	hashMap.put("deptId",device.getDeviceDept());
         	hashMap.put("deviceLevel",device.getDeviceLevel());
         	hashMap.put("deviceId", 0);
         	DeviceExceptionEntity deviceExceptionEntity = deviceExceptionService.findDeviceExceptionByDeptidDeviceLevel(hashMap);
-        	System.out.println("查询是否存在" + deviceException);
         	if(deviceExceptionEntity!=null) {
 				String exceptionIds = deviceExceptionEntity.getExceptionIds();
 				String[] split = exceptionIds.split(",");
@@ -253,7 +251,6 @@ public class AppInspectionController {
 				}
         	}
         }else {
-			System.out.println("查询存在" + deviceException);
 			String exceptionIds = deviceException.getExceptionIds();
 			String[] split = exceptionIds.split(",");
 			for(String s: split) {

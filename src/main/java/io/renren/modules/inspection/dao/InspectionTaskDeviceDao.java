@@ -26,6 +26,6 @@ public interface InspectionTaskDeviceDao extends BaseMapper<InspectionTaskDevice
     List<Map<String,Object>> selectMissingLineByDate(Pagination page, @Param("lineId") String lineId, @Param("deptIds") List<Integer> deptIds, @Param("inspectStartDate") String inspectStartDate, @Param("inspectEndDate")  String inspectEndDate);
     List<Map<String,Object>> selectMissingTurnByDate(@Param("lineId") String lineId, @Param("deptIds") List<Integer> deptIds, @Param("inspectStartDate") String inspectStartDate,@Param("inspectEndDate")  String inspectEndDate);
     List<Map<String,Object>> selectMissingTurnByDate(Pagination page, @Param("lineId") String lineId, @Param("deptIds") List<Integer> deptIds, @Param("inspectStartDate") String inspectStartDate,@Param("inspectEndDate")  String inspectEndDate);
-    Map<String, Object> selectByParams(@Param("lineId") String lineId, @Param("turnId") String turnId);
+    Map<String, Object> selectByParams(@Param("lineId") String lineId, @Param("turnId") String turnId, @Param("turnStartTime") String turnStartTime, @Param("turnEndTime") String turnEndTime);
     List<Map<String, Object>> getDeviceByTime(Page<Map<String, Object>> page,@Param("lineId") String lineId,@Param("deptIds") List<Integer> deptIds,@Param("inspectStartDate") String inspectStartTime,@Param("inspectEndDate") String inspectEndTime);
 }
