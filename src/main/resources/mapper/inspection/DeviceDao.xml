@@ -36,7 +36,7 @@
     </select>
 
     <select id="selectByCode" resultType="io.renren.modules.inspection.entity.DeviceEntity" parameterType="io.renren.modules.inspection.entity.DeviceEntity">
-        select * from tb_device where is_delete=0 and device_id != #{deviceId} and device_code = #{deviceCode}  limit 1
+        select * from tb_device where is_delete=0  and device_code = #{deviceCode}  limit 1
     </select>
 
     <select id="selectByLine" resultType="java.util.HashMap" parameterType="java.lang.Long">

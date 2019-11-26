@@ -193,8 +193,8 @@ public class DeviceServiceImpl extends ServiceImpl<DeviceDao, DeviceEntity> impl
     }
 
     @Override
-    public DeviceEntity selectByCode(Integer deviceId, String deviceCode){
-        return baseMapper.selectByCode(deviceId, deviceCode);
+    public DeviceEntity selectByCode(String deviceCode){
+        return baseMapper.selectByCode(deviceCode);
     }
 
     private void getTreeNodeData(Map<String,Object> node, String deviceName){

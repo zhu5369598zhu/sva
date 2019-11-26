@@ -3,11 +3,8 @@ package io.renren.modules.inspection.service;
 import com.baomidou.mybatisplus.service.IService;
 import io.renren.common.utils.PageUtils;
 import io.renren.modules.inspection.entity.DeviceEntity;
-import org.apache.ibatis.annotations.Param;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -68,7 +65,7 @@ public interface DeviceService extends IService<DeviceEntity> {
 
     public List<DeviceEntity> all (Map<String, Object> params);
 
-    public DeviceEntity selectByCode(Integer deviceId, String deviceCode);
+    public DeviceEntity selectByCode(String deviceCode);
 
     public Integer isExist(String deviceName, String deviceCode);
 

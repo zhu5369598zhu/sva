@@ -23,7 +23,7 @@ public interface DeviceDao extends BaseMapper<DeviceEntity> {
 
     List<Map<String,Object>> selectByLine(@Param("lineId") Long lineId);
 
-    DeviceEntity selectByCode(@Param("deviceId") Integer deviceId, @Param("deviceCode") String deviceCode);
+    DeviceEntity selectByCode(@Param("deviceCode") String deviceCode);
 
     Integer isExist(@Param("deviceName") String deviceName, @Param("deviceCode") String deviceCode);
 

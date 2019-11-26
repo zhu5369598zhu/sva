@@ -1,6 +1,14 @@
 package io.renren.modules.inspection.service.impl;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.plugins.Page;
+import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import io.renren.common.utils.PageUtils;
+import io.renren.common.utils.Query;
+import io.renren.modules.inspection.dao.LineZoneDao;
+import io.renren.modules.inspection.entity.LineZoneEntity;
 import io.renren.modules.inspection.entity.ZoneEntity;
+import io.renren.modules.inspection.service.LineZoneService;
 import io.renren.modules.inspection.service.ZoneService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,15 +17,6 @@ import org.springframework.stereotype.Service;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.plugins.Page;
-import com.baomidou.mybatisplus.service.impl.ServiceImpl;
-import io.renren.common.utils.PageUtils;
-import io.renren.common.utils.Query;
-
-import io.renren.modules.inspection.dao.LineZoneDao;
-import io.renren.modules.inspection.entity.LineZoneEntity;
-import io.renren.modules.inspection.service.LineZoneService;
 
 
 @Service("lineZoneService")
@@ -62,6 +61,7 @@ public class LineZoneServiceImpl extends ServiceImpl<LineZoneDao, LineZoneEntity
                 new EntityWrapper<ZoneEntity>()
                     .like(StringUtils.isNotBlank(key), filterField, key)
                     .eq(dept_id != null, "dept_id", dept_id)
+                    .eq("is_delete", 0)
         );
 
         List<LineZoneEntity> lineZoneEntityList = lineZoneService.selectList(

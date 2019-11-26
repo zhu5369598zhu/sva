@@ -1,15 +1,14 @@
 package io.renren.modules.inspection.controller;
 
-import java.io.ByteArrayOutputStream;
-import java.util.*;
-
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import io.renren.common.annotation.SysLog;
 import io.renren.common.utils.*;
+import io.renren.modules.inspection.entity.DeviceEntity;
 import io.renren.modules.inspection.entity.DeviceQrcodeEntity;
 import io.renren.modules.inspection.entity.ZoneDeviceEntity;
 import io.renren.modules.inspection.entity.ZoneEntity;
 import io.renren.modules.inspection.service.DeviceQrcodeService;
+import io.renren.modules.inspection.service.DeviceService;
 import io.renren.modules.inspection.service.ZoneDeviceService;
 import io.renren.modules.inspection.service.ZoneService;
 import io.renren.modules.setting.entity.DeviceLevelEntity;
@@ -17,17 +16,14 @@ import io.renren.modules.setting.service.DeviceLevelService;
 import io.renren.modules.sys.entity.SysDeptEntity;
 import io.renren.modules.sys.service.SysDeptService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
-import io.renren.modules.inspection.entity.DeviceEntity;
-import io.renren.modules.inspection.service.DeviceService;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.ByteArrayOutputStream;
+import java.util.*;
 
 
 /**
@@ -365,7 +361,7 @@ public class DeviceController {
     @RequiresPermissions("inspection:device:save")
     public R save(@RequestBody DeviceEntity device) throws Exception{
         if(!device.getDeviceCode().equals("")){
-            DeviceEntity tmp = deviceService.selectByCode(device.getDeviceId(), device.getDeviceCode());
+            DeviceEntity tmp = deviceService.selectByCode(device.getDeviceCode());
             if (tmp != null){
                 return R.error(400,"设备编码已存在，参数错误。");
             }
@@ -400,7 +396,7 @@ public class DeviceController {
     @RequiresPermissions("inspection:device:update")
     public R update(@RequestBody DeviceEntity device){
         if(!device.getDeviceCode().equals("")){
-            DeviceEntity tmp = deviceService.selectByCode(device.getDeviceId(), device.getDeviceCode());
+            DeviceEntity tmp = deviceService.selectByCode(device.getDeviceCode());
             if (tmp != null){
                 return R.error(400,"设备编码已存在，参数错误。");
             }
