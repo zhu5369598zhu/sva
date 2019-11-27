@@ -3,6 +3,7 @@ package io.renren.modules.inspection.service.impl;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import io.renren.common.utils.DateUtils;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
 import io.renren.modules.inspection.dao.InspectionTaskDao;
@@ -427,6 +428,20 @@ public class InspectionTaskServiceImpl extends ServiceImpl<InspectionTaskDao, In
                     classGroupList.add(classGroupEntity.getName());
                 }
             }
+            String haoshi = item.get("haoshi").toString();
+            if("0".equals(haoshi)){ //巡检设备小于1分钟
+                String inspectedStartTime = item.get("inspectedStartTime").toString();
+                String inspectedEndTime = item.get("inspectedEndTime").toString();
+                Date startDate = DateUtils.stringToDate(inspectedStartTime, DateUtils.DATE_TIME_PATTERN);
+                Date endDate = DateUtils.stringToDate(inspectedEndTime, DateUtils.DATE_TIME_PATTERN);
+                long a = startDate.getTime();
+                long b = endDate.getTime();
+                int c = (int)((b - a) / 1000);
+                item.put("haoshi",c+"s");
+            }else {
+                item.put("haoshi",haoshi+"min");
+            }
+
             item.put("workerList",org.apache.commons.lang.StringUtils.join(classGroupList.toArray(), '/'));
         }
         page.setRecords(list);
