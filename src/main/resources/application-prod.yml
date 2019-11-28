@@ -4,9 +4,9 @@ spring:
         driverClassName: com.mysql.jdbc.Driver
         druid:
             first:
-                url: jdbc:mysql://demo.gronhco.cn:3306/sva?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
-                username: qiaoba
-                password: qiaoba&791121
+                url: jdbc:mysql://localhost:3306/sva?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
+                username: root
+                password: 123456
             second:
                 url: jdbc:mysql://localhost:3306/sva?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
                 username: root
