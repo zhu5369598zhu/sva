@@ -103,7 +103,11 @@ public class SysUserEntity implements Serializable {
 	 */
 	@TableField(exist=false)
 	private List<Long> roleIdList;
-	
+	/**
+	 * 角色名称集合
+	 */
+	@TableField(exist=false)
+	private String roleNameList;
 	/**
 	 * 创建者ID
 	 */
@@ -330,5 +334,13 @@ public class SysUserEntity implements Serializable {
 	 */
 	public Integer getIsDelete() {
 		return isDelete;
+	}
+
+	public String getRoleNameList() {
+		return roleNameList;
+	}
+
+	public void setRoleNameList(String roleNameList) {
+		this.roleNameList = roleNameList;
 	}
 }

@@ -180,4 +180,12 @@ public class InspectionTaskDeviceController {
         return R.ok().put("page", page);
     }
 
+    /**
+     *  设备耗时统计 不分页（导出)
+     * */
+    @RequestMapping("/getalldevicebytime")
+    public R getAllDeviceDate(@RequestParam Map<String, Object> params){
+        List<Map<String,Object>> list =  inspectionTaskDeviceService.getAllDeviceDate(params);
+        return R.ok().put("list", list);
+    }
 }

@@ -11,6 +11,8 @@
         <result property="inspectionSpanEndDate" column="inspection_span_end_date"/>
         <result property="inspectDeviceCount" column="inspect_device_count"/>
         <result property="inspectedDeviceCount" column="inspected_device_count"/>
+        <result property="inspectDevices" column="inspect_devices"/>
+        <result property="inspectedDevices" column="inspected_devices"/>
         <result property="inspectItemCount" column="inspect_item_count"/>
         <result property="inspectedItemCount" column="inspected_item_count"/>
         <result property="isInspected" column="is_inspected"/>
@@ -47,8 +49,8 @@
 
     <select id="selectAbsenceDetailByDate" resultType="java.util.HashMap" parameterType="java.lang.String">
         select dept.name as deptName,line.name as lineName,case line.period_type
-        when 1 then '天' when 2 then '日' when 3 then '月' end as periodName,turn.id as turnId,turn.name as turnName
-        case period.turn_finish_mod when 0 then '全体完成' when 1 then '班组完成' when 2 then '个人完成' end as turnFinishMod,
+        when 1 then '天' when 2 then '日' when 3 then '月' end as periodName,turn.id as turnId,turn.name as turnName,
+        case period.turn_finish_mod when 1 then '整体完成' when 2 then '班组完成' when 3 then '个人完成' end as turnFinishMod,
         task.turn_start_time as turnStartTime,task.turn_end_time as turnEndTime
         from tb_inspection_task as task
         left join tb_inspection_line as line on line.id=task.`line_id`
@@ -129,11 +131,11 @@
          turn.id AS turnId,
          turn.name as turnName,
          CASE period.turn_finish_mod
-        WHEN 0 THEN
-            '全体完成'
         WHEN 1 THEN
-            '班组完成'
+            '整体完成'
         WHEN 2 THEN
+            '班组完成'
+        WHEN 3 THEN
             '个人完成'
         END AS turnFinishMod,
          task.inspect_item_count,

@@ -1,30 +1,26 @@
 package io.renren.modules.sys.controller;
 
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Map;
-
+import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.QrCodeUtils;
-import io.renren.modules.inspection.entity.InspectionRandomResultMediaEntity;
+import io.renren.common.utils.R;
+import io.renren.modules.sys.entity.AppUpgradeEntity;
+import io.renren.modules.sys.service.AppUpgradeService;
 import net.dongliu.apk.parser.ApkFile;
 import net.dongliu.apk.parser.bean.ApkMeta;
 import org.apache.commons.io.IOUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import io.renren.modules.sys.entity.AppUpgradeEntity;
-import io.renren.modules.sys.service.AppUpgradeService;
-import io.renren.common.utils.PageUtils;
-import io.renren.common.utils.R;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Map;
 
 
 /**

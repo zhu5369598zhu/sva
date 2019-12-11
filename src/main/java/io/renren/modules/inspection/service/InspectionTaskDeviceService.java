@@ -27,5 +27,6 @@ public interface InspectionTaskDeviceService extends IService<InspectionTaskDevi
     PageUtils queryPage(Map<String, Object> params);
     Map<String,Object> selectByParams(Map<String, Object> params);
     PageUtils getDeviceDate(Map<String, Object> params);
+    List<Map<String, Object>> getAllDeviceDate(Map<String, Object> params);
 }
 

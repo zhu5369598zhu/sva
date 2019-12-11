@@ -443,4 +443,41 @@ public class InspectionTaskDeviceServiceImpl extends ServiceImpl<InspectionTaskD
         page.setRecords(list);
         return new PageUtils(page);
     }
+
+    @Override
+    public List<Map<String, Object>> getAllDeviceDate(Map<String, Object> params) {
+        List<Integer> deptIds = null;
+        String deptId = (String)params.get("deptId");
+        String lineId = (String)params.get("lineId");
+        String inspectStartTime = (String)params.get("startTime");
+        String inspectEndTime = (String)params.get("endTime");
+        inspectEndTime = inspectEndTime + " 23:59:59";
+
+        if(deptId != null && !deptId.equals("")){
+            deptIds = deptService.queryRecursiveChildByParentId(Long.parseLong(deptId));
+        }
+        Page<Map<String, Object>> page = new Query<Map<String, Object>>(params).getPage();
+        List<Map<String, Object>> list = this.baseMapper.getAllDeviceByTime(
+                lineId,
+                deptIds,
+                inspectStartTime,
+                inspectEndTime
+        );
+        for(Map<String, Object> item:list){
+            List<String> classGroupList = new ArrayList<>();
+            Long turnId = (Long)item.get("turnId");
+            HashMap<String,Object> turnClassparams = new HashMap<>();
+            turnClassparams.put("turn_id",turnId);
+            List<TurnClassGroupEntity> turnClassGroupEntities = turnClassGroupService.selectByMap(turnClassparams);
+            for(TurnClassGroupEntity turnClassGroupEntity:turnClassGroupEntities){
+                ClassGroupEntity classGroupEntity = classGroupService.selectById(turnClassGroupEntity.getClassGroupId());
+                if(classGroupEntity != null){
+                    classGroupList.add(classGroupEntity.getName());
+                }
+            }
+            item.put("workerList",org.apache.commons.lang.StringUtils.join(classGroupList.toArray(), '/'));
+        }
+
+        return list;
+    }
 }

@@ -14,6 +14,7 @@
         <result property="deviceManufacturer" column="device_manufacturer"/>
         <result property="deviceSupplier" column="device_supplier"/>
         <result property="deviceLevel" column="device_level"/>
+        <result property="deviceStatus" column="device_status"/>
         <result property="deviceDept" column="device_dept"/>
         <result property="deviceModel" column="device_model"/>
         <result property="deviceMaster" column="device_master"/>

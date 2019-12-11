@@ -83,10 +83,24 @@ public class ZoneController {
                     .append("行[")
                     .append(zone.getZoneName())
                     .append("]");
+
+            if("".equals(zone.getZoneName())){
+                result.append("巡区名称未找到\r\n");
+                continue;
+            }
+            if("".equals(zone.getZoneCode())){
+                result.append("巡区编码未找到\r\n");
+                continue;
+            }
+            if("".equals(zone.getDeptName())){
+                result.append("巡区部门未找到\r\n");
+                continue;
+            }
             if (zoneService.isExist(zone.getZoneName(), zone.getZoneCode()) > 0) {
                 result.append("重复\r\n");
                 continue;
             }
+
             //设置部门
             SysDeptEntity dept = deptService.selectByName(zone.getDeptName());
             if (dept != null){
@@ -177,6 +191,17 @@ public class ZoneController {
     @RequestMapping("/update")
     @RequiresPermissions("inspection:zone:update")
     public R update(@RequestBody ZoneEntity zone){
+        HashMap<String, Object> params = new HashMap<String, Object>();
+        params.put("zone_id", zone.getZoneId());
+        List<LineZoneEntity> lineZoneEntities = lineZoneService.selectByMap(params);
+        if(lineZoneEntities.size() > 0){
+            for(LineZoneEntity lineZoneEntity:lineZoneEntities){
+                InspectionLineEntity lineEntity = lineService.selectById(lineZoneEntity.getLineId());
+                if(lineEntity != null && lineEntity.getIsDelete() == 0 && lineEntity.getIsPublish() == 1){
+                    return R.error(400,"该巡区已绑定到巡检线路[" + lineEntity.getName() + "]，请选解除绑定再修改。");
+                }
+            }
+        }
         List<ZoneEntity> tmp = zoneService.selectByZoneCodeList(zone.getZoneCode());
         if(tmp != null){
             if(tmp.size() == 1){

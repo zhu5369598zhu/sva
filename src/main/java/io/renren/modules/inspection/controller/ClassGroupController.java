@@ -1,24 +1,21 @@
 package io.renren.modules.inspection.controller;
 
-import java.util.*;
-
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.mapper.Wrapper;
 import io.renren.common.annotation.SysLog;
-import io.renren.modules.inspection.service.ClassWorkerService;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import io.renren.modules.inspection.entity.ClassGroupEntity;
-import io.renren.modules.inspection.service.ClassGroupService;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
+import io.renren.modules.inspection.entity.ClassGroupEntity;
+import io.renren.modules.inspection.entity.TurnClassGroupEntity;
+import io.renren.modules.inspection.entity.TurnEntity;
+import io.renren.modules.inspection.service.ClassGroupService;
+import io.renren.modules.inspection.service.ClassWorkerService;
+import io.renren.modules.inspection.service.TurnClassGroupService;
+import io.renren.modules.inspection.service.TurnService;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.*;
 
 
 /**
@@ -35,7 +32,10 @@ public class ClassGroupController {
     private ClassWorkerService classWorkerService;
     @Autowired
     private ClassGroupService classGroupService;
-
+    @Autowired
+    private TurnClassGroupService turnClassGroupService;
+    @Autowired
+    private TurnService turnService;
     /**
      * 列表
      */
@@ -100,9 +100,17 @@ public class ClassGroupController {
     @RequestMapping("/save")
     @RequiresPermissions("inspection:classgroup:save")
     public R save(@RequestBody ClassGroupEntity classGroup){
-            classGroup.setCreateTime(new Date());
-            classGroup.setGuid(UUID.randomUUID().toString());
-			classGroupService.save(classGroup);
+        HashMap<String, Object> paramsMap = new HashMap<>();
+        paramsMap.put("name",classGroup.getName());
+        paramsMap.put("inspection_line_id",classGroup.getInspectionLineId());
+        List<ClassGroupEntity> classGroupEntityList = classGroupService.selectByMap(paramsMap);
+        if(classGroupEntityList.size() > 0){
+            return R.error(1,"同一线路中班组名称不能重复");
+        }
+
+        classGroup.setCreateTime(new Date());
+        classGroup.setGuid(UUID.randomUUID().toString());
+        classGroupService.save(classGroup);
 
         return R.ok();
     }
@@ -114,7 +122,19 @@ public class ClassGroupController {
     @RequestMapping("/update")
     @RequiresPermissions("inspection:classgroup:update")
     public R update(@RequestBody ClassGroupEntity classGroup){
-			classGroupService.update(classGroup);
+        HashMap<String, Object> paramsMap = new HashMap<>();
+        paramsMap.put("name",classGroup.getName());
+        paramsMap.put("inspection_line_id",classGroup.getInspectionLineId());
+        List<ClassGroupEntity> classGroupEntityList = classGroupService.selectByMap(paramsMap);
+        if(classGroupEntityList.size() > 0){
+            for (ClassGroupEntity classGroupEntity : classGroupEntityList){
+                if(!classGroupEntity.getId().equals(classGroup.getId())){
+                    return R.error(1,"同一线路中班组名称不能重复");
+                }
+            }
+        }
+
+		classGroupService.update(classGroup);
 
         return R.ok();
     }
@@ -126,7 +146,21 @@ public class ClassGroupController {
     @RequestMapping("/delete")
     @RequiresPermissions("inspection:classgroup:delete")
     public R delete(@RequestBody Long[] ids){
-			classGroupService.deleteBatch(ids);
+        // 班组是否 被轮次绑定
+        for (Long classGroupId:ids){
+            HashMap<String, Object> params = new HashMap<String, Object>();
+            params.put("class_group_id", classGroupId);
+            List<TurnClassGroupEntity> turnClassGroupEntityList = turnClassGroupService.selectByMap(params);
+            if(turnClassGroupEntityList.size() > 0){
+                for(TurnClassGroupEntity turnClassGroupEntity :turnClassGroupEntityList){
+                    TurnEntity turnEntity = turnService.selectById(turnClassGroupEntity.getTurnId());
+                    if(turnEntity != null){
+                        return R.error(400,"该班组已被轮次[" + turnEntity.getName() + "]绑定使用，请先在该轮次删除.");
+                    }
+                }
+            }
+        }
+		classGroupService.deleteBatch(ids);
 
         return R.ok();
     }

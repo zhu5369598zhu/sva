@@ -64,7 +64,7 @@ public class InspectionItemController {
         String[] mustHeader = {"所属设备<device_name>", "设备编码<device_code>", "巡检项<name>", "巡检类型名称<inspection_type_name>",
                 "单位<unit>", "检时状态标记<inspection_status>", "发射率<emissivity>", "采样频率<frequency_name>", "采样点数<precision_name>",
                 "上限报警<up_used>","上限<up_limit>", "上上限危险<upup_used>", "上上限<upup_limit>", "下限报警<down_used>", "下限<down_limit>",
-                "下下限危险<downdwon_used>", "下下限<downdown_limit>", "扩展<extras>", "扩展异常<exceptions>", "描述<remark>", "默认转速<default_rpm>"};
+                "下下限危险<downdwon_used>", "下下限<downdown_limit>", "扩展<extras>", "扩展异常<exceptions>", "描述<remark>", "默认转速<default_rpm>", "排序<orderNum>"};
         List<String[]> rows = PoiUtils.readExcel(file);
         if (!Arrays.equals(rows.get(0), mustHeader)) {
             return R.error(400, "导入数据格式错误，导入失败。");
@@ -140,6 +140,9 @@ public class InspectionItemController {
                 }
                 if(!row[20].isEmpty()) {
                     item.setDefaultRpm(Integer.valueOf(row[20]));
+                }
+                if(!row[21].isEmpty()){
+                    item.setOrderNum(Integer.valueOf(row[21]));
                 }
             }catch (ArrayIndexOutOfBoundsException e){
             }

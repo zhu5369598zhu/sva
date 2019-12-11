@@ -911,9 +911,33 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
                 Date dt = new Date();
                 InspectionTaskDeviceEntity taskDeviceEntity = null;
                 List<InspectionTaskDeviceEntity> taskDeviceList = taskDeviceService.selectByMap(taskDeviceParams);// 查询今天的设备上传
+                HashMap taskParams = new HashMap();
+                taskParams.put("line_id",turn.getInspectionLineId());
+                taskParams.put("turn_id",turn.getId());
+                taskParams.put("inspection_span_end_date",simpleDateFormat.format(new Date()));
+                List<InspectionTaskEntity> taskList = taskService.selectByMap(taskParams);
+                Integer taskInspectedItemCount = taskList.get(0).getInspectedItemCount();
                 if(taskDeviceList.size() > 0){ // 已经有上传
                     taskDeviceEntity = taskDeviceList.get(0);
-                    taskDeviceEntity.setInspectedItemCount(taskDeviceEntity.getInspectedItemCount() + 1); // 巡检项数目加1
+                    String inspectedItems = taskDeviceEntity.getInspectedItems();// 已检巡检项
+                    if(inspectedItems == null){
+                        taskDeviceEntity.setInspectedItems(result.getItemId().toString()+",");
+                        taskDeviceEntity.setInspectedItemCount(taskDeviceEntity.getInspectedItemCount() + 1); // 巡检项数目加1
+                        if(taskList.size() > 0){
+                            taskInspectedItemCount = taskList.get(0).getInspectedItemCount()+ 1;
+                        }
+                    }else {
+                        String[] array = inspectedItems.split(",");
+                        boolean flag = Arrays.asList(array).contains(result.getItemId().toString()); // 已检项中查询是否包含了该巡检项id
+                        if(flag){
+                        }else {
+                            taskDeviceEntity.setInspectedItems(taskDeviceEntity.getInspectedItems() + result.getItemId().toString()+",");
+                            taskDeviceEntity.setInspectedItemCount(taskDeviceEntity.getInspectedItemCount() + 1); // 巡检项数目加1
+                            if(taskList.size() > 0){
+                                taskInspectedItemCount = taskList.get(0).getInspectedItemCount()+ 1;
+                            }
+                        }
+                    }
                     taskDeviceEntity.setIsInspected(1);
                     if(taskDeviceEntity.getInspectedItemCount() >= taskDeviceEntity.getInspectItemCount()){
                         taskDeviceEntity.setIsUpdate(1);
@@ -933,18 +957,26 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
                     taskDeviceEntity.setCreateTime(result.getCreateTime());
                     taskDeviceService.updateById(taskDeviceEntity);
 
-                    HashMap taskParams = new HashMap();
-                    taskParams.put("line_id",turn.getInspectionLineId());
-                    taskParams.put("turn_id",turn.getId());
-                    taskParams.put("inspection_span_end_date",simpleDateFormat.format(new Date()));
-                    List<InspectionTaskEntity> taskList = taskService.selectByMap(taskParams);
+
                     if(taskList.size() >0){
                         InspectionTaskEntity task = taskList.get(0);
                         task.setIsInspected(1);
                         if(taskDeviceEntity.getInspectedItemCount() >= taskDeviceEntity.getInspectItemCount()){ // 单个设备的巡检项已经完成
                             // taskDeviceEntity.setIsUpdate(1);
                             if(task.getInspectedDeviceCount() <  task.getInspectDeviceCount()){// 已检设备数小于 应检设备数
-                                task.setInspectedDeviceCount(task.getInspectedDeviceCount() + 1);
+                                String inspectedDevices = task.getInspectedDevices();
+                                if(inspectedDevices == null){
+                                    task.setInspectedDevices(taskDeviceEntity.getDeviceId() + ",");
+                                    task.setInspectedDeviceCount(task.getInspectedDeviceCount() + 1);
+                                }else{
+                                    String[] DeviceArray = inspectedDevices.split(",");
+                                    boolean flag = Arrays.asList(DeviceArray).contains(taskDeviceEntity.getDeviceId().toString());
+                                    if(flag){
+                                    }else {
+                                        task.setInspectedDevices(task.getInspectedDevices() + taskDeviceEntity.getDeviceId() + ",");
+                                        task.setInspectedDeviceCount(task.getInspectedDeviceCount() + 1);
+                                    }
+                                }
                                 // 计算耗时时间
                                 taskDeviceParams.put("turn_start_time",task.getTurnStartTime());
                                 taskDeviceParams.put("turn_end_time",task.getTurnEndTime());
@@ -960,7 +992,7 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
                                 task.setInspectedEndTime(endTime);
                             }
                         }
-                        task.setInspectedItemCount(task.getInspectedItemCount() + 1);
+                        task.setInspectedItemCount(taskInspectedItemCount);
                         taskService.updateById(task);
                     }
                 }else{ // 今天第一次上传　直接新增

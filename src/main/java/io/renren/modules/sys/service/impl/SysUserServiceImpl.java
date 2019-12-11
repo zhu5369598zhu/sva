@@ -10,7 +10,9 @@ import io.renren.common.utils.Query;
 import io.renren.modules.app.form.LoginForm;
 import io.renren.modules.sys.dao.SysUserDao;
 import io.renren.modules.sys.entity.SysDeptEntity;
+import io.renren.modules.sys.entity.SysRoleEntity;
 import io.renren.modules.sys.entity.SysUserEntity;
+import io.renren.modules.sys.entity.SysUserRoleEntity;
 import io.renren.modules.sys.service.SysDeptService;
 import io.renren.modules.sys.service.SysRoleService;
 import io.renren.modules.sys.service.SysUserRoleService;
@@ -66,6 +68,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
 			sysUserEntity.setSalt("");
 			sysUserEntity.setDeptName(sysDeptEntity.getName());
 		}
+
 		return new PageUtils(page);
 	}
 
@@ -95,6 +98,18 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
 			} else {
 				sysUserEntity.setStatusName("禁用");
 			}
+			HashMap<String, Object> roleMap = new HashMap<>();
+			roleMap.put("user_id", sysUserEntity.getUserId());
+            List<SysUserRoleEntity> sysUserRoleEntityList = sysUserRoleService.selectByMap(roleMap);
+
+            StringBuffer buffer = new StringBuffer();
+            if(sysUserRoleEntityList.size() > 0){
+				for (SysUserRoleEntity sysUserRoleEntity: sysUserRoleEntityList){
+					SysRoleEntity sysRoleEntity = sysRoleService.selectById(sysUserRoleEntity.getRoleId());
+					buffer.append(sysRoleEntity.getRoleName()+",");
+				}
+			}
+			sysUserEntity.setRoleNameList(buffer.toString());
 
 		}
 

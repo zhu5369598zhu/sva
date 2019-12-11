@@ -17,9 +17,12 @@ import io.renren.modules.inspection.service.ClassGroupService;
 import io.renren.modules.inspection.service.ClassWorkerService;
 import io.renren.modules.inspection.service.InspectionLineService;
 import io.renren.modules.sys.entity.SysDeptEntity;
+import io.renren.modules.sys.entity.SysRoleEntity;
 import io.renren.modules.sys.entity.SysUserEntity;
+import io.renren.modules.sys.entity.SysUserRoleEntity;
 import io.renren.modules.sys.form.PasswordForm;
 import io.renren.modules.sys.service.SysDeptService;
+import io.renren.modules.sys.service.SysRoleService;
 import io.renren.modules.sys.service.SysUserRoleService;
 import io.renren.modules.sys.service.SysUserService;
 import org.apache.commons.lang.ArrayUtils;
@@ -55,12 +58,13 @@ public class SysUserController extends AbstractController {
 	private ClassWorkerService workerService;
 	@Autowired
 	private InspectionLineService lineService;
-
+    @Autowired
+	private SysRoleService sysRoleService;
 
 	@PostMapping("/upload")
 	@RequiresPermissions("sys:user:import")
 	public R upload(HttpServletRequest request, @RequestParam("file") MultipartFile file) throws Exception {
-		String[] mustHeader = {"用户名<username>", "工号<user_code>", "机构名称<dept_name>", "邮箱<email>", "手机号<mobile>", "微信<wechat>", "状态<status_name>", "备注<remark>", "密码<password>", "密码盐<salt>"};
+		String[] mustHeader = {"用户名<username>", "工号<user_code>", "机构名称<dept_name>", "邮箱<email>", "手机号<mobile>", "微信<wechat>", "角色<roleNameList>", "状态<status_name>", "备注<remark>", "密码<password>", "密码盐<salt>"};
 		List<String[]> rows = PoiUtils.readExcel(file);
 		if (!Arrays.equals(rows.get(0), mustHeader)) {
 			return R.error(400, "导入数据格式错误，导入失败。");
@@ -79,10 +83,11 @@ public class SysUserController extends AbstractController {
 			user.setEmail(row[3]);
 			user.setMobile(row[4]);
 			user.setWechat(row[5]);
-			user.setStatusName(row[6]);
-			user.setRemark(row[7]);
-			user.setPassword(row[8]);
-			user.setSalt(row[9]);
+			user.setRoleNameList(row[6]);
+			user.setStatusName(row[7]);
+			user.setRemark(row[8]);
+			user.setPassword(row[9]);
+			user.setSalt(row[10]);
 			users.add(user);
 		}
 		return R.ok().put("list", users);
@@ -122,12 +127,29 @@ public class SysUserController extends AbstractController {
 				result.append("状态数据错误\r\n");
 				continue;
 			}
-
+			String roleNameList = user.getRoleNameList();
+			String[] split = roleNameList.split(",");
+            if(split == null || split.length == 0 || split[0] == ""){
+				result.append("角色不能为空\r\n");
+				continue;
+			}
 			user.setGuid(UUID.randomUUID().toString());
 			user.setCreateUserId(this.getUserId());
 			user.setCreateTime(new Date());
 			try{
 				sysUserService.insert(user);
+				for (String roleName: split){
+					HashMap<String, Object> roleNameMap = new HashMap<>();
+					roleNameMap.put("role_name", roleName);
+					List<SysRoleEntity> roleEntityList = sysRoleService.selectByMap(roleNameMap);
+					if(roleEntityList.size() > 0 ){
+						Long roleId = roleEntityList.get(0).getRoleId();
+						SysUserRoleEntity sysUserRoleEntity = new SysUserRoleEntity();
+						sysUserRoleEntity.setUserId(user.getUserId());
+						sysUserRoleEntity.setRoleId(roleId);
+						sysUserRoleService.insertOrUpdate(sysUserRoleEntity);
+					}
+				}
 			}catch(Exception e) {
 				result.append(e.getMessage());
 				result.append("\r\n");
@@ -185,9 +207,11 @@ public class SysUserController extends AbstractController {
 	 */
 	@RequestMapping("/selectByDept")
 	@RequiresPermissions("sys:user:list")
-	public R selectByDept(){
+	public R selectByDept(@RequestParam Map<String, Object> params){
+		String deptId = params.get("deptId").toString();
 		List<SysUserEntity> sysUserEntityList = sysUserService.selectList(
 				new EntityWrapper<SysUserEntity>()
+				.eq(deptId!=null,"dept_id", deptId)
 		);
 
 		return R.ok().put("users", sysUserEntityList);

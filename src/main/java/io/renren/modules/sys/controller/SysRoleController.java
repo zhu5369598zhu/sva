@@ -6,8 +6,12 @@ import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.common.validator.ValidatorUtils;
 import io.renren.modules.sys.entity.SysRoleEntity;
+import io.renren.modules.sys.entity.SysUserEntity;
+import io.renren.modules.sys.entity.SysUserRoleEntity;
 import io.renren.modules.sys.service.SysRoleMenuService;
 import io.renren.modules.sys.service.SysRoleService;
+import io.renren.modules.sys.service.SysUserRoleService;
+import io.renren.modules.sys.service.SysUserService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +34,10 @@ public class SysRoleController extends AbstractController {
 	private SysRoleService sysRoleService;
 	@Autowired
 	private SysRoleMenuService sysRoleMenuService;
+	@Autowired
+	private SysUserRoleService sysUserRoleService;
+	@Autowired
+	private SysUserService sysUserService;
 
 	/**
 	 * 角色列表
@@ -88,7 +96,12 @@ public class SysRoleController extends AbstractController {
 	@RequiresPermissions("sys:role:save")
 	public R save(@RequestBody SysRoleEntity role){
 		ValidatorUtils.validateEntity(role);
-		
+		HashMap<String, Object> roleMap = new HashMap<>();
+		roleMap.put("role_name",role.getRoleName());
+        List<SysRoleEntity> roleEntityList = sysRoleService.selectByMap(roleMap);
+        if(roleEntityList.size()>0){
+        	return R.error(1,"角色名不能重复");
+		}
 		role.setCreateUserId(getUserId());
 		sysRoleService.save(role);
 		
@@ -103,7 +116,15 @@ public class SysRoleController extends AbstractController {
 	@RequiresPermissions("sys:role:update")
 	public R update(@RequestBody SysRoleEntity role){
 		ValidatorUtils.validateEntity(role);
-		
+		HashMap<String, Object> roleMap = new HashMap<>();
+		roleMap.put("role_name",role.getRoleName());
+		List<SysRoleEntity> roleEntityList = sysRoleService.selectByMap(roleMap);
+		if(roleEntityList.size()>0){
+			SysRoleEntity sysRoleEntity = roleEntityList.get(0);
+			if(sysRoleEntity.getRoleId() != role.getRoleId()){
+				return R.error(1,"角色名不能重复");
+			}
+		}
 		role.setCreateUserId(getUserId());
 		sysRoleService.update(role);
 		
@@ -117,6 +138,21 @@ public class SysRoleController extends AbstractController {
 	@PostMapping("/delete")
 	@RequiresPermissions("sys:role:delete")
 	public R delete(@RequestBody Long[] roleIds){
+
+		for (Long roleId: roleIds
+		) {
+			HashMap<String, Object> roleMap = new HashMap<>();
+			roleMap.put("role_id",roleId);
+			List<SysUserRoleEntity> sysUserRoleEntitiesList = sysUserRoleService.selectByMap(roleMap);
+			if(sysUserRoleEntitiesList.size() > 0){
+				for(SysUserRoleEntity sysUserRoleEntity: sysUserRoleEntitiesList){
+					SysUserEntity sysUserEntity = sysUserService.selectById(sysUserRoleEntity.getUserId());
+					if(sysUserEntity != null && sysUserEntity.getIsDelete() == 0){
+						return R.error("角色已经赋予用户"+ sysUserEntity.getUsername() +"，请先解绑");
+					}
+				}
+			}
+		}
 		sysRoleService.deleteBatch(roleIds);
 		
 		return R.ok();

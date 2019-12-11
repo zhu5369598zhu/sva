@@ -9,9 +9,12 @@
         <result property="lineId" column="line_id"/>
         <result property="turnId" column="turn_id"/>
         <result property="deviceId" column="device_id"/>
+        <result property="deviceState" column="device_state"/>
         <result property="inspectionDate" column="inspection_date"/>
         <result property="inspectItemCount" column="insepct_item_count"/>
         <result property="inspectedItemCount" column="inspected_item_count"/>
+        <result property="inspectItems" column="inspect_items"/>
+        <result property="inspectedItems" column="inspected_items"/>
         <result property="isUpdate" column="is_update"/>
     </resultMap>
 
@@ -135,6 +138,62 @@
         WHEN 1 THEN
         '班组完成'
         WHEN 2 THEN
+        '个人完成'
+        END AS turnFinishMod,
+        device.device_name AS deviceName,
+        turn.id AS turnId,
+        turn. NAME AS turnName,
+        dept.name AS deptName,
+        task.inspection_date AS inspectionDate,
+        task.inspect_item_count AS inspectItemCount,
+        task.inspected_item_count AS inspectedItemCount,
+        task.start_time AS startTime,
+        task.end_time AS endTime,
+        TIMESTAMPDIFF(
+        SECOND,
+        task.start_time,
+        task.end_time
+        ) AS haoshi,
+        task.create_time AS createTime
+        FROM
+        tb_inspection_task_device AS task
+        LEFT JOIN tb_device AS device ON device.device_id = task.device_id
+        LEFT JOIN tb_inspection_line AS line ON line.id = task.`line_id`
+        LEFT JOIN tb_turn AS turn ON turn.id = task.turn_id
+        LEFT JOIN sys_dept AS dept ON dept.dept_id = line.dept_id
+        LEFT JOIN tb_inspection_period AS period ON period.line_id = line.id
+        WHERE
+        task.start_time >= '${inspectStartDate}'
+        AND task.end_time &lt;= '${inspectEndDate}'
+        AND task.start_time > 0
+        <if test="deptIds!=null">
+            and dept.dept_id in
+            <foreach item="item" index="index" collection="deptIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="lineId!=null">
+            and line.id=#{lineId}
+        </if>
+    </select>
+
+    <select id="getDeviceByTime" resultType="java.util.HashMap" parameterType="java.lang.String">
+        SELECT
+        line. NAME AS lineName,
+        CASE line.period_type
+        WHEN 1 THEN
+        '天'
+        WHEN 2 THEN
+        '日'
+        WHEN 3 THEN
+        '月'
+        END AS periodName,
+        CASE period.turn_finish_mod
+        WHEN 1 THEN
+        '整体完成'
+        WHEN 2 THEN
+        '班组完成'
+        WHEN 3 THEN
         '个人完成'
         END AS turnFinishMod,
         device.device_name AS deviceName,

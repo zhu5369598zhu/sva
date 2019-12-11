@@ -1,27 +1,21 @@
 package io.renren.modules.inspection.service.impl;
 
-import io.renren.common.utils.MapUtils;
-import io.renren.modules.inspection.entity.ClassWorkerEntity;
-import io.renren.modules.inspection.service.ClassWorkerService;
-import io.renren.modules.sys.entity.SysUserEntity;
-import io.renren.modules.sys.service.SysUserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
-
 import io.renren.modules.inspection.dao.ClassGroupDao;
 import io.renren.modules.inspection.entity.ClassGroupEntity;
 import io.renren.modules.inspection.service.ClassGroupService;
+import io.renren.modules.inspection.service.ClassWorkerService;
+import io.renren.modules.sys.entity.SysUserEntity;
+import io.renren.modules.sys.service.SysUserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
 
 
 @Service("classGroupService")
@@ -75,9 +69,9 @@ public class ClassGroupServiceImpl extends ServiceImpl<ClassGroupDao, ClassGroup
     @Transactional
     public void deleteBatch(Long[] classGroupIds) {
         List<Long> classGroupIdList = Arrays.asList(classGroupIds);
-        for(Long classGroupId :classGroupIdList){
+        /*for(Long classGroupId :classGroupIdList){
             classWorkerService.deleteByMap(new MapUtils().put("class_group_id", classGroupId));
-        }
+        }*/
 
         this.deleteBatchIds(classGroupIdList);
     }

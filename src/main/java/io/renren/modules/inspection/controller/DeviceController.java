@@ -3,14 +3,8 @@ package io.renren.modules.inspection.controller;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import io.renren.common.annotation.SysLog;
 import io.renren.common.utils.*;
-import io.renren.modules.inspection.entity.DeviceEntity;
-import io.renren.modules.inspection.entity.DeviceQrcodeEntity;
-import io.renren.modules.inspection.entity.ZoneDeviceEntity;
-import io.renren.modules.inspection.entity.ZoneEntity;
-import io.renren.modules.inspection.service.DeviceQrcodeService;
-import io.renren.modules.inspection.service.DeviceService;
-import io.renren.modules.inspection.service.ZoneDeviceService;
-import io.renren.modules.inspection.service.ZoneService;
+import io.renren.modules.inspection.entity.*;
+import io.renren.modules.inspection.service.*;
 import io.renren.modules.setting.entity.DeviceLevelEntity;
 import io.renren.modules.setting.service.DeviceLevelService;
 import io.renren.modules.sys.entity.SysDeptEntity;
@@ -49,8 +43,10 @@ public class DeviceController {
     private ZoneService zoneService;
     @Autowired
     private DeviceLevelService levelService;
-
-
+    @Autowired
+    private SysDeptService sysDeptService;
+    @Autowired
+    private InspectionItemService inspectionItemService;
 
 
     @PostMapping("/upload")
@@ -319,8 +315,11 @@ public class DeviceController {
     @RequestMapping("/info/{deviceId}")
     @RequiresPermissions("inspection:device:info")
     public R info(@PathVariable("deviceId") Integer deviceId){
-			DeviceEntity device = deviceService.selectById(deviceId);
-
+        DeviceEntity device = deviceService.selectById(deviceId);
+        SysDeptEntity sysDeptEntity = sysDeptService.selectById(device.getDeviceDept());
+        if(sysDeptEntity !=null){
+            device.setDeptName(sysDeptEntity.getName());
+        }
         return R.ok().put("device", device);
     }
 
@@ -395,13 +394,43 @@ public class DeviceController {
     @RequestMapping("/update")
     @RequiresPermissions("inspection:device:update")
     public R update(@RequestBody DeviceEntity device){
-        if(!device.getDeviceCode().equals("")){
-            DeviceEntity tmp = deviceService.selectByCode(device.getDeviceCode());
-            if (tmp != null){
-                return R.error(400,"设备编码已存在，参数错误。");
+        HashMap<String, Object> paramsMap = new HashMap<>();
+        paramsMap.put("device_code", device.getDeviceCode());
+        List<DeviceEntity> deviceEntityList = deviceService.selectByMap(paramsMap);
+        if(deviceEntityList.size() > 0){
+            for (DeviceEntity entity: deviceEntityList){
+                if(!entity.getDeviceId().equals(device.getDeviceId())){
+                    return R.error(400,"设备编码已存在，参数错误。");
+                }
             }
         }
-
+        // 关闭巡检
+        if(device.getIsInspect() == 0){
+            // 解绑巡区
+            HashMap<String, Object> deviceMap = new HashMap<>();
+            deviceMap.put("device_id", device.getDeviceId());
+            List<ZoneDeviceEntity> zoneDeviceEntityList = zoneDeviceService.selectByMap(deviceMap);
+            if(zoneDeviceEntityList.size() > 0){
+                for(ZoneDeviceEntity zoneDeviceEntity: zoneDeviceEntityList){
+                    ZoneEntity zoneEntity = zoneService.selectById(zoneDeviceEntity.getZoneId());
+                    if(zoneEntity !=null){
+                        return R.error(1,"不能取消巡检，该设备绑定了巡区["+  zoneEntity.getZoneName() + "]，请取消绑定");
+                    }
+                }
+            }
+            // 解绑 巡检项
+            HashMap<String, Object> itemMap = new HashMap<>();
+            itemMap.put("device_id",device.getDeviceId());
+            itemMap.put("is_delete",0); // 未删除
+            List<InspectionItemEntity> inspectionItemEntityList = inspectionItemService.selectByMap(itemMap);
+            if(inspectionItemEntityList.size() > 0){
+                for(InspectionItemEntity inspectionItemEntity: inspectionItemEntityList){
+                    if(inspectionItemEntity !=null){
+                        R.error(1,"不能取消巡检，该设备绑定了巡检项["+ inspectionItemEntity.getName() +"]，请先解绑");
+                    }
+                }
+            }
+        }
 
         deviceService.updateById(device);
 

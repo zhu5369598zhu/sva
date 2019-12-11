@@ -1,23 +1,18 @@
 package io.renren.modules.inspection.controller;
 
-import java.util.*;
-
 import io.renren.common.annotation.SysLog;
+import io.renren.common.utils.PageUtils;
+import io.renren.common.utils.R;
 import io.renren.modules.inspection.entity.InspectionLineEntity;
+import io.renren.modules.inspection.entity.InspectionPeriodEntity;
 import io.renren.modules.inspection.service.InspectionLineService;
+import io.renren.modules.inspection.service.InspectionPeriodService;
 import io.renren.modules.inspection.service.PeriodTurnService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import io.renren.modules.inspection.entity.InspectionPeriodEntity;
-import io.renren.modules.inspection.service.InspectionPeriodService;
-import io.renren.common.utils.PageUtils;
-import io.renren.common.utils.R;
+import java.util.*;
 
 
 
@@ -72,6 +67,14 @@ public class InspectionPeriodController {
     @RequestMapping("/save")
     @RequiresPermissions("inspection:inspectionperiod:save")
     public R save(@RequestBody InspectionPeriodEntity inspectionPeriod){
+        HashMap<String, Object> paramsMap = new HashMap<>();
+        paramsMap.put("name", inspectionPeriod.getName());
+        paramsMap.put("line_id", inspectionPeriod.getLineId());
+        List<InspectionPeriodEntity> inspectionPeriodEntityList = inspectionPeriodService.selectByMap(paramsMap);
+        if(inspectionPeriodEntityList.size() >0){
+            return R.error(1,"同一线路，周期名称不能重复");
+        }
+
         InspectionLineEntity line = lineService.selectById(inspectionPeriod.getLineId());
         Integer day = 0;
         if (line != null){
@@ -125,7 +128,18 @@ public class InspectionPeriodController {
     @RequestMapping("/update")
     @RequiresPermissions("inspection:inspectionperiod:update")
     public R update(@RequestBody InspectionPeriodEntity inspectionPeriod){
-			inspectionPeriodService.update(inspectionPeriod);
+        HashMap<String, Object> paramsMap = new HashMap<>();
+        paramsMap.put("name", inspectionPeriod.getName());
+        paramsMap.put("line_id", inspectionPeriod.getLineId());
+        List<InspectionPeriodEntity> inspectionPeriodEntityList = inspectionPeriodService.selectByMap(paramsMap);
+        if(inspectionPeriodEntityList.size() >0){
+            for(InspectionPeriodEntity inspectionPeriodEntity :inspectionPeriodEntityList){
+                if(!inspectionPeriodEntity.getId().equals(inspectionPeriod.getId())){
+                    return R.error(1,"同一线路，周期名称不能重复");
+                }
+            }
+        }
+		inspectionPeriodService.update(inspectionPeriod);
 
         return R.ok();
     }

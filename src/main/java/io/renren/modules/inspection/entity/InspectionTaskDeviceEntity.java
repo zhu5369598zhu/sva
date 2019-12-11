@@ -36,6 +36,10 @@ public class InspectionTaskDeviceEntity implements Serializable {
 	 */
 	private Integer deviceId;
 	/**
+	 * 巡检设备状态
+	 */
+	private Integer deviceState;
+	/**
 	 * 应检项数
 	 */
 	private Integer inspectItemCount;
@@ -43,6 +47,14 @@ public class InspectionTaskDeviceEntity implements Serializable {
 	 * 已检项数
 	 */
 	private Integer inspectedItemCount;
+	/**
+	 * 应检项id集合
+	 */
+	private String inspectItems;
+	/**
+	 * 已检项id集合
+	 */
+	private String inspectedItems;
 	/**
 	 * 巡检日期
 	 */
@@ -214,5 +226,41 @@ public class InspectionTaskDeviceEntity implements Serializable {
 	 */
 	public Date getCreateTime() {
 		return createTime;
+	}
+	/**
+	 * 获取：应检巡检项id集合
+	 */
+	public String getInspectItems() {
+		return inspectItems;
+	}
+	/**
+	 * 设置：应检巡检项id集合
+	 */
+	public void setInspectItems(String inspectItems) {
+		this.inspectItems = inspectItems;
+	}
+	/**
+	 * 获取：已检巡检项id集合
+	 */
+	public String getInspectedItems() {
+		return inspectedItems;
+	}
+	/**
+	 * 设置：已检巡检项id集合
+	 */
+	public void setInspectedItems(String inspectedItems) {
+		this.inspectedItems = inspectedItems;
+	}
+	/**
+	 * 获取：已检设备状态
+	 */
+	public Integer getDeviceState() {
+		return deviceState;
+	}
+	/**
+	 * 设置：已检设备状态
+	 */
+	public void setDeviceState(Integer deviceState) {
+		this.deviceState = deviceState;
 	}
 }

@@ -56,6 +56,10 @@ public class DeviceEntity implements Serializable {
 	 */
 	private Integer deviceLevel;
 	/**
+	 * 巡检时设备状态
+	 */
+	private Integer deviceStatus;
+	/**
 	 * 设备等级
 	 */
 	@TableField(exist = false)
@@ -378,5 +382,17 @@ public class DeviceEntity implements Serializable {
 	 */
 	public Integer getIsDelete() {
 		return isDelete;
+	}
+	/**
+	 * 获取：设备巡检时设备状态
+	 */
+	public Integer getDeviceStatus() {
+		return deviceStatus;
+	}
+	/**
+	 * 设置：设备巡检时设备状态
+	 */
+	public void setDeviceStatus(Integer deviceStatus) {
+		this.deviceStatus = deviceStatus;
 	}
 }

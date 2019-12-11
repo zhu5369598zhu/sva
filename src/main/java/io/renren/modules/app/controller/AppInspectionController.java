@@ -63,6 +63,8 @@ public class AppInspectionController {
 	private SysUserService sysUserService; 
     @Autowired
     private ExceptionService exceptionService;
+    @Autowired
+    private DeviceCurrentStatusService deviceCurrentStatusService;
 
     @GetMapping("upgrade")
     @ApiOperation("获取升级信息")
@@ -99,6 +101,23 @@ public class AppInspectionController {
 
         return R.ok().put("download", downloadList);
     }
+
+	@Login
+	@PostMapping("test")
+	@ApiOperation("上传巡检设备状态")
+	public  R test(@RequestBody DeviceCurrentStatusEntity deviceCurrentStatusEntity){
+		String updateDeviceStatus = deviceCurrentStatusService.text(deviceCurrentStatusEntity);
+		return R.ok().put("text",updateDeviceStatus);
+	}
+
+
+    @Login
+	@PostMapping("devicestatus")
+	@ApiOperation("上传巡检设备状态")
+    public  R devicestatus(@RequestBody DeviceCurrentStatusEntity deviceCurrentStatusEntity){
+		String updateDeviceStatus = deviceCurrentStatusService.updateDeviceStatus(deviceCurrentStatusEntity);
+		return R.ok().put("text",updateDeviceStatus);
+	}
 
     @Login
     @PostMapping("save")

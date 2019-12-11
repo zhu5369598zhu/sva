@@ -39,6 +39,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleDao, SysRoleEntity> i
     @Autowired
     private SysUserRoleService sysUserRoleService;
 
+
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
 		String roleName = (String)params.get("roleName");

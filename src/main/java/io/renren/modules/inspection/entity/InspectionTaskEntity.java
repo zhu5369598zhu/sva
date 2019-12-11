@@ -39,6 +39,14 @@ public class InspectionTaskEntity implements Serializable {
 	 */
 	private Integer inspectedDeviceCount;
 	/**
+	 * 应检设备id 集合
+	 */
+	private String inspectDevices;
+	/**
+	 * 已检设备id 集合
+	 */
+	private String inspectedDevices;
+	/**
 	 * 应检项数
 	 */
 	private Integer inspectItemCount;
@@ -249,5 +257,28 @@ public class InspectionTaskEntity implements Serializable {
 	public void setInspectedEndTime(String inspectedEndTime) {
 		this.inspectedEndTime = inspectedEndTime;
 	}
-
+	/**
+	 * 获取：应检设备id 集合
+	 * */
+	public String getInspectDevices() {
+		return inspectDevices;
+	}
+	/**
+	 * 设置：应检设备id 集合
+	 * */
+	public void setInspectDevices(String inspectDevices) {
+		this.inspectDevices = inspectDevices;
+	}
+	/**
+	 * 获取：已检设备id 集合
+	 * */
+	public String getInspectedDevices() {
+		return inspectedDevices;
+	}
+	/**
+	 * 设置：已检设备id 集合
+	 * */
+	public void setInspectedDevices(String inspectedDevices) {
+		this.inspectedDevices = inspectedDevices;
+	}
 }
