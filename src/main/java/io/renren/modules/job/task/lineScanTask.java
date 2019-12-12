@@ -63,26 +63,26 @@ public class lineScanTask {
         HashMap lineParams = new HashMap();
         lineParams.put("is_publish", 1);
         lineParams.put("is_delete", 0);
-        List<InspectionLineEntity> lines = lineService.selectByMap(lineParams);
+        List<InspectionLineEntity> lines = lineService.selectByMap(lineParams); // 得到已发布未删除的巡线
         HashSet<Integer> deviceList = new HashSet<>();
         for (InspectionLineEntity line:lines) {
             Integer deviceCount = 0;
             Integer itemCount = 0;
             HashMap lineZoneParams = new HashMap();
             lineZoneParams.put("line_id",line.getId());
-            List<LineZoneEntity> lineZoneList = lineZoneService.selectByMap(lineZoneParams);
+            List<LineZoneEntity> lineZoneList = lineZoneService.selectByMap(lineZoneParams); // 得到巡线绑定的巡区
             for(LineZoneEntity lineZone:lineZoneList){
                 HashMap zoneDeviceParams = new HashMap();
                 zoneDeviceParams.put("zone_id",lineZone.getZoneId());
-                List<ZoneDeviceEntity> zoneDeviceList = zoneDeviceService.selectByMap(zoneDeviceParams);
+                List<ZoneDeviceEntity> zoneDeviceList = zoneDeviceService.selectByMap(zoneDeviceParams); // 得到巡区
                 zoneDeviceList.size();
                 for(ZoneDeviceEntity zoneDevice:zoneDeviceList){
-                    deviceList.add(zoneDevice.getDeviceId());
+                    deviceList.add(zoneDevice.getDeviceId());// 得到巡区绑定的设备集合
                 }
             }
             HashMap periodParams = new HashMap();
             periodParams.put("line_id", line.getId());
-            List<InspectionPeriodEntity> periods = periodService.selectByMap(periodParams);
+            List<InspectionPeriodEntity> periods = periodService.selectByMap(periodParams); // 得到周期
             for (InspectionPeriodEntity period:periods) {
                 InspectionTaskEntity taskEntity = new InspectionTaskEntity();
                 taskEntity.setLineId(line.getId());
@@ -108,6 +108,7 @@ public class lineScanTask {
 
                         if(period.getFrequency() == 1){
                             deviceCount = deviceList.size();
+                            StringBuffer deviceBuffer = new StringBuffer();
                             for(Integer deviceId:deviceList){
                                 HashMap itemParams = new HashMap();
                                 itemParams.put("device_id",deviceId);
@@ -119,10 +120,20 @@ public class lineScanTask {
                                 taskDeviceEntity.setLineId(line.getId().longValue());
                                 taskDeviceEntity.setTurnId(turn.getId());
                                 taskDeviceEntity.setInspectItemCount(itemList.size());
+                                StringBuffer buffer = new StringBuffer();
+                                if(itemList.size() >0){
+                                    for(InspectionItemEntity inspectionItemEntity: itemList){
+                                        buffer.append(inspectionItemEntity.getId()+",");
+                                    }
+                                }
+                                taskDeviceEntity.setInspectItems(buffer.toString());
                                 taskDeviceEntity.setInspectionDate(dt);
                                 writeTaskDevice(line.getId(),turn.getId().intValue(),deviceId,simpleDateFormat.format(dt),taskDeviceEntity);
+                                deviceBuffer.append(deviceId+ ","); // 添加要巡检的设备id集合
                             }
+
                             taskEntity.setIsSpan(0);
+                            taskEntity.setInspectDevices(deviceBuffer.toString());
                             taskEntity.setInspectDeviceCount(deviceCount);
                             taskEntity.setInspectItemCount(itemCount);
                             taskEntity.setInspectionSpanEndDate(dt);
@@ -134,6 +145,7 @@ public class lineScanTask {
                                 if (period.getSpan() == 1) {
                                     if (period.getStartPoint() == week) {
                                         deviceCount = deviceList.size();
+                                        StringBuffer deviceBuffer = new StringBuffer();
                                         for(Integer deviceId:deviceList){
                                             HashMap itemParams = new HashMap();
                                             itemParams.put("device_id",deviceId);
@@ -145,10 +157,19 @@ public class lineScanTask {
                                             taskDeviceEntity.setLineId(line.getId().longValue());
                                             taskDeviceEntity.setTurnId(turn.getId());
                                             taskDeviceEntity.setInspectItemCount(itemList.size());
+                                            StringBuffer buffer = new StringBuffer();
+                                            if(itemList.size() >0){
+                                                for(InspectionItemEntity inspectionItemEntity: itemList){
+                                                    buffer.append(inspectionItemEntity.getId()+",");
+                                                }
+                                            }
+                                            taskDeviceEntity.setInspectItems(buffer.toString());
                                             taskDeviceEntity.setInspectionDate(dt);
                                             writeTaskDevice(line.getId(),turn.getId().intValue(),deviceId,simpleDateFormat.format(dt),taskDeviceEntity);
+                                            deviceBuffer.append(deviceId+ ","); // 添加要巡检的设备id集合
                                         }
                                         taskEntity.setIsSpan(0);
+                                        taskEntity.setInspectDevices(deviceBuffer.toString());
                                         taskEntity.setInspectDeviceCount(deviceCount);
                                         taskEntity.setInspectItemCount(itemCount);
                                         taskEntity.setInspectionSpanEndDate(dt);
@@ -158,6 +179,7 @@ public class lineScanTask {
                                 } else {
                                     if (period.getStartPoint() + period.getSpan() == week) {
                                         deviceCount = deviceList.size();
+                                        StringBuffer deviceBuffer = new StringBuffer();
                                         for(Integer deviceId:deviceList){
                                             HashMap itemParams = new HashMap();
                                             itemParams.put("device_id",deviceId);
@@ -169,10 +191,19 @@ public class lineScanTask {
                                             taskDeviceEntity.setLineId(line.getId().longValue());
                                             taskDeviceEntity.setTurnId(turn.getId());
                                             taskDeviceEntity.setInspectItemCount(itemList.size());
+                                            StringBuffer buffer = new StringBuffer();
+                                            if(itemList.size() >0){
+                                                for(InspectionItemEntity inspectionItemEntity: itemList){
+                                                    buffer.append(inspectionItemEntity.getId()+",");
+                                                }
+                                            }
+                                            taskDeviceEntity.setInspectItems(buffer.toString());
                                             taskDeviceEntity.setInspectionDate(dt);
                                             writeTaskDevice(line.getId(),turn.getId().intValue(),deviceId,simpleDateFormat.format(dt),taskDeviceEntity);
+                                            deviceBuffer.append(deviceId+ ","); // 添加要巡检的设备id集合
                                         }
                                         taskEntity.setIsSpan(1);
+                                        taskEntity.setInspectDevices(deviceBuffer.toString());
                                         taskEntity.setInspectDeviceCount(deviceCount);
                                         taskEntity.setInspectItemCount(itemCount);
                                         taskEntity.setInspectionSpanEndDate(dt);
@@ -186,6 +217,7 @@ public class lineScanTask {
                             Integer day = cal.get(Calendar.DATE);
                             if(basePoint.getTime()< dt.getTime()){
                                 deviceCount = deviceList.size();
+                                StringBuffer deviceBuffer = new StringBuffer();
                                 for(Integer deviceId:deviceList){
                                     HashMap itemParams = new HashMap();
                                     itemParams.put("device_id",deviceId);
@@ -197,9 +229,18 @@ public class lineScanTask {
                                     taskDeviceEntity.setLineId(line.getId().longValue());
                                     taskDeviceEntity.setTurnId(turn.getId());
                                     taskDeviceEntity.setInspectItemCount(itemList.size());
+                                    StringBuffer buffer = new StringBuffer();
+                                    if(itemList.size() >0){
+                                        for(InspectionItemEntity inspectionItemEntity: itemList){
+                                            buffer.append(inspectionItemEntity.getId()+",");
+                                        }
+                                    }
+                                    taskDeviceEntity.setInspectItems(buffer.toString());
                                     taskDeviceEntity.setInspectionDate(dt);
                                     writeTaskDevice(line.getId(),turn.getId().intValue(),deviceId,simpleDateFormat.format(dt),taskDeviceEntity);
+                                    deviceBuffer.append(deviceId+ ","); // 添加要巡检的设备id集合
                                 }
+                                taskEntity.setInspectDevices(deviceBuffer.toString());
                                 taskEntity.setInspectDeviceCount(deviceCount);
                                 taskEntity.setInspectItemCount(itemCount);
 
