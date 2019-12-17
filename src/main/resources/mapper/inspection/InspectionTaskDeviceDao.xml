@@ -231,5 +231,6 @@
         <if test="lineId!=null">
             and line.id=#{lineId}
         </if>
+        order by task.id desc
     </select>
 </mapper>

@@ -202,7 +202,7 @@ public class InspectionItemController {
                 continue;
             }
 
-            SamplingFrequencyEntity frequency = frequencyService.selectByName(item.getFrequencyName());
+            /*SamplingFrequencyEntity frequency = frequencyService.selectByName(item.getFrequencyName());
             if (frequency != null){
                 item.setFrequency(frequency.getId());
             }else{
@@ -216,10 +216,10 @@ public class InspectionItemController {
             }else{
                 result.append("采样点数未找到\r\n");
                 continue;
-            }
+            }*/
 
             item.setGuid(UUID.randomUUID().toString());
-            item.setOrderNum(0);
+            // item.setOrderNum(0);
             item.setCreateTime(new Date());
             try{
                 inspectionItemService.insert(item);
