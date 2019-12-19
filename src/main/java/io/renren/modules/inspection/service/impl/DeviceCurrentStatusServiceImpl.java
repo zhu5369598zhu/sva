@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.plugins.Page;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
+import io.renren.common.utils.R;
 import io.renren.modules.inspection.dao.DeviceCurrentStatusDao;
 import io.renren.modules.inspection.entity.*;
 import io.renren.modules.inspection.service.*;
@@ -48,10 +49,10 @@ public class DeviceCurrentStatusServiceImpl extends ServiceImpl<DeviceCurrentSta
     }
 
     @Override
-    public String updateDeviceStatus(DeviceCurrentStatusEntity deviceCurrentStatusEntity) {
+    public R updateDeviceStatus(DeviceCurrentStatusEntity deviceCurrentStatusEntity) {
         String userGuid = deviceCurrentStatusEntity.getUserGuid();
         if(userGuid == null){
-            return "用户userGuid不能为空";
+            return R.error(1,"用户userGuid不能为空");
         }
         Map<String,Object> userHashMap = new HashMap<String,Object>();
         userHashMap.put("guid", userGuid);
@@ -61,11 +62,11 @@ public class DeviceCurrentStatusServiceImpl extends ServiceImpl<DeviceCurrentSta
         if(users.size() > 0){
             user = users.get(0);
         }else{
-            return "用户不能为空";
+            return R.error(1,"用户不能为空");
         }
         String turnGuid = deviceCurrentStatusEntity.getTurnGuid();
         if(turnGuid == null){
-            return "轮次Guid不能为空";
+            return R.error(1,"轮次Guid不能为空");
         }
         HashMap<String, Object> turnMap = new HashMap<>();
         turnMap.put("guid", turnGuid);
@@ -74,11 +75,11 @@ public class DeviceCurrentStatusServiceImpl extends ServiceImpl<DeviceCurrentSta
         if(turnEntityList.size()>0){
             turnEntity = turnEntityList.get(0);
         }else {
-            return "轮次不能为空";
+            return R.error(1,"轮次不能为空");
         }
         String deviceGuid = deviceCurrentStatusEntity.getDeviceGuid();
         if (deviceGuid == null){
-            return "设备Guid 不能为空";
+            return R.error(1,"设备Guid 不能为空");
         }
         HashMap<String, Object> deviceMap = new HashMap<>();
         deviceMap.put("guid", deviceCurrentStatusEntity.getDeviceGuid());
@@ -89,7 +90,7 @@ public class DeviceCurrentStatusServiceImpl extends ServiceImpl<DeviceCurrentSta
             device = deviceEntityList.get(0);
             deviceId = deviceEntityList.get(0).getDeviceId();
         }else {
-            return "设备不能为空";
+            return R.error(1,"设备不能为空");
         }
 
         HashMap<String, Object> dateMap = new HashMap<>();
@@ -97,7 +98,7 @@ public class DeviceCurrentStatusServiceImpl extends ServiceImpl<DeviceCurrentSta
         List<InspectedDateEntity> inspectedDateList = inspectedDateService.selectByMap(dateMap);
         if(inspectedDateList.size()>0){
             if(inspectedDateList.get(0).getInspectionDate().compareTo(deviceCurrentStatusEntity.getCurrentDate())>0){ // 左侧时间大于右侧参数时间
-                return "上传的巡检时间不能小于最后一次上传的巡检时间";
+                return R.error(1,"上传的巡检时间不能小于最后一次上传的巡检时间");
             }else {
                 InspectedDateEntity inspectedDateEntity = inspectedDateList.get(0);
                 inspectedDateEntity.setInspectionDate(deviceCurrentStatusEntity.getCurrentDate());
@@ -173,20 +174,20 @@ public class DeviceCurrentStatusServiceImpl extends ServiceImpl<DeviceCurrentSta
                     }
                     taskService.updateById(task);
                 }else{
-                    return "该轮次没有巡检设备巡检项任务";
+                    return R.error(1,"该轮次没有巡检设备巡检项任务");
                 }
             }
         }else {
-            return "该轮次没有巡检设备巡检项任务";
+            return R.error(1,"该轮次没有巡检设备巡检项任务");
         }
-        return "ok";
+        return R.ok();
     }
 
     @Override
-    public String text(DeviceCurrentStatusEntity deviceCurrentStatusEntity) {
+    public R text(DeviceCurrentStatusEntity deviceCurrentStatusEntity) {
         String userGuid = deviceCurrentStatusEntity.getUserGuid();
         if(userGuid == null){
-            return "用户userGuid不能为空";
+            return R.error(1,"用户userGuid不能为空");
         }
         Map<String,Object> userHashMap = new HashMap<String,Object>();
         userHashMap.put("guid", userGuid);
@@ -196,11 +197,11 @@ public class DeviceCurrentStatusServiceImpl extends ServiceImpl<DeviceCurrentSta
         if(users.size() > 0){
             user = users.get(0);
         }else{
-            return "用户不能为空";
+            return R.error(1,"用户不能为空");
         }
         String turnGuid = deviceCurrentStatusEntity.getTurnGuid();
         if(turnGuid == null){
-            return "轮次TurnGuid不能为空";
+            return R.error(1,"轮次TurnGuid不能为空");
         }
         HashMap<String, Object> turnMap = new HashMap<>();
         turnMap.put("guid", turnGuid);
@@ -209,11 +210,11 @@ public class DeviceCurrentStatusServiceImpl extends ServiceImpl<DeviceCurrentSta
         if(turnEntityList.size()>0){
             turnEntity = turnEntityList.get(0);
         }else {
-            return "轮次不能为空";
+            return R.error(1,"轮次不能为空");
         }
         String deviceGuid = deviceCurrentStatusEntity.getDeviceGuid();
         if (deviceGuid == null){
-            return "设备Guid 不能为空";
+            return R.error(1,"设备Guid 不能为空");
         }
         HashMap<String, Object> deviceMap = new HashMap<>();
         deviceMap.put("guid", deviceCurrentStatusEntity.getDeviceGuid());
@@ -224,19 +225,19 @@ public class DeviceCurrentStatusServiceImpl extends ServiceImpl<DeviceCurrentSta
             device = deviceEntityList.get(0);
             deviceId = deviceEntityList.get(0).getDeviceId();
         }else {
-            return "设备不能为空";
+            return R.error(1,"设备不能为空");
         }
 
         String deviceState = deviceCurrentStatusEntity.getDeviceState();
         if(deviceState ==null){
-            return "设备状态deviceState不能为空";
+            return R.error(1,"设备状态deviceState不能为空");
         }
         Date currentDate = deviceCurrentStatusEntity.getCurrentDate();
         if(currentDate == null){
-            return "巡检日期不能为空";
+            return R.error(1,"巡检日期不能为空");
         }
 
-        return "ok";
+        return R.ok();
     }
 
 }

@@ -106,8 +106,8 @@ public class AppInspectionController {
 	@PostMapping("test")
 	@ApiOperation("上传巡检设备状态")
 	public  R test(@RequestBody DeviceCurrentStatusEntity deviceCurrentStatusEntity){
-		String updateDeviceStatus = deviceCurrentStatusService.text(deviceCurrentStatusEntity);
-		return R.ok().put("text",updateDeviceStatus);
+		R updateDeviceStatus = deviceCurrentStatusService.text(deviceCurrentStatusEntity);
+		return updateDeviceStatus;
 	}
 
 
@@ -115,8 +115,8 @@ public class AppInspectionController {
 	@PostMapping("devicestatus")
 	@ApiOperation("上传巡检设备状态")
     public  R devicestatus(@RequestBody DeviceCurrentStatusEntity deviceCurrentStatusEntity){
-		String updateDeviceStatus = deviceCurrentStatusService.updateDeviceStatus(deviceCurrentStatusEntity);
-		return R.ok().put("text",updateDeviceStatus);
+		R updateDeviceStatus = deviceCurrentStatusService.updateDeviceStatus(deviceCurrentStatusEntity);
+		return updateDeviceStatus;
 	}
 
     @Login

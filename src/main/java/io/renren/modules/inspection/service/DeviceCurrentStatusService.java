@@ -2,6 +2,7 @@ package io.renren.modules.inspection.service;
 
 import com.baomidou.mybatisplus.service.IService;
 import io.renren.common.utils.PageUtils;
+import io.renren.common.utils.R;
 import io.renren.modules.inspection.entity.DeviceCurrentStatusEntity;
 
 import java.util.Map;
@@ -18,8 +19,10 @@ public interface DeviceCurrentStatusService extends IService<DeviceCurrentStatus
 
     PageUtils queryPage(Map<String, Object> params);
 
-    String updateDeviceStatus(DeviceCurrentStatusEntity deviceCurrentStatusEntity);
+    R updateDeviceStatus(DeviceCurrentStatusEntity deviceCurrentStatusEntity);
 
-    String text(DeviceCurrentStatusEntity deviceCurrentStatusEntity);
+    R text(DeviceCurrentStatusEntity deviceCurrentStatusEntity);
+
+
 }
 
