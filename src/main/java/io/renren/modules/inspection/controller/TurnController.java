@@ -165,6 +165,9 @@ public class TurnController {
         List<TurnEntity> entityList = turnService.selectByMap(turnMap);
         if(entityList.size() > 0){
             for(TurnEntity entity: entityList){
+                if(entity.getId() == turn.getId()){
+                    continue;
+                }
                 Date date = new Date();
                 String format = DateUtils.format(date);
                 String startTime = format + " " +entity.getStartTime() + ":00";

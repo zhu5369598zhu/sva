@@ -3,6 +3,7 @@ package io.renren.modules.inspection.service.impl;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import io.renren.common.utils.DateUtils;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
 import io.renren.common.utils.R;
@@ -125,11 +126,14 @@ public class DeviceCurrentStatusServiceImpl extends ServiceImpl<DeviceCurrentSta
             this.baseMapper.insert(deviceCurrentStatusEntity);
         }
         // 这次上传 修改 状态
+        String dateTime = DateUtils.format(deviceCurrentStatusEntity.getCurrentDate(),DateUtils.DATE_TIME_PATTERN);
+        String date = dateTime.substring(0,9);
+        Date currentDate = DateUtils.stringToDate(date,DateUtils.DATE_PATTERN);
         HashMap taskDeviceParams = new HashMap();
         taskDeviceParams.put("turn_id",turnEntity.getId());
         taskDeviceParams.put("device_id",deviceId);
         taskDeviceParams.put("line_id",turnEntity.getInspectionLineId());
-        taskDeviceParams.put("inspection_date",deviceCurrentStatusEntity.getCurrentDate());// 巡检时间
+        taskDeviceParams.put("inspection_date",currentDate);// 巡检时间
         InspectionTaskDeviceEntity taskDeviceEntity = null;
         List<InspectionTaskDeviceEntity> taskDeviceList = taskDeviceService.selectByMap(taskDeviceParams);
         if(taskDeviceList.size()>0){
@@ -142,7 +146,7 @@ public class DeviceCurrentStatusServiceImpl extends ServiceImpl<DeviceCurrentSta
             HashMap taskParams = new HashMap();
             taskParams.put("line_id",turnEntity.getInspectionLineId());
             taskParams.put("turn_id",turnEntity.getId());
-            taskParams.put("inspection_span_end_date",deviceCurrentStatusEntity.getCurrentDate());
+            taskParams.put("inspection_span_end_date",currentDate);
             List<InspectionTaskEntity> taskList = taskService.selectByMap(taskParams);
             InspectionTaskEntity task =null;
             if(taskDeviceEntity.getDeviceState()!= 1){  // 设备不是运行状态
