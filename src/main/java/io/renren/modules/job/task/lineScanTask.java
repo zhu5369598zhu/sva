@@ -216,46 +216,48 @@ public class lineScanTask {
                             cal.setTime(dt);
                             Integer day = cal.get(Calendar.DATE);
                             if(basePoint.getTime()< dt.getTime()){
-                                deviceCount = deviceList.size();
-                                StringBuffer deviceBuffer = new StringBuffer();
-                                for(Integer deviceId:deviceList){
-                                    HashMap itemParams = new HashMap();
-                                    itemParams.put("device_id",deviceId);
-                                    itemParams.put("is_delete",0);
-                                    List<InspectionItemEntity> itemList = itemService.selectByMap(itemParams);
-                                    itemCount += itemList.size();
-                                    InspectionTaskDeviceEntity taskDeviceEntity = new InspectionTaskDeviceEntity();
-                                    taskDeviceEntity.setDeviceId(deviceId);
-                                    taskDeviceEntity.setLineId(line.getId().longValue());
-                                    taskDeviceEntity.setTurnId(turn.getId());
-                                    taskDeviceEntity.setInspectItemCount(itemList.size());
-                                    StringBuffer buffer = new StringBuffer();
-                                    if(itemList.size() >0){
-                                        for(InspectionItemEntity inspectionItemEntity: itemList){
-                                            buffer.append(inspectionItemEntity.getId()+",");
+                                if(period.getStartPoint() + period.getSpan() - 1 == day){
+                                    deviceCount = deviceList.size();
+                                    StringBuffer deviceBuffer = new StringBuffer();
+                                    for(Integer deviceId:deviceList){
+                                        HashMap itemParams = new HashMap();
+                                        itemParams.put("device_id",deviceId);
+                                        itemParams.put("is_delete",0);
+                                        List<InspectionItemEntity> itemList = itemService.selectByMap(itemParams);
+                                        itemCount += itemList.size();
+                                        InspectionTaskDeviceEntity taskDeviceEntity = new InspectionTaskDeviceEntity();
+                                        taskDeviceEntity.setDeviceId(deviceId);
+                                        taskDeviceEntity.setLineId(line.getId().longValue());
+                                        taskDeviceEntity.setTurnId(turn.getId());
+                                        taskDeviceEntity.setInspectItemCount(itemList.size());
+                                        StringBuffer buffer = new StringBuffer();
+                                        if(itemList.size() >0){
+                                            for(InspectionItemEntity inspectionItemEntity: itemList){
+                                                buffer.append(inspectionItemEntity.getId()+",");
+                                            }
+                                        }
+                                        taskDeviceEntity.setInspectItems(buffer.toString());
+                                        taskDeviceEntity.setInspectionDate(dt);
+                                        writeTaskDevice(line.getId(),turn.getId().intValue(),deviceId,simpleDateFormat.format(dt),taskDeviceEntity);
+                                        deviceBuffer.append(deviceId+ ","); // 添加要巡检的设备id集合
+                                    }
+                                    taskEntity.setInspectDevices(deviceBuffer.toString());
+                                    taskEntity.setInspectDeviceCount(deviceCount);
+                                    taskEntity.setInspectItemCount(itemCount);
+
+                                    if(period.getSpan() == 1){
+                                        if(period.getStartPoint() == day){
+                                            taskEntity.setIsSpan(0);
+                                            taskEntity.setInspectionSpanEndDate(dt);
+                                        }else{
+                                            taskEntity.setIsSpan(1);  // 跨度
+                                            cal.add(Calendar.DAY_OF_MONTH,period.getSpan()-1);
+                                            taskEntity.setInspectionSpanEndDate(cal.getTime());
                                         }
                                     }
-                                    taskDeviceEntity.setInspectItems(buffer.toString());
-                                    taskDeviceEntity.setInspectionDate(dt);
-                                    writeTaskDevice(line.getId(),turn.getId().intValue(),deviceId,simpleDateFormat.format(dt),taskDeviceEntity);
-                                    deviceBuffer.append(deviceId+ ","); // 添加要巡检的设备id集合
-                                }
-                                taskEntity.setInspectDevices(deviceBuffer.toString());
-                                taskEntity.setInspectDeviceCount(deviceCount);
-                                taskEntity.setInspectItemCount(itemCount);
 
-                                if(period.getSpan() == 1){
-                                    if(period.getStartPoint() == day){
-                                        taskEntity.setIsSpan(0);
-                                        taskEntity.setInspectionSpanEndDate(dt);
-                                    }else{
-                                        taskEntity.setIsSpan(1);
-                                        cal.add(Calendar.DAY_OF_MONTH,1);
-                                        taskEntity.setInspectionSpanEndDate(cal.getTime());
-                                    }
+                                    writeTask(line.getId(),turn.getId().intValue(),simpleDateFormat.format(dt),taskEntity);
                                 }
-
-                                writeTask(line.getId(),turn.getId().intValue(),simpleDateFormat.format(dt),taskEntity);
                             }
                         }
                     }

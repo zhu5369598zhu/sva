@@ -127,7 +127,7 @@ public class DeviceCurrentStatusServiceImpl extends ServiceImpl<DeviceCurrentSta
         }
         // 这次上传 修改 状态
         String dateTime = DateUtils.format(deviceCurrentStatusEntity.getCurrentDate(),DateUtils.DATE_TIME_PATTERN);
-        String date = dateTime.substring(0,9);
+        String date = dateTime.substring(0,10);
         Date currentDate = DateUtils.stringToDate(date,DateUtils.DATE_PATTERN);
         HashMap taskDeviceParams = new HashMap();
         taskDeviceParams.put("turn_id",turnEntity.getId());
@@ -154,15 +154,20 @@ public class DeviceCurrentStatusServiceImpl extends ServiceImpl<DeviceCurrentSta
                 taskDeviceEntity.setInspectedItemCount(taskDeviceEntity.getInspectItemCount());
                 taskDeviceEntity.setIsUpdate(1);
                 taskDeviceEntity.setIsInspected(1);
+                taskDeviceEntity.setStartTime(dateTime);
+                taskDeviceEntity.setEndTime(dateTime);
+                taskDeviceEntity.setCreateTime(new Date());
                 taskDeviceService.updateById(taskDeviceEntity);
                 if(taskList.size()>0){
                     task = taskList.get(0);
                     if(task !=null){
-                        String inspectedDevices = task.getInspectedDevices();
+                        String inspectedDevices = task.getInspectedDevices(); // 应检设备id集合
                         if(inspectedDevices == null){
                             task.setInspectedDevices(taskDeviceEntity.getDeviceId() + ",");
                             task.setInspectedDeviceCount(task.getInspectedDeviceCount() + 1);
                             task.setInspectedItemCount(task.getInspectedItemCount()+ taskDeviceEntity.getInspectItemCount());
+                            task.setInspectedStartTime(taskDeviceEntity.getStartTime());
+                            task.setInspectedEndTime(taskDeviceEntity.getEndTime());
                         }else{ // 判断该设备之前是否全部巡检完成
                             String[] DeviceArray = inspectedDevices.split(",");
                             boolean flag = Arrays.asList(DeviceArray).contains(taskDeviceEntity.getDeviceId().toString());
@@ -170,11 +175,19 @@ public class DeviceCurrentStatusServiceImpl extends ServiceImpl<DeviceCurrentSta
                             }else { // 如果之前没有巡检完 加入到巡检完成的集合中
                                 task.setInspectedDevices(task.getInspectedDevices() + taskDeviceEntity.getDeviceId() + ",");
                                 task.setInspectedDeviceCount(task.getInspectedDeviceCount() + 1);
-                                Integer inspectItemCount = taskDeviceEntity.getInspectItemCount();
+                                // Integer inspectItemCount = taskDeviceEntity.getInspectItemCount();
                                 Integer inspectedItemCount = taskDeviceEntity.getInspectedItemCount();
-                                task.setInspectedItemCount(task.getInspectedItemCount() + inspectItemCount - inspectedItemCount);
+                                task.setInspectedItemCount(task.getInspectedItemCount() +  inspectedItemCount);
+                                // 判断巡线开始巡检时间和结束巡检时间
+                                if(DateUtils.stringToDate(task.getInspectedStartTime(),DateUtils.DATE_TIME_PATTERN).compareTo(DateUtils.stringToDate(taskDeviceEntity.getStartTime(), DateUtils.DATE_TIME_PATTERN))>0){ // 左侧时间大于右侧参数时间
+                                    task.setInspectedStartTime(taskDeviceEntity.getStartTime());
+                                }
+                                if(DateUtils.stringToDate(task.getInspectedEndTime(),DateUtils.DATE_TIME_PATTERN).compareTo(DateUtils.stringToDate(taskDeviceEntity.getEndTime(), DateUtils.DATE_TIME_PATTERN))<0){ // 左侧时间小于右侧时间
+                                    task.setInspectedEndTime(taskDeviceEntity.getEndTime());
+                                }
                             }
                         }
+                        task.setIsInspected(1); // 是否已经巡检 1 巡检
                     }
                     taskService.updateById(task);
                 }else{
