@@ -254,6 +254,9 @@ public class lineScanTask {
                                             cal.add(Calendar.DAY_OF_MONTH,period.getSpan()-1);
                                             taskEntity.setInspectionSpanEndDate(cal.getTime());
                                         }
+                                    }else{
+                                        taskEntity.setIsSpan(1);  // 跨度
+                                        taskEntity.setInspectionSpanEndDate(dt);
                                     }
 
                                     writeTask(line.getId(),turn.getId().intValue(),simpleDateFormat.format(dt),taskEntity);
