@@ -49,7 +49,7 @@ public class InspectionTaskController {
     }
 
     /**
-     * 获取缺勤详情
+     * 获取缺勤数据
      */
     @RequestMapping("/getabsencebydate")
     public R getAbsenceByDate(@RequestParam Map<String, Object> params){
@@ -59,7 +59,7 @@ public class InspectionTaskController {
     }
 
     /**
-     * 获取缺勤详情（不分页）
+     * 获取缺勤数据导出
      */
     @RequestMapping("/getallabsencebydate")
     public R getAllAbsenceByDate(@RequestParam Map<String, Object> params){
@@ -69,7 +69,7 @@ public class InspectionTaskController {
     }
 
     /**
-     * 获取缺勤统计
+     * 获取缺勤数据图表
      */
     @RequestMapping("/getabsencestatisticsbydate")
     public R getAbsenceStatisticsByDate(@RequestParam Map<String, Object> params){
@@ -79,7 +79,7 @@ public class InspectionTaskController {
     }
 
     /**
-     * 获取缺勤详情
+     * 获取缺勤率统计数据
      */
     @RequestMapping("/getlinebydate")
     public R getLineByDate(@RequestParam Map<String, Object> params){
@@ -89,7 +89,7 @@ public class InspectionTaskController {
     }
 
     /**
-     * 获取缺勤详情（不分页）
+     * 获取缺勤率统计导出（不分页）
      */
     @RequestMapping("/getalllinebydate")
     public R getAllLineByDate(@RequestParam Map<String, Object> params){
@@ -99,7 +99,7 @@ public class InspectionTaskController {
     }
 
     /**
-     * 获取缺勤统计
+     * 获取缺勤率统计图表
      */
     @RequestMapping("/getlinestatisticsbydate")
     public R getLineStatisticsByDate(@RequestParam Map<String, Object> params){
@@ -109,7 +109,7 @@ public class InspectionTaskController {
     }
 
     /**
-     * 获取缺勤详情
+     * 获取缺勤周期表数据
      */
     @RequestMapping("/getturnbydate")
     public R getTurnByDate(@RequestParam Map<String, Object> params){
@@ -119,7 +119,7 @@ public class InspectionTaskController {
     }
 
     /**
-     * 获取缺勤详情（不分页）
+     * 获取缺勤周期表导出
      */
     @RequestMapping("/getallturnbydate")
     public R getAllTurnByDate(@RequestParam Map<String, Object> params){
@@ -129,7 +129,7 @@ public class InspectionTaskController {
     }
 
     /**
-     * 获取缺勤统计
+     * 获取缺勤周期表图表
      */
     @RequestMapping("/getturnstatisticsbydate")
     public R getTurnStatisticsByDate(@RequestParam Map<String, Object> params){

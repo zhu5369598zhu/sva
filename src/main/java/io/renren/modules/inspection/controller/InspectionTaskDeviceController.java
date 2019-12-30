@@ -39,7 +39,7 @@ public class InspectionTaskDeviceController {
     }
 
     /**
-     * 获取缺勤详情
+     * 获取漏检数据详情
      */
     @RequestMapping("/getmissingbydate")
     public R getMissingByDate(@RequestParam Map<String, Object> params){
@@ -59,7 +59,7 @@ public class InspectionTaskDeviceController {
     }
 
     /**
-     * 获取缺勤统计
+     * 获取漏检数据图表
      */
     @RequestMapping("/getmissingstatisticsbydate")
     public R getMissingStatisticsByDate(@RequestParam Map<String, Object> params){
@@ -69,7 +69,7 @@ public class InspectionTaskDeviceController {
     }
 
     /**
-     * 获取缺勤详情
+     * 获取漏检率统计
      */
     @RequestMapping("/getlinebydate")
     public R getLineByDate(@RequestParam Map<String, Object> params){
@@ -79,7 +79,7 @@ public class InspectionTaskDeviceController {
     }
 
     /**
-     * 获取缺勤详情（不分页）
+     * 获取漏检率统计导出
      */
     @RequestMapping("/getalllinebydate")
     public R getAllLineByDate(@RequestParam Map<String, Object> params){
@@ -99,7 +99,7 @@ public class InspectionTaskDeviceController {
     }
 
     /**
-     * 获取缺勤详情
+     * 获取漏检周期表数据
      */
     @RequestMapping("/getturnbydate")
     public R getTurnByDate(@RequestParam Map<String, Object> params){
@@ -109,7 +109,7 @@ public class InspectionTaskDeviceController {
     }
 
     /**
-     * 获取缺勤详情（不分页）
+     * 获取漏检周期表导出
      */
     @RequestMapping("/getallturnbydate")
     public R getAllTurnByDate(@RequestParam Map<String, Object> params){
@@ -119,7 +119,7 @@ public class InspectionTaskDeviceController {
     }
 
     /**
-     * 获取缺勤统计
+     * 获取漏检周期表图表
      */
     @RequestMapping("/getturnstatisticsbydate")
     public R getTurnStatisticsByDate(@RequestParam Map<String, Object> params){
