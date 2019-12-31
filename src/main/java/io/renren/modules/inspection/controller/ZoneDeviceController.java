@@ -1,24 +1,19 @@
 package io.renren.modules.inspection.controller;
 
-import java.util.*;
-
 import io.renren.common.annotation.SysLog;
-import io.renren.modules.inspection.entity.InspectionLineEntity;
-import io.renren.modules.inspection.entity.LineZoneEntity;
-import io.renren.modules.inspection.service.InspectionLineService;
-import io.renren.modules.inspection.service.LineZoneService;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import io.renren.modules.inspection.entity.ZoneDeviceEntity;
-import io.renren.modules.inspection.service.ZoneDeviceService;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
+import io.renren.modules.inspection.entity.InspectionLineEntity;
+import io.renren.modules.inspection.entity.LineZoneEntity;
+import io.renren.modules.inspection.entity.ZoneDeviceEntity;
+import io.renren.modules.inspection.service.InspectionLineService;
+import io.renren.modules.inspection.service.LineZoneService;
+import io.renren.modules.inspection.service.ZoneDeviceService;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.*;
 
 
 
@@ -110,7 +105,7 @@ public class ZoneDeviceController {
         List<LineZoneEntity> lineZoneEntities = lineZoneService.selectByMap(lineZoneParams);
         for(LineZoneEntity lineZoneEntity:lineZoneEntities){
             InspectionLineEntity line = lineService.selectById(lineZoneEntity.getLineId());
-            if(line.getIsPublish().equals(1)){
+            if(line.getIsPublish() ==1 && line.getIsDelete() == 0){
                 return R.error(400,"巡区已绑定的线路\"" + line.getName() + "\"已发布，无法删除已绑定设备，请先修改线路发布状态。");
             }
         }
