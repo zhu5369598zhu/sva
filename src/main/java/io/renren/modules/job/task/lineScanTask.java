@@ -177,7 +177,7 @@ public class lineScanTask {
                                         writeTask(line.getId(),turn.getId().intValue(),simpleDateFormat.format(dt),taskEntity);
                                     }
                                 } else {
-                                    if (period.getStartPoint() + period.getSpan() == week) {
+                                    if (period.getStartPoint() + period.getSpan() -1 == week) {
                                         deviceCount = deviceList.size();
                                         StringBuffer deviceBuffer = new StringBuffer();
                                         for(Integer deviceId:deviceList){
@@ -244,19 +244,19 @@ public class lineScanTask {
                                     taskEntity.setInspectDevices(deviceBuffer.toString());
                                     taskEntity.setInspectDeviceCount(deviceCount);
                                     taskEntity.setInspectItemCount(itemCount);
-
+                                    taskEntity.setInspectionSpanEndDate(dt);
                                     if(period.getSpan() == 1){
-                                        if(period.getStartPoint() == day){
-                                            taskEntity.setIsSpan(0);
-                                            taskEntity.setInspectionSpanEndDate(dt);
-                                        }else{
-                                            taskEntity.setIsSpan(1);  // 跨度
-                                            cal.add(Calendar.DAY_OF_MONTH,period.getSpan()-1);
-                                            taskEntity.setInspectionSpanEndDate(cal.getTime());
-                                        }
+                                        taskEntity.setIsSpan(0);
+                                        //if(period.getStartPoint() == day){
+                                            // taskEntity.setIsSpan(0);
+                                           // taskEntity.setInspectionSpanEndDate(dt);
+                                        //}else{
+                                            // taskEntity.setIsSpan(1);  // 跨度
+                                            // cal.add(Calendar.DAY_OF_MONTH,period.getSpan()-1);
+                                            // taskEntity.setInspectionSpanEndDate(cal.getTime());
+                                        //}
                                     }else{
                                         taskEntity.setIsSpan(1);  // 跨度
-                                        taskEntity.setInspectionSpanEndDate(dt);
                                     }
 
                                     writeTask(line.getId(),turn.getId().intValue(),simpleDateFormat.format(dt),taskEntity);
