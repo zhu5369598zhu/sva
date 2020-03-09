@@ -161,7 +161,7 @@ public class SysDeptController {
         if(deptIds.size() > 0){
             for(Integer id: deptIds){
                 if(id == sysDept.getParentId().intValue()){
-                   return R.error(1,"上级部门不能成为子级部门的下级");
+                   return R.error(1,"机构不能成为本机构的子部门");
                 }
             }
         }
@@ -195,11 +195,13 @@ public class SysDeptController {
         if(zoneEntityList.size() > 0){
             return R.error("该部门下绑定了巡区，不能删除");
         }
-        List<InspectionItemEntity> inspectionItemEntityList = inspectionItemService.selectByMap(userMap);
+        /*List<InspectionItemEntity> inspectionItemEntityList = inspectionItemService.selectByMap(userMap);
         if(inspectionItemEntityList.size() > 0){
             return R.error("该部门下绑定了巡点，不能删除");
-        }
-        List<DeviceEntity> deviceEntityList = deviceService.selectByMap(userMap);
+        }*/
+        HashMap<String, Object> deviceMap = new HashMap<>();
+        deviceMap.put("device_dept", deptId);
+        List<DeviceEntity> deviceEntityList = deviceService.selectByMap(deviceMap);
         if(deviceEntityList.size() > 0){
             return R.error("该部门下绑定了设备，不能删除");
         }

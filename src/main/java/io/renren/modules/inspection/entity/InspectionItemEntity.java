@@ -3,6 +3,7 @@ package io.renren.modules.inspection.entity;
 import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableName;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -127,6 +128,11 @@ public class InspectionItemEntity implements Serializable {
 	 * 是否启用下限
 	 */
 	private Integer downUsed;
+	/**
+	 * 阈值
+	 */
+	@TableField(exist = false)
+	private String threshold;
 
 	public String getLimits() {
 		return limits;
@@ -579,5 +585,13 @@ public class InspectionItemEntity implements Serializable {
 	 */
 	public Integer getIsDelete() {
 		return isDelete;
+	}
+
+	public String getThreshold() {
+		return threshold;
+	}
+
+	public void setThreshold(String threshold) {
+		this.threshold = threshold;
 	}
 }

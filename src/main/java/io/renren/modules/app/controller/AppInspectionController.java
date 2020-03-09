@@ -170,19 +170,19 @@ public class AppInspectionController {
 				Double result = Double.valueOf(inspectionResult.getResult());
 				inspectionResult.setExceptionId(1);
 				inspectionResult.setIsOk(1);
-				if( result > inspctionItem.getUpupLimit()){
+				if( result > inspctionItem.getUpupLimit()&& inspctionItem.getUpupUsed() == 1){
 					inspectionResult.setExceptionId(3);
 					inspectionResult.setIsOk(0);
 				}
-				if(result > inspctionItem.getUpLimit() && result < inspctionItem.getUpupLimit()){
+				if(result > inspctionItem.getUpLimit() && inspctionItem.getUpUsed() ==1 && result < inspctionItem.getUpupLimit() && inspctionItem.getUpupUsed() ==1){
 					inspectionResult.setExceptionId(2);
 					inspectionResult.setIsOk(0);
 				}
-				if(result < inspctionItem.getDowndownLimit()){
+				if(result < inspctionItem.getDowndownLimit() && inspctionItem.getDowndownUsed() == 1){
 					inspectionResult.setExceptionId(3);
 					inspectionResult.setIsOk(0);
 				}
-				if(result < inspctionItem.getDownLimit() && result > inspctionItem.getDowndownLimit()){
+				if(result < inspctionItem.getDownLimit() && inspctionItem.getDownUsed() == 1 && result > inspctionItem.getDowndownLimit() && inspctionItem.getDowndownUsed() ==1){
 					inspectionResult.setExceptionId(2);
 					inspectionResult.setIsOk(0);
 				}

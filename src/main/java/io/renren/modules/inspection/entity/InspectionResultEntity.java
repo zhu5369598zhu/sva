@@ -226,6 +226,10 @@ public class InspectionResultEntity implements Serializable {
 	@TableField(exist = false)
 	private String limits;
 	/**
+	 * 阀值开关
+	 */
+	private String threshold;
+	/**
 	 * 附件
 	 */
 	private List<InspectionResultMediaEntity> medias;
@@ -705,6 +709,18 @@ public class InspectionResultEntity implements Serializable {
 	 */
 	public String getLimits() {
 		return limits;
+	}
+	/**
+	 * 设置：阀值开关
+	 */
+	public void setThreshold(String threshold) {
+		this.threshold = threshold;
+	}
+	/**
+	 * 获取：阀值开关
+	 */
+	public String getThreshold() {
+		return threshold;
 	}
 	/**
 	 * 设置：上限

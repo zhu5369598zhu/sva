@@ -201,22 +201,23 @@ public class InspectionItemController {
                 result.append("检时状态未找到\r\n");
                 continue;
             }
+            if(item.getInspectionTypeName().equals("速度")||item.getInspectionTypeName().equals("加速度")||item.getInspectionTypeName().equals("位移")||item.getInspectionTypeName().equals("转速")){
+                SamplingFrequencyEntity frequency = frequencyService.selectByName(item.getFrequencyName());
+                if (frequency != null){
+                    item.setFrequency(frequency.getId());
+                }else{
+                    result.append("采样频率未找到\r\n");
+                    continue;
+                }
 
-            /*SamplingFrequencyEntity frequency = frequencyService.selectByName(item.getFrequencyName());
-            if (frequency != null){
-                item.setFrequency(frequency.getId());
-            }else{
-                result.append("采样频率未找到\r\n");
-                continue;
+                SamplingPrecisionEntity precision = precisionService.selectByName(item.getPrecisionName());
+                if (frequency != null){
+                    item.setPrecision(precision.getId());
+                }else{
+                    result.append("采样点数未找到\r\n");
+                    continue;
+                }
             }
-
-            SamplingPrecisionEntity precision = precisionService.selectByName(item.getPrecisionName());
-            if (frequency != null){
-                item.setPrecision(precision.getId());
-            }else{
-                result.append("采样点数未找到\r\n");
-                continue;
-            }*/
 
             item.setGuid(UUID.randomUUID().toString());
             // item.setOrderNum(0);
@@ -409,5 +410,28 @@ public class InspectionItemController {
         }else{
             return R.error(500,"服务器错误");
         }
+    }
+
+    /**
+     * 删除
+     */
+    @RequestMapping("/ispublished")
+    @RequiresPermissions("inspection:inspectionitem:ispublished")
+    public R ispublished(@RequestParam Map<String, Object> params){
+        HashMap<String, Object> paramsMap = new HashMap<String, Object>();
+        paramsMap.put("device_id", Integer.parseInt(params.get("deviceId").toString()));
+        List<ZoneDeviceEntity>  zoneDevices = zoneDeviceService.selectByMap(paramsMap);
+        for(ZoneDeviceEntity zoneDeviceEntity:zoneDevices){
+            HashMap<String, Object> lineZoneParams = new HashMap<String, Object>();
+            lineZoneParams.put("zone_id", zoneDeviceEntity.getZoneId());
+            List<LineZoneEntity> lineZoneEntities = lineZoneService.selectByMap(lineZoneParams);
+            for(LineZoneEntity lineZoneEntity:lineZoneEntities){
+                InspectionLineEntity line = lineService.selectById(lineZoneEntity.getLineId());
+                if(line != null && line.getIsPublish().equals(1) && line.getIsDelete().equals(0)){
+                    return R.error(400,"该巡点对应巡检线路[" + line.getName() + "]已发布，不能新增和修改。");
+                }
+            }
+        }
+        return R.ok();
     }
 }

@@ -4,8 +4,11 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import io.renren.common.annotation.SysLog;
+import io.renren.common.utils.DateUtils;
 import io.renren.modules.inspection.entity.*;
 import io.renren.modules.inspection.service.*;
+import io.renren.modules.sys.entity.SysDeptEntity;
+import io.renren.modules.sys.service.SysDeptService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +57,12 @@ public class InspectionLineController {
     private InspectionLinePublishService publishService;
     @Autowired
     private InspectionLineService lineService;
-
+    @Autowired
+    private InspectionTaskService taskService;
+    @Autowired
+    private InspectionTaskDeviceService taskDeviceService;
+    @Autowired
+    private SysDeptService sysDeptService;
     /**
      * 列表
      */
@@ -73,7 +81,16 @@ public class InspectionLineController {
     @RequestMapping("/info/{id}")
     @RequiresPermissions("inspection:inspectionline:info")
     public R info(@PathVariable("id") Integer id){
-			InspectionLineEntity inspectionLine = inspectionLineService.selectById(id);
+		InspectionLineEntity inspectionLine = inspectionLineService.selectById(id);
+        SysDeptEntity sysDeptEntity = sysDeptService.selectById(inspectionLine.getDeptId());
+        inspectionLine.setDeptName(sysDeptEntity.getName());
+        if(inspectionLine.getPeriodType()== 1){
+            inspectionLine.setPeriodTypeName("天");
+        }else if(inspectionLine.getPeriodType()== 2){
+            inspectionLine.setPeriodTypeName("周");
+        }else if(inspectionLine.getPeriodType()== 3){
+            inspectionLine.setPeriodTypeName("月");
+        }
 
         return R.ok().put("inspectionLine", inspectionLine);
     }
@@ -147,7 +164,14 @@ public class InspectionLineController {
                 }
             }
         }
-
+        HashMap<String, Object> taskMap = new HashMap<>();
+        taskMap.put("line_id",inspectionLine.getId());
+        taskMap.put("inspection_span_end_date", DateUtils.format(new Date(), DateUtils.DATE_PATTERN));
+        taskService.deleteByMap(taskMap);
+        HashMap<String, Object> devicetaskMap = new HashMap<>();
+        devicetaskMap.put("line_id",inspectionLine.getId());
+        devicetaskMap.put("inspection_date", DateUtils.format(new Date(), DateUtils.DATE_PATTERN));
+        taskDeviceService.deleteByMap(devicetaskMap);
         HashMap<String, Object> publishParams = new HashMap<String, Object>();
         publishParams.put("line_id", inspectionLine.getId());
         publishService.updateDownload(inspectionLine.getId(), 0);

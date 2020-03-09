@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import io.renren.common.utils.DateUtils;
 import io.renren.common.utils.MapUtils;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
@@ -58,6 +59,8 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
     InspectionTaskService taskService;
     @Autowired
     InspectionTaskDeviceService taskDeviceService;
+    @Autowired
+    InspectionItemService inspectionItemService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -211,7 +214,7 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
                 InspectionResultEntity result = (InspectionResultEntity)resultList.get(i);
                 ids[k] = result.getId().toString();
                 category[k] = result.getStartTime().toString();
-                if(result.getInspectionTypeId()==8 || result.getInspectionTypeId()==9)
+                if(result.getInspectionTypeId()==8 || result.getInspectionTypeId()==9 || result.getInspectionTypeId()==2)
                 {
                     series[k] = result.getExceptionId().toString();
                 }else{
@@ -817,9 +820,12 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
             List<InspectionResultMediaEntity> mediaEntityList = mediaService.selectListByResultId(result.getId());
             result.setMedias(mediaEntityList);
             result.setDeviceName(result.getDeviceName() + "[" + result.getDeviceCode() + "]");
-            if(result.getUpLimit() != null && result.getUpupLimit() != null && result.getDownLimit() !=null && result.getDowndownLimit() !=null)
-            result.setLimits(result.getUpupLimit().toString() + "/" + result.getUpLimit().toString() + "/" +
-                    result.getDownLimit().toString() + "/" + result.getDowndownLimit().toString());
+            if(result.getUpLimit() != null && result.getUpupLimit() != null && result.getDownLimit() !=null && result.getDowndownLimit() !=null) {
+                result.setLimits(result.getUpupLimit().toString() + "/" + result.getUpLimit().toString() + "/" +
+                        result.getDownLimit().toString() + "/" + result.getDowndownLimit().toString());
+            }
+            InspectionItemEntity itemEntity = inspectionItemService.selectById(result.getItemId());
+            result.setThreshold(itemEntity.getUpupUsed() + "/" + itemEntity.getUpUsed() + "/" + itemEntity.getDownUsed() + "/" + itemEntity.getDowndownUsed());
         }
         page.setRecords(list);
         return new PageUtils(page);
@@ -906,15 +912,18 @@ public class InspectionResultServiceImpl extends ServiceImpl<InspectionResultDao
                 taskDeviceParams.put("turn_id",turn.getId());
                 taskDeviceParams.put("device_id",itemEntity.getDeviceId());
                 taskDeviceParams.put("line_id",turn.getInspectionLineId());
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                taskDeviceParams.put("inspection_date",simpleDateFormat.format(new Date()));
+                // 巡检开始时间
+                String date = result.getStartTime().substring(0,10);
+                // SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                taskDeviceParams.put("inspection_date",date);
                 Date dt = new Date();
                 InspectionTaskDeviceEntity taskDeviceEntity = null;
                 List<InspectionTaskDeviceEntity> taskDeviceList = taskDeviceService.selectByMap(taskDeviceParams);// 查询今天的设备上传
                 HashMap taskParams = new HashMap();
                 taskParams.put("line_id",turn.getInspectionLineId());
                 taskParams.put("turn_id",turn.getId());
-                taskParams.put("inspection_span_end_date",simpleDateFormat.format(new Date()));
+                //taskParams.put("inspection_span_end_date",simpleDateFormat.format(new Date()));
+                taskParams.put("inspection_span_end_date",date);
                 List<InspectionTaskEntity> taskList = taskService.selectByMap(taskParams);
                 Integer taskInspectedItemCount = taskList.get(0).getInspectedItemCount();
                 if(taskDeviceList.size() > 0){ // 已经有上传

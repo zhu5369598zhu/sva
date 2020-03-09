@@ -18,6 +18,14 @@
         <result property="deviceDept" column="device_dept"/>
         <result property="deviceModel" column="device_model"/>
         <result property="deviceMaster" column="device_master"/>
+        <result property="featureOne" column="feature_one"/>
+        <result property="oneContent" column="one_content"/>
+        <result property="featureTwo" column="feature_two"/>
+        <result property="twoContent" column="two_content"/>
+        <result property="featureThree" column="feature_three"/>
+        <result property="threeContent" column="threeContent"/>
+        <result property="featureFour" column="feature_four"/>
+        <result property="fourContent" column="four_content"/>
         <result property="isInspect" column="is_inspect"/>
         <result property="isShowDashboard" column="is_show_dashboard"/>
         <result property="manufactureDate" column="manufacture_date"/>

@@ -33,6 +33,9 @@ public class PdaController {
     private InspectionLinePublishService publishService;
     @Autowired
     private InspectionLineService lineService;
+    @Autowired
+    private InspectionLinePublishService inspectionLinePublishService;
+
 
     /**
      * 列表
@@ -104,16 +107,31 @@ public class PdaController {
     @RequestMapping("/update")
     @RequiresPermissions("inspection:pda:update")
     public R update(@RequestBody PdaEntity pda){
-        PdaEntity tmp = pdaService.selectByMac(pda.getPdaMac());
-        if(tmp != null){
-            if(tmp.getPdaId() == pda.getPdaId()){
+        PdaEntity p = pdaService.selectById(pda.getPdaId());
+        PdaEntity tmp = pdaService.selectByMac(pda.getPdaMac()); // 查询MAC地址是否被绑定
+        if(tmp != null){ // 修改了 MAC地址
+            return R.error(400, "Mac已绑定过其它设备，不能再次绑定。");
+        }
+        if(p.getDeptId() != pda.getDeptId()){ // 修改了PDA 所属机构
+            // 判断之前所属机构的PDA 是否绑定了巡线
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("pda_id", pda.getPdaId());
+            List<InspectionLinePublishEntity> publishEntityList = inspectionLinePublishService.selectByMap(map);
+            if(publishEntityList.size()>0){
+                for(InspectionLinePublishEntity publishEntity: publishEntityList){
+                    InspectionLineEntity inspectionLineEntity = lineService.selectById(publishEntity.getLineId());
+                    if(inspectionLineEntity.getDeptId() == 0){ // 巡线未删除
+                        return R.error(400,"PDA在之前的所属机构绑定了巡线"+inspectionLineEntity.getName()+" ，请解绑后再修改所属机构");
+                    }
+                }
                 pdaService.updateById(pda);
-            } else {
-                return R.error(400, "Mac已绑定过其它设备，不能再次绑定。");
+            }else{
+                pdaService.updateById(pda);
             }
         }else{
             pdaService.updateById(pda);
         }
+
 
         return R.ok();
     }

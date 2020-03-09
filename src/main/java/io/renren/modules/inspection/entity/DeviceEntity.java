@@ -82,6 +82,38 @@ public class DeviceEntity implements Serializable {
 	 */
 	private String deviceMaster;
 	/**
+	 * 特征1
+	 */
+	private String featureOne;
+	/**
+	 * 特征1内容
+	 */
+	private String oneContent;
+	/**
+	 * 特征2
+	 */
+	private String featureTwo;
+	/**
+	 * 特征2内容
+	 */
+	private String twoContent;
+	/**
+	 * 特征3
+	 */
+	private String featureThree;
+	/**
+	 * 特征3内容
+	 */
+	private String threeContent;
+	/**
+	 * 特征4
+	 */
+    private String featureFour;
+	/**
+	 * 特征4内容
+	 */
+    private String fourContent;
+	/**
 	 * 是否巡检
 	 */
 	private Integer isInspect;
@@ -278,6 +310,102 @@ public class DeviceEntity implements Serializable {
 	 */
 	public String getDeviceMaster() {
 		return deviceMaster;
+	}
+	/**
+	 * 设置：特征1
+	 */
+	public void setFeatureOne(String featureOne) {
+		this.featureOne = featureOne;
+	}
+	/**
+	 * 获取：特征1
+	 */
+	public String getFeatureOne() {
+		return featureOne;
+	}
+	/**
+	 * 设置：特征1内容
+	 */
+	public void setOneContent(String oneContent) {
+		this.oneContent = oneContent;
+	}
+	/**
+	 * 获取：特征1内容
+	 */
+	public String getOneContent() {
+		return oneContent;
+	}
+	/**
+	 * 设置：特征2
+	 */
+	public void setFeatureTwo(String featureTwo) {
+		this.featureTwo = featureTwo;
+	}
+	/**
+	 * 获取：特征2
+	 */
+	public String getFeatureTwo() {
+		return featureTwo;
+	}
+	/**
+	 * 设置：特征2内容
+	 */
+	public void setTwoContent(String twoContent) {
+		this.twoContent = twoContent;
+	}
+	/**
+	 * 获取：特征2内容
+	 */
+	public String getTwoContent() {
+		return twoContent;
+	}
+	/**
+	 * 设置：特征3
+	 */
+	public void setFeatureThree(String featureThree) {
+		this.featureThree = featureThree;
+	}
+	/**
+	 * 获取：特征3
+	 */
+	public String getFeatureThree() {
+		return featureThree;
+	}
+	/**
+	 * 设置：特征3内容
+	 */
+	public void setThreeContent(String threeContent) {
+		this.threeContent = threeContent;
+	}
+	/**
+	 * 获取：特征3内容
+	 */
+	public String getThreeContent() {
+		return threeContent;
+	}
+	/**
+	 * 设置：特征4
+	 */
+	public void setFeatureFour(String featureFour) {
+		this.featureFour = featureFour;
+	}
+	/**
+	 * 获取：特征3
+	 */
+	public String getFeatureFour() {
+		return featureFour;
+	}
+	/**
+	 * 设置：特征4内容
+	 */
+	public void setFourContent(String fourContent) {
+		this.fourContent = fourContent;
+	}
+	/**
+	 * 获取：特征4内容
+	 */
+	public String getFourContent() {
+		return fourContent;
 	}
 	/**
 	 * 设置：是否巡检

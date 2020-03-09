@@ -49,7 +49,7 @@
 
     <select id="selectAbsenceDetailByDate" resultType="java.util.HashMap" parameterType="java.lang.String">
         select dept.name as deptName,line.name as lineName,case line.period_type
-        when 1 then '天' when 2 then '日' when 3 then '月' end as periodName,turn.id as turnId,turn.name as turnName,
+        when 1 then '天' when 2 then '周' when 3 then '月' end as periodName,turn.id as turnId,turn.name as turnName,
         case period.turn_finish_mod when 1 then '整体完成' when 2 then '班组完成' when 3 then '个人完成' end as turnFinishMod,
         task.turn_start_time as turnStartTime,task.turn_end_time as turnEndTime
         from tb_inspection_task as task
@@ -97,6 +97,8 @@
     <select id="selectAbsenceTurnByDate" resultType="java.util.HashMap" parameterType="java.lang.String">
         select dept.name as deptName,line.name as lineName,turn.id as turnId,turn.name as turnName,
         count(task.line_id) as inspectCount ,sum(case task.is_inspected when 1 then 1 else 0 end) as inspectedCount,
+        count(task.line_id) - sum(case task.is_inspected when 1 then 1 else 0 end) as mustInspectCount,
+        concat(round((count(task.line_id) - sum(case task.is_inspected when 1 then 1 else 0 end))/count(task.line_id)*100,2),'%') as inspectRate,
         '${inspectStartDate}' as inspectionStartDate,'${inspectEndDate}' as inspectionEndDate
         from tb_inspection_task as task
         left join tb_inspection_line as line on line.id=task.`line_id`
@@ -124,7 +126,7 @@
         WHEN 1 THEN
             '天'
         WHEN 2 THEN
-            '日'
+            '周'
         WHEN 3 THEN
             '月'
         END AS periodName,

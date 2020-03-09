@@ -40,7 +40,7 @@
     </select>
 
     <select id="selectMissingDetailByDate" resultType="java.util.HashMap" parameterType="java.lang.String">
-        select line.name as lineName,device.device_name as deviceName,turn.id as turnId,turn.name as turnName,
+        select line.name as lineName,device.device_name as deviceName,turn.id as turnId,dept.name as deptName,  turn.name as turnName,
         task.inspection_date as inspectionDate,task.start_time as startTime,task.end_time as endTime,task.create_time as createTime
         from tb_inspection_task_device as task
         left join tb_device as device on device.device_id=task.device_id
@@ -128,7 +128,7 @@
         WHEN 1 THEN
         '天'
         WHEN 2 THEN
-        '日'
+        '周'
         WHEN 3 THEN
         '月'
         END AS periodName,
@@ -184,7 +184,7 @@
         WHEN 1 THEN
         '天'
         WHEN 2 THEN
-        '日'
+        '周'
         WHEN 3 THEN
         '月'
         END AS periodName,
@@ -241,7 +241,7 @@
         WHEN 1 THEN
         '天'
         WHEN 2 THEN
-        '日'
+        '周'
         WHEN 3 THEN
         '月'
         END AS periodName,

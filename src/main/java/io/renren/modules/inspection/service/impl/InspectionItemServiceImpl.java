@@ -88,9 +88,12 @@ public class InspectionItemServiceImpl extends ServiceImpl<InspectionItemDao, In
                 inspectionItemEntity.setInspectionStatusName(inspectionStatusEntity.getName());
             }
 
-            if(inspectionItemEntity.getUpLimit() != null && inspectionItemEntity.getUpupLimit() != null && inspectionItemEntity.getDownLimit() !=null && inspectionItemEntity.getDowndownLimit() !=null)
+            if(inspectionItemEntity.getUpLimit() != null && inspectionItemEntity.getUpupLimit() != null && inspectionItemEntity.getDownLimit() !=null && inspectionItemEntity.getDowndownLimit() !=null) {
                 inspectionItemEntity.setLimits(inspectionItemEntity.getUpupLimit().toString() + "/" + inspectionItemEntity.getUpLimit().toString() + "/" +
                         inspectionItemEntity.getDownLimit().toString() + "/" + inspectionItemEntity.getDowndownLimit().toString());
+            }
+            inspectionItemEntity.setThreshold(inspectionItemEntity.getUpupUsed() + "/" + inspectionItemEntity.getUpUsed() + "/" + inspectionItemEntity.getDownUsed() + "/" + inspectionItemEntity.getDowndownUsed());
+
 
             //如果是抄表，单位重新读取
             if (inspectionItemEntity.getInspectionType().equals(3)) {
